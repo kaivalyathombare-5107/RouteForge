@@ -50,7 +50,7 @@ export default function App() {
   // Navigation & Category States
   const [activeSection, setActiveSection] = useState<ReRouteSection>('destinations');
   const [activeCategory, setActiveCategory] = useState<SidebarCategory>('home');
-  const [selectedCurrency, setSelectedCurrency] = useState('USD');
+  const [selectedCurrency, setSelectedCurrency] = useState('INR');
 
   // Destination & Carousel State
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
@@ -254,25 +254,22 @@ export default function App() {
               reducedMotion={reducedMotion}
             />
 
-            {/* Showcase Row: 3D Tilt Cards (Amalfi, Santorini, Kyoto, Machu Picchu) + 360° Immersive Stay */}
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-              {/* Left: 3D Interactive Tilt Cards Deck */}
-              <div className="xl:col-span-6 space-y-4">
-                <DestinationTiltCards
-                  selectedDestinationId={currentDestination.id}
-                  onSelectDestination={handleSelectDestination}
-                  reducedMotion={reducedMotion}
-                />
-              </div>
+            {/* Featured Destinations: 3D Interactive Tilt Cards Deck (Full Width) */}
+            <div className="w-full space-y-4">
+              <DestinationTiltCards
+                selectedDestinationId={currentDestination.id}
+                onSelectDestination={handleSelectDestination}
+                reducedMotion={reducedMotion}
+              />
+            </div>
 
-              {/* Right: Immersive Stay 360° Panorama with 4-Way Spatial Control Pad */}
-              <div className="xl:col-span-6 space-y-4">
-                <ImmersiveStayCard
-                  destination={currentDestination}
-                  onOpenFullPanorama={() => setIsFullPanoramaOpen(true)}
-                  reducedMotion={reducedMotion}
-                />
-              </div>
+            {/* Immersive Stay 360° Panorama Suite Showcase (Full Width - Covers overall window in desktop view) */}
+            <div className="w-full space-y-4">
+              <ImmersiveStayCard
+                destination={currentDestination}
+                onOpenFullPanorama={() => setIsFullPanoramaOpen(true)}
+                reducedMotion={reducedMotion}
+              />
             </div>
 
             {/* Bottom: 4 Value Propositions Bar */}
@@ -398,8 +395,23 @@ export default function App() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-              <div className="xl:col-span-7">
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+              {/* Left Column: ReRoute Privé AI Concierge & Statutory Refund Intelligence (Moved into the left free space) */}
+              <div className="xl:col-span-5 space-y-6">
+                <AIAssistantDrawer
+                  trip={trip}
+                  isDisrupted={isDisrupted}
+                  recoveryOptions={recoveryOptions}
+                  onSelectOption={(opt) => setModalOptionToExecute(opt)}
+                  onNavigateTab={(tab) => {
+                    if (tab === 'command_center') setActiveSection('journeys');
+                  }}
+                />
+                <RefundIntelligenceSection refundCases={trip.refundCases} />
+              </div>
+
+              {/* Right Column: Recovery Planner & Optimization Preferences */}
+              <div className="xl:col-span-7 space-y-6">
                 <RecoveryPlannerSection
                   recoveryOptions={recoveryOptions.length > 0 ? recoveryOptions : generateRecoveryOptions(trip.bookings[0], trip)}
                   userPreferences={trip.preferences}
@@ -414,19 +426,6 @@ export default function App() {
                   onSelectRecoveryOption={(opt) => setModalOptionToExecute(opt)}
                   selectedOptionId={activeRecoveryPlan?.id}
                   isInfeasibleState={isInfeasibleState}
-                />
-              </div>
-
-              <div className="xl:col-span-5 space-y-6">
-                <RefundIntelligenceSection refundCases={trip.refundCases} />
-                <AIAssistantDrawer
-                  trip={trip}
-                  isDisrupted={isDisrupted}
-                  recoveryOptions={recoveryOptions}
-                  onSelectOption={(opt) => setModalOptionToExecute(opt)}
-                  onNavigateTab={(tab) => {
-                    if (tab === 'command_center') setActiveSection('journeys');
-                  }}
                 />
               </div>
             </div>

@@ -136,12 +136,40 @@ export const Full360PanoramaModal: React.FC<Full360PanoramaModalProps> = ({
     if (dir === 'down') latRef.current = Math.max(-85, latRef.current - 15);
   };
 
-  const hotspots = [
-    { id: 'terrace', label: 'Infinity Cliffside Terrace', desc: 'Direct views of the Tyrrhenian sunset & Positano bay.' },
-    { id: 'suite', label: 'Master King Alcove', desc: 'Hand-woven Italian linens, bespoke walnut cabinetry.' },
-    { id: 'bath', label: 'Carrara Marble Spa Bath', desc: 'Freestanding soaking tub with heated limestone flooring.' },
-    { id: 'chef', label: 'Private Sommelier & Chef Table', desc: 'Curated 7-course seasonal Amalfi seafood degustation.' },
-  ];
+  const getHotspots = () => {
+    switch (destination.id) {
+      case 'udaipur':
+        return [
+          { id: 'jharokha', label: 'Royal Lake Jharokha Balcony', desc: 'Carved marble bay window opening directly over Lake Pichola with views of the City Palace.' },
+          { id: 'suite', label: 'Maharaja Master Bedroom', desc: 'Original gold-embossed ceiling artwork, Mewari silk drapery, and vintage royal antiques.' },
+          { id: 'bath', label: 'Makarana Marble Spa Tub', desc: 'Freestanding rose petal soaking bath with bespoke organic Ayurvedic essential oils.' },
+          { id: 'butler', label: '24/7 Royal Butler Dining', desc: 'Private Mewari royal thali & silver service dinner under starlit lakeside skies.' },
+        ];
+      case 'kashmir':
+        return [
+          { id: 'terrace', label: 'Apharwat Peak Snow Deck', desc: 'Panoramic heated cedar deck overlooking virgin powder snow and pine forest.' },
+          { id: 'suite', label: 'Pine Chalet Master Suite', desc: 'Bespoke hand-tufted Kashmiri silk carpets and traditional walnut wood carved headboards.' },
+          { id: 'bath', label: 'Heated L\'Occitane Bath', desc: 'Deep soaking tub with cedar sauna & underfloor warming overlooking the snowline.' },
+          { id: 'kehwa', label: 'Saffron Kehwa Lounge', desc: 'Cozy hearthside lounge serving authentic Kashmiri saffron kehwa with almonds & honey.' },
+        ];
+      case 'kerala':
+        return [
+          { id: 'pool', label: 'Direct Meandering Pool Access', desc: 'Step directly from your private heritage veranda into the 250-meter lotus pool.' },
+          { id: 'suite', label: '16th-Century Heritage Mana', desc: 'Authentic teakwood architecture carefully restored with modern air-conditioned luxury.' },
+          { id: 'bath', label: 'Open-to-Sky Courtyard Shower', desc: 'Traditional Kerala open-air bathing pavilion surrounded by tropical heliconias.' },
+          { id: 'ayurveda', label: 'Private Panchakarma Wellness', desc: 'Dedicated in-suite traditional Ayurvedic therapies and herbal steam therapy.' },
+        ];
+      default:
+        return [
+          { id: 'terrace', label: 'Panoramic Alpine / Horizon Terrace', desc: 'Unobstructed scenic landscape vistas with plush daybeds and heated wraps.' },
+          { id: 'suite', label: 'Presidential Master Alcove', desc: 'Bespoke king bedding, hand-loomed textiles, and curated art collection.' },
+          { id: 'bath', label: 'Thermal Hydro-Spa Bath', desc: 'Heated stone flooring, soaking jacuzzi tub, and organic botanical amenities.' },
+          { id: 'dining', label: 'Private Sommelier & Dining Service', desc: 'Curated multi-course seasonal tasting menu by the executive chef.' },
+        ];
+    }
+  };
+
+  const hotspots = getHotspots();
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950 flex flex-col justify-between overflow-hidden animate-fadeIn">

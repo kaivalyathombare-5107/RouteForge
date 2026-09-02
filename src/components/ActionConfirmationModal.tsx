@@ -69,13 +69,13 @@ export const ActionConfirmationModal: React.FC<ActionConfirmationModalProps> = (
   if (!isOpen || !option) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-      <div className="relative w-full max-w-2xl p-6 sm:p-8 rounded-3xl bg-[#05070B] border border-cyan-500/40 shadow-2xl space-y-6 text-slate-100 font-mono">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+      <div className="relative w-full max-w-2xl p-6 sm:p-8 rounded-3xl bg-[#0B0D13] border border-gold-bright shadow-2xl space-y-6 text-slate-100 font-sans-luxury">
         {/* Close Button */}
         {!isExecuting && (
           <button
             onClick={onClose}
-            className="absolute top-5 right-5 p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-colors"
+            className="absolute top-5 right-5 p-2 rounded-xl bg-slate-950 border border-gold-subtle text-slate-400 hover:text-white transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -83,21 +83,21 @@ export const ActionConfirmationModal: React.FC<ActionConfirmationModalProps> = (
 
         {/* Modal Header */}
         <div className="space-y-1">
-          <div className="flex items-center space-x-2 text-xs text-cyan-400">
+          <div className="flex items-center space-x-2 text-xs font-cinzel text-[#D4AF37]">
             <ShieldCheck className="w-4 h-4" />
-            <span>MISSION EXECUTION PROTOCOL // 1-CLICK RECOVERY</span>
+            <span>VIP EXECUTION PROTOCOL // 1-CLICK AUTONOMOUS RECOVERY</span>
           </div>
-          <h3 className="text-xl sm:text-2xl font-bold font-display text-white">
+          <h3 className="text-xl sm:text-2xl font-bold font-serif-display text-white">
             {option.title}
           </h3>
-          <p className="text-xs text-slate-400 font-light">
-            Strategy: <strong className="text-slate-200 uppercase">{option.strategy}</strong> • Net Financial Impact: <strong className="text-emerald-400">{option.netFinancialImpact <= 0 ? `₹${Math.abs(option.netFinancialImpact)} Refund Surplus` : `+₹${option.netFinancialImpact}`}</strong>
+          <p className="text-xs text-slate-300 font-light">
+            Strategy: <strong className="text-[#FCE7AC] font-cinzel uppercase">{option.strategy}</strong> • Net Financial Impact: <strong className="text-emerald-400">{option.netFinancialImpact <= 0 ? `₹${Math.abs(option.netFinancialImpact)} Refund Surplus` : `+₹${option.netFinancialImpact}`}</strong>
           </p>
         </div>
 
         {/* 5-Stage Execution Progress Stepper */}
-        <div className="space-y-3 p-4 rounded-2xl bg-slate-900/60 border border-slate-800">
-          <div className="text-[11px] uppercase text-slate-400 flex justify-between">
+        <div className="space-y-3 p-4 rounded-2xl bg-slate-950/90 border border-gold-subtle">
+          <div className="text-[11px] font-cinzel uppercase text-slate-400 flex justify-between">
             <span>Autonomous Multi-Provider Execution</span>
             <span>{isComplete ? '100% COMPLETE' : isExecuting ? `STAGE 0${currentStep + 1} OF 05` : 'STANDBY'}</span>
           </div>
@@ -114,27 +114,27 @@ export const ActionConfirmationModal: React.FC<ActionConfirmationModalProps> = (
                     isPassed
                       ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-300'
                       : isCurrent
-                      ? 'bg-cyan-950/60 border-cyan-500 text-cyan-200 shadow-md shadow-cyan-950/50 scale-[1.01]'
-                      : 'bg-slate-950/40 border-slate-850 text-slate-500'
+                      ? 'bg-[#D4AF37]/15 border-gold-bright text-[#FCE7AC] shadow-md shadow-[#D4AF37]/10 scale-[1.01]'
+                      : 'bg-slate-950/40 border-gold-subtle/20 text-slate-500'
                   }`}
                 >
                   <div className="flex items-center space-x-3">
                     {isPassed ? (
                       <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                     ) : isCurrent ? (
-                      <RefreshCw className="w-4 h-4 text-cyan-400 animate-spin" />
+                      <RefreshCw className="w-4 h-4 text-[#D4AF37] animate-spin" />
                     ) : (
                       <div className="w-4 h-4 rounded-full border border-slate-700 flex items-center justify-center text-[9px]">
                         {idx + 1}
                       </div>
                     )}
                     <div>
-                      <div className="font-bold">{stg.label}</div>
-                      <div className="text-[10px] opacity-80">{stg.desc}</div>
+                      <div className="font-bold text-slate-200">{stg.label}</div>
+                      <div className="text-[10px] text-slate-400 opacity-80">{stg.desc}</div>
                     </div>
                   </div>
 
-                  <span className="text-[10px] font-bold uppercase">
+                  <span className="text-[10px] font-cinzel font-bold uppercase">
                     {isPassed ? 'VERIFIED' : isCurrent ? 'RUNNING' : 'QUEUED'}
                   </span>
                 </div>
@@ -151,13 +151,13 @@ export const ActionConfirmationModal: React.FC<ActionConfirmationModalProps> = (
               <span>TRANSACTION CONFIRMED & VERIFIED ACROSS ALL GDS NETWORKS</span>
             </div>
             <div className="grid grid-cols-2 gap-2 text-[11px] pt-1">
-              <div className="p-2 rounded bg-slate-950 border border-slate-800">
-                <span className="text-slate-500 block">Air India PNR:</span>
-                <span className="text-cyan-300 font-bold font-mono">AI-864-CNF-99218</span>
+              <div className="p-2.5 rounded-xl bg-slate-950 border border-gold-subtle">
+                <span className="text-slate-400 block text-[10px] font-cinzel">Air India Maharaja PNR:</span>
+                <span className="text-[#FCE7AC] font-bold font-mono">AI-864-CNF-99218</span>
               </div>
-              <div className="p-2 rounded bg-slate-950 border border-slate-800">
-                <span className="text-slate-500 block">IRCTC TDR Ticket:</span>
-                <span className="text-amber-300 font-bold font-mono">TDR-2026-784019</span>
+              <div className="p-2.5 rounded-xl bg-slate-950 border border-gold-subtle">
+                <span className="text-slate-400 block text-[10px] font-cinzel">IRCTC TDR Reference:</span>
+                <span className="text-[#D4AF37] font-bold font-mono">TDR-2026-784019</span>
               </div>
             </div>
           </div>
@@ -170,7 +170,7 @@ export const ActionConfirmationModal: React.FC<ActionConfirmationModalProps> = (
               <button
                 onClick={onClose}
                 disabled={isExecuting}
-                className="px-4 py-2.5 rounded-xl border border-slate-850 bg-slate-900 text-xs text-slate-400 hover:text-white transition-colors"
+                className="px-5 py-2.5 rounded-full border border-gold-subtle bg-slate-950 text-xs text-slate-300 hover:text-white transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -178,7 +178,7 @@ export const ActionConfirmationModal: React.FC<ActionConfirmationModalProps> = (
                 id="btn-confirm-execute-recovery"
                 onClick={handleStartExecution}
                 disabled={isExecuting}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs flex items-center space-x-2 shadow-lg shadow-cyan-950/60 transition-all cursor-pointer"
+                className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#D4AF37] to-[#A88325] hover:from-[#FCE7AC] hover:to-[#D4AF37] text-slate-950 font-cinzel font-bold text-xs flex items-center space-x-2 shadow-lg shadow-[#D4AF37]/20 transition-all cursor-pointer"
               >
                 {isExecuting ? (
                   <>
@@ -188,7 +188,7 @@ export const ActionConfirmationModal: React.FC<ActionConfirmationModalProps> = (
                 ) : (
                   <>
                     <span>APPROVE & EXECUTE RECOVERY</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </>
                 )}
               </button>
@@ -200,7 +200,7 @@ export const ActionConfirmationModal: React.FC<ActionConfirmationModalProps> = (
                 onConfirmSuccess(option);
                 onClose();
               }}
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-bold text-xs flex items-center justify-center space-x-2 shadow-xl cursor-pointer"
+              className="w-full py-3.5 rounded-full font-cinzel bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-bold text-xs flex items-center justify-center space-x-2 shadow-xl cursor-pointer"
             >
               <span>RETURN TO 3D LIVING GRAPH (RECOVERED)</span>
               <ArrowRight className="w-4 h-4" />

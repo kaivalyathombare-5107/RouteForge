@@ -51,12 +51,12 @@ export const HeroJourneySection: React.FC<HeroJourneySectionProps> = ({
 }) => {
   // Booking engine form state
   const [mode, setMode] = useState<JourneyMode>('flight');
-  const [origin, setOrigin] = useState('JFK New York');
-  const [destinationCity, setDestinationCity] = useState('CDG Paris');
-  const [departDate, setDepartDate] = useState('24 May, 2025');
-  const [returnDate, setReturnDate] = useState('31 May, 2025');
-  const [travelers, setTravelers] = useState('2 Adults');
-  const [cabinClass, setCabinClass] = useState('Business');
+  const [origin, setOrigin] = useState('BOM Mumbai (CSMIA T2)');
+  const [destinationCity, setDestinationCity] = useState('UDR Udaipur (Taj Lake Palace)');
+  const [departDate, setDepartDate] = useState('15 Oct, 2025');
+  const [returnDate, setReturnDate] = useState('22 Oct, 2025');
+  const [travelers, setTravelers] = useState('2 Adults, 1 Child (Family)');
+  const [cabinClass, setCabinClass] = useState('Business / Club Class');
 
   const [showTravelerDropdown, setShowTravelerDropdown] = useState(false);
   const [showClassDropdown, setShowClassDropdown] = useState(false);
@@ -289,7 +289,14 @@ export const HeroJourneySection: React.FC<HeroJourneySectionProps> = ({
 
                 {showTravelerDropdown && (
                   <div className="absolute bottom-full mb-1 left-0 right-0 bg-[#0F1117] border border-gold-subtle rounded-xl py-1 shadow-2xl z-30 text-xs font-mono">
-                    {['1 Adult', '2 Adults', '2 Adults, 1 Child', 'VIP Private Group'].map((t) => (
+                    {[
+                      '1 Adult (Solo Luxury)',
+                      '2 Adults (Couple)',
+                      '2 Adults, 1 Child (Family)',
+                      '2 Adults, 2 Children (Family)',
+                      'Joint Family (6+ Guests)',
+                      'VIP Private Delegation'
+                    ].map((t) => (
                       <button
                         key={t}
                         type="button"
@@ -323,7 +330,13 @@ export const HeroJourneySection: React.FC<HeroJourneySectionProps> = ({
 
                 {showClassDropdown && (
                   <div className="absolute bottom-full mb-1 left-0 right-0 bg-[#0F1117] border border-gold-subtle rounded-xl py-1 shadow-2xl z-30 text-xs font-mono">
-                    {['First Class', 'Business', 'Premium Economy', 'Private Charter'].map((c) => (
+                    {[
+                      'Business / Club Class',
+                      'First / Maharaja Suite',
+                      'Vande Bharat Executive',
+                      'Premium Economy / Stretch',
+                      'Private Charter / Helitransfer'
+                    ].map((c) => (
                       <button
                         key={c}
                         type="button"

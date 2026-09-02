@@ -24,7 +24,7 @@ export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  const currencies = ['USD ($)', 'EUR (€)', 'GBP (£)', 'INR (₹)', 'JPY (¥)'];
+  const currencies = ['INR (₹)', 'USD ($)', 'AED (د.إ)', 'EUR (€)', 'GBP (£)', 'SGD (S$)'];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 w-full px-6 lg:px-12 py-5 flex items-center justify-between pointer-events-none">
@@ -129,7 +129,7 @@ export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
               <input
                 type="text"
                 autoFocus
-                placeholder="Search Amalfi, Kyoto, Paris..."
+                placeholder="Search Udaipur, Kashmir, Swiss Alps, Dubai..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => {

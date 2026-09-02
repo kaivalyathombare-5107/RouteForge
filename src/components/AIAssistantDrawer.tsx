@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bot, Send, Sparkles, ShieldCheck, ArrowRight, CornerDownLeft, RefreshCw, MessageSquare } from 'lucide-react';
+import { Bot, Send, Sparkles, ShieldCheck, ArrowRight, CornerDownLeft, RefreshCw, MessageSquare, Crown } from 'lucide-react';
 import { Trip, RecoveryOption } from '../types';
 
 interface AIAssistantDrawerProps {
@@ -30,13 +30,13 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
       id: 'init_1',
       sender: 'ai',
       text: isDisrupted
-        ? '⚠️ Attention: Flight 6E-204 has been cancelled by IndiGo. I have calculated that your Delhi-Jaipur train connection is broken. You are entitled to ₹7,060 in deterministic statutory refunds, and I have synthesized 3 feasible recovery plans to keep your trip on track.'
-        : 'JOURNEY//X Intelligence active. Monitoring all 4 bookings and 3 dependency edges in real-time. Ask me any question about your connections, transfer buffers, or refund entitlements.',
+        ? '⚠️ Attention: Flight AI-864 connection has a critical delay notice. I have audited your Udaipur Lake Palace itinerary. You are entitled to ₹7,060 in deterministic statutory refunds under DGCA CAR, and I have synthesized 3 feasible luxury recovery plans to protect your heritage suite check-in.'
+        : 'ReRoute Privé AI Concierge active. Monitoring all your luxury rail, air, and royal palace bookings in real-time. How may I assist your travel party today?',
       timestamp: '13:42 IST',
       actionChips: isDisrupted ? [
-        { label: 'View Recovery Plans', action: () => onNavigateTab('recovery_planner') },
-        { label: 'Audit Refund Breakdown', action: () => onNavigateTab('refund_intelligence') },
-        { label: 'Inspect 3D Cascade', action: () => onNavigateTab('command_center') },
+        { label: 'Review Recovery Plans', action: () => onNavigateTab('recovery_planner') },
+        { label: 'Audit Mandated Refunds', action: () => onNavigateTab('refund_intelligence') },
+        { label: 'Inspect 3D Living Graph', action: () => onNavigateTab('command_center') },
       ] : undefined,
     },
   ]);
@@ -45,10 +45,10 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
   const [isThinking, setIsThinking] = useState(false);
 
   const quickQuestions = [
-    'What happens to my hotel if my train is missed?',
-    'How much refund do I get for the cancelled flight?',
-    'Why is Option A recommended as the best choice?',
-    'Will I reach the HackCelestial keynote before the 20:30 curfew?',
+    'What happens to my Udaipur palace stay if flight is delayed?',
+    'How much refund do I get under DGCA CAR regulations?',
+    'Why is Option A recommended as the best choice for my family?',
+    'Can you arrange a Taj Royal Chauffeur fallback transfer?',
   ];
 
   const handleSend = async (questionText?: string) => {
@@ -79,13 +79,13 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
 
       let dynamicChips: { label: string; action: () => void }[] = [];
       const lower = textToSend.toLowerCase();
-      if (lower.includes('hotel') || lower.includes('option')) {
-        dynamicChips.push({ label: 'Review Option A', action: () => {
+      if (lower.includes('hotel') || lower.includes('option') || lower.includes('plan')) {
+        dynamicChips.push({ label: 'Select Best Plan', action: () => {
           if (recoveryOptions[0]) onSelectOption(recoveryOptions[0]);
         }});
         dynamicChips.push({ label: 'Open 3D Graph', action: () => onNavigateTab('command_center') });
-      } else if (lower.includes('refund') || lower.includes('money')) {
-        dynamicChips.push({ label: 'Open Refund Center', action: () => onNavigateTab('refund_intelligence') });
+      } else if (lower.includes('refund') || lower.includes('money') || lower.includes('tdr')) {
+        dynamicChips.push({ label: 'Audit Refunds', action: () => onNavigateTab('refund_intelligence') });
       }
 
       const aiMsg: ChatMessage = {
@@ -101,7 +101,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
       const fallbackMsg: ChatMessage = {
         id: `ai_${Date.now()}`,
         sender: 'ai',
-        text: 'Under DGCA Civil Aviation Requirements and IRCTC Rule 73A, all refunds (₹7,060) are 100% legally mandated. Option A safely reaches Jaipur at 12:20 IST.',
+        text: 'Under DGCA Civil Aviation Requirements and IRCTC Rule 73A, all refunds (₹7,060) are 100% legally mandated. Option A safely reaches your heritage destination at 12:20 IST.',
         timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) + ' IST',
       };
       setMessages(prev => [...prev, fallbackMsg]);
@@ -111,22 +111,22 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
+    <div className="w-full space-y-6">
       {/* Header */}
-      <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xl flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-purple-950/80 border border-purple-500/50 flex items-center justify-center text-purple-300 shadow-md">
-            <Bot className="w-5 h-5" />
+      <div className="p-6 rounded-3xl bg-[#0B0D13]/90 border border-gold-subtle backdrop-blur-xl flex items-center justify-between shadow-xl">
+        <div className="flex items-center space-x-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-slate-950 border border-gold-bright flex items-center justify-center text-[#D4AF37] shadow-md shadow-[#D4AF37]/10">
+            <Crown className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h2 className="text-xl font-bold font-display text-slate-100">JOURNEY//X AI Copilot</h2>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800">
+              <h2 className="text-xl font-bold font-serif-display text-white">ReRoute Privé AI Concierge</h2>
+              <span className="text-[10px] font-cinzel font-semibold px-2.5 py-0.5 rounded-full bg-slate-950 text-[#D4AF37] border border-gold-subtle">
                 GEMINI GROUNDED
               </span>
             </div>
-            <p className="text-xs text-slate-400 font-light">
-              Authoritative trip intelligence grounded strictly on deterministic policy data.
+            <p className="text-xs text-slate-300 font-sans-luxury font-light mt-0.5">
+              Authoritative luxury travel intelligence grounded strictly in deterministic rules and royal service standards.
             </p>
           </div>
         </div>
@@ -138,7 +138,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
           <button
             key={idx}
             onClick={() => handleSend(q)}
-            className="px-3 py-1.5 rounded-lg bg-slate-950/80 hover:bg-slate-900 border border-slate-800 text-xs font-mono text-slate-300 hover:text-cyan-300 transition-colors text-left cursor-pointer"
+            className="px-3.5 py-2 rounded-xl bg-[#0B0D13]/90 hover:bg-slate-900 border border-gold-subtle text-xs font-sans-luxury text-slate-300 hover:text-[#FCE7AC] hover:border-gold-bright transition-all text-left cursor-pointer shadow-sm"
           >
             "{q}"
           </button>
@@ -146,32 +146,32 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
       </div>
 
       {/* Chat Messages Log */}
-      <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800/80 backdrop-blur-xl min-h-[380px] max-h-[500px] overflow-y-auto space-y-4">
+      <div className="p-6 rounded-3xl bg-[#0B0D13]/85 border border-gold-subtle backdrop-blur-xl min-h-[360px] max-h-[480px] overflow-y-auto space-y-4 shadow-xl">
         {messages.map(msg => (
           <div
             key={msg.id}
             className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
           >
-            <div className="text-[10px] font-mono text-slate-500 mb-1 px-1">
-              {msg.sender === 'user' ? 'You' : 'JOURNEY//X AI'} • {msg.timestamp}
+            <div className="text-[10px] font-mono text-slate-400 mb-1 px-1">
+              {msg.sender === 'user' ? 'You' : 'ReRoute Concierge'} • {msg.timestamp}
             </div>
             <div
-              className={`p-4 rounded-2xl max-w-2xl text-xs font-mono leading-relaxed shadow-lg ${
+              className={`p-4 rounded-2xl max-w-2xl text-xs font-sans-luxury leading-relaxed shadow-lg ${
                 msg.sender === 'user'
-                  ? 'bg-blue-600 text-white rounded-tr-none'
-                  : 'bg-slate-950/90 text-slate-200 border border-purple-500/30 rounded-tl-none'
+                  ? 'bg-gradient-to-r from-[#D4AF37] to-[#A88325] text-slate-950 font-medium rounded-tr-none'
+                  : 'bg-slate-950/90 text-slate-200 border border-gold-subtle rounded-tl-none'
               }`}
             >
               {msg.text}
 
               {/* Action Chips */}
               {msg.actionChips && msg.actionChips.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-slate-800 flex flex-wrap gap-2">
+                <div className="mt-3 pt-3 border-t border-gold-subtle/30 flex flex-wrap gap-2">
                   {msg.actionChips.map((chip, cIdx) => (
                     <button
                       key={cIdx}
                       onClick={chip.action}
-                      className="px-2.5 py-1 rounded-md bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/50 text-[11px] font-bold text-cyan-300 flex items-center space-x-1 transition-colors cursor-pointer"
+                      className="px-3 py-1.5 rounded-full bg-slate-900 hover:bg-[#D4AF37] hover:text-slate-950 border border-gold-subtle text-[11px] font-cinzel font-bold text-[#FCE7AC] flex items-center space-x-1.5 transition-all cursor-pointer shadow-sm"
                     >
                       <span>{chip.label}</span>
                       <ArrowRight className="w-3 h-3" />
@@ -184,9 +184,9 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
         ))}
 
         {isThinking && (
-          <div className="flex items-center space-x-2 text-xs font-mono text-purple-400 p-2">
+          <div className="flex items-center space-x-2 text-xs font-sans-luxury text-[#D4AF37] p-2">
             <Sparkles className="w-4 h-4 animate-spin" />
-            <span>JOURNEY//X AI is reasoning over graph dependencies & policy rules...</span>
+            <span>ReRoute Concierge is evaluating real-time itinerary parameters and statutory policies...</span>
           </div>
         )}
       </div>
@@ -198,15 +198,15 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
           value={inputVal}
           onChange={e => setInputVal(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSend()}
-          placeholder="Ask anything about your flights, trains, transfer buffers, or refund rules..."
-          className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3.5 pr-28 text-xs font-mono text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors shadow-xl"
+          placeholder="Ask anything about your flights, royal stays, transfer buffers, or refund rules..."
+          className="w-full bg-[#0B0D13]/90 border border-gold-subtle rounded-2xl px-5 py-4 pr-32 text-xs font-sans-luxury text-slate-100 placeholder-slate-400 focus:outline-none focus:border-gold-bright transition-colors shadow-2xl"
         />
         <button
           onClick={() => handleSend()}
           disabled={!inputVal.trim() || isThinking}
-          className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 disabled:opacity-40 text-slate-950 text-xs font-mono font-bold flex items-center space-x-1.5 transition-all cursor-pointer"
+          className="absolute right-2.5 top-1/2 -translate-y-1/2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#A88325] hover:from-[#FCE7AC] hover:to-[#D4AF37] disabled:opacity-40 text-slate-950 text-xs font-cinzel font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-md"
         >
-          <span>ASK</span>
+          <span>SEND</span>
           <Send className="w-3 h-3" />
         </button>
       </div>

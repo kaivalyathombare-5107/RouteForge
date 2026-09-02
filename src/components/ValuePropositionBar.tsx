@@ -9,26 +9,26 @@ export const ValuePropositionBar: React.FC<ValuePropositionBarProps> = ({ onSele
   const pillars = [
     {
       id: 'concierge',
-      title: '24/7 CONCIERGE',
-      subtitle: 'Personalized assistance',
+      title: '24/7 DEDICATED CONCIERGE',
+      subtitle: 'WhatsApp desk & Pure Veg/Jain care',
       icon: <Headphones className="w-4 h-4 stroke-[1.5]" />,
     },
     {
       id: 'guarantee',
-      title: 'BEST PRICE GUARANTEE',
-      subtitle: 'Exclusive rates & offers',
+      title: 'DGCA & IRCTC SHIELD',
+      subtitle: 'Instant auto-TDR & zero-loss refunds',
       icon: <ShieldCheck className="w-4 h-4 stroke-[1.5]" />,
     },
     {
       id: 'seamless',
-      title: 'SEAMLESS EXPERIENCE',
-      subtitle: 'End to end travel, perfected',
+      title: 'HERITAGE & ROYAL LUXURY',
+      subtitle: 'Taj, Oberoi, ITC & private havelis',
       icon: <Sparkles className="w-4 h-4 stroke-[1.5]" />,
     },
     {
       id: 'vip',
-      title: 'VIP ACCESS',
-      subtitle: 'Lounges, events & more',
+      title: 'VIP AIRPORT & LOUNGE',
+      subtitle: 'T2/T3 Meet & Greet, fast-track entry',
       icon: <Crown className="w-4 h-4 stroke-[1.5]" />,
     },
   ];

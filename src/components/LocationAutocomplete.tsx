@@ -29,7 +29,7 @@ interface LocationAutocompleteProps {
   otherLocationValue?: string;
 }
 
-type TabCategory = 'All' | 'Worldwide Live' | 'Popular' | 'Europe' | 'Americas' | 'Asia & Pacific' | 'Middle East & Africa' | 'Oceania';
+type TabCategory = 'All' | 'India & Subcontinent' | 'Popular' | 'Europe' | 'Middle East & Africa' | 'Asia & Pacific' | 'Americas' | 'Worldwide Live';
 
 export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
   id,
@@ -202,23 +202,23 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
     if (activeTab === 'Worldwide Live') {
       return liveResults.length > 0 ? liveResults : merged;
     }
+    if (activeTab === 'India & Subcontinent') {
+      return merged.filter((l) => l.region === 'India & Subcontinent');
+    }
     if (activeTab === 'Popular') {
       return merged.filter((l) => l.popular);
     }
     if (activeTab === 'Europe') {
       return merged.filter((l) => l.region === 'Europe');
     }
-    if (activeTab === 'Americas') {
-      return merged.filter((l) => l.region === 'Americas');
+    if (activeTab === 'Middle East & Africa') {
+      return merged.filter((l) => l.region === 'Middle East & Africa');
     }
     if (activeTab === 'Asia & Pacific') {
       return merged.filter((l) => l.region === 'Asia & Pacific');
     }
-    if (activeTab === 'Middle East & Africa') {
-      return merged.filter((l) => l.region === 'Middle East & Africa');
-    }
-    if (activeTab === 'Oceania') {
-      return merged.filter((l) => l.region === 'Oceania');
+    if (activeTab === 'Americas') {
+      return merged.filter((l) => l.region === 'Americas');
     }
 
     return merged;
@@ -366,7 +366,16 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
 
             {/* Filter Tabs by Region & Live Global Search */}
             <div className="flex items-center space-x-1 pb-2 overflow-x-auto scrollbar-none text-[9px] font-mono">
-              {(['All', 'Worldwide Live', 'Popular', 'Europe', 'Americas', 'Asia & Pacific', 'Middle East & Africa', 'Oceania'] as const).map((tab) => (
+              {([
+                'All',
+                'India & Subcontinent',
+                'Popular',
+                'Europe',
+                'Middle East & Africa',
+                'Asia & Pacific',
+                'Americas',
+                'Worldwide Live'
+              ] as const).map((tab) => (
                 <button
                   key={tab}
                   type="button"
@@ -377,7 +386,11 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                       : 'bg-slate-900/70 text-slate-400 hover:text-slate-200 border border-slate-800/80 hover:border-slate-700'
                   }`}
                 >
-                  {tab === 'Worldwide Live' ? '🌍 Live World Map' : tab}
+                  {tab === 'India & Subcontinent'
+                    ? '🇮🇳 India & Hubs'
+                    : tab === 'Worldwide Live'
+                    ? '🌍 Live World Map'
+                    : tab}
                 </button>
               ))}
             </div>

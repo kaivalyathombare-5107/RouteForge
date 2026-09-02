@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { Compass, Sparkles, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Eye, Maximize2 } from 'lucide-react';
+import { Compass, Sparkles, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Eye, Maximize2, MapPin } from 'lucide-react';
 import { DestinationItem } from './DestinationTiltCards';
 
 interface ImmersiveStayCardProps {
@@ -165,42 +165,92 @@ export const ImmersiveStayCard: React.FC<ImmersiveStayCardProps> = ({
   };
 
   return (
-    <div className="relative w-full rounded-2xl bg-gradient-to-r from-[#0E1017]/95 via-[#0B0C10]/95 to-[#08090C]/95 border border-gold-subtle backdrop-blur-2xl shadow-2xl p-5 sm:p-6 flex flex-col lg:flex-row items-center justify-between gap-6 overflow-hidden">
+    <div className="relative w-full rounded-2xl bg-gradient-to-r from-[#0E1017]/95 via-[#0B0C10]/95 to-[#08090C]/95 border border-gold-subtle backdrop-blur-2xl shadow-2xl p-5 sm:p-6 lg:p-7 flex flex-col lg:flex-row items-stretch justify-between gap-6 overflow-hidden">
       {/* Background soft gold glow */}
       <div className="absolute top-0 right-1/4 w-80 h-80 bg-[#D4AF37]/5 rounded-full blur-3xl pointer-events-none" />
 
       {/* Left Details Panel */}
-      <div className="w-full lg:w-5/12 space-y-3 z-10">
-        <div className="flex items-center space-x-2 text-[10px] font-cinzel font-semibold tracking-[0.25em] text-[#D4AF37]">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>IMMERSIVE STAY</span>
+      <div className="w-full lg:w-5/12 space-y-3.5 z-10 flex flex-col justify-between">
+        {/* Box 1: Header Category & Status Badge */}
+        <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-950/80 border border-gold-subtle/50 text-[10px] font-cinzel font-semibold tracking-[0.2em] text-[#D4AF37]">
+          <div className="flex items-center space-x-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <span>IMMERSIVE STAY</span>
+          </div>
+          <span className="text-[9px] text-[#FCE7AC] px-2 py-0.5 rounded-full bg-[#D4AF37]/15 border border-gold-bright/30">
+            VERIFIED RESIDENCE
+          </span>
         </div>
 
-        <h3 className="font-serif-display font-medium text-2xl sm:text-3xl text-white tracking-wide leading-tight">
-          {destination.villaName}
-        </h3>
+        {/* Box 2: Residence Title & Location Box */}
+        <div className="p-3.5 rounded-xl bg-[#090B10]/95 border border-gold-subtle shadow-md space-y-1.5">
+          <div className="text-[9px] font-cinzel font-bold tracking-widest text-slate-400 uppercase">
+            ROYAL PALACE & HERITAGE SUITE
+          </div>
+          <h3 className="font-serif-display font-medium text-xl sm:text-2xl text-white tracking-wide leading-snug">
+            {destination.villaName}
+          </h3>
+          <div className="flex items-center space-x-1.5 pt-0.5 text-[11px] font-cinzel font-semibold tracking-wider text-[#E5C07B]">
+            <MapPin className="w-3 h-3 text-[#D4AF37] shrink-0" />
+            <span>{destination.villaLocation}</span>
+          </div>
+        </div>
 
-        <p className="text-[11px] font-cinzel font-medium tracking-widest text-[#E5C07B]">
-          {destination.villaLocation}
-        </p>
+        {/* Box 3: Description Narrative Box */}
+        <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800/80 text-xs font-sans-luxury text-slate-300 font-light leading-relaxed space-y-1">
+          <div className="text-[9px] font-cinzel font-bold tracking-widest text-[#D4AF37] uppercase">
+            EXPERIENCE NARRATIVE
+          </div>
+          <p>{destination.villaDescription}</p>
+        </div>
 
-        <p className="text-xs font-sans-luxury text-slate-300 font-light leading-relaxed pr-2">
-          {destination.villaDescription}
-        </p>
+        {/* Box 4: Dual Key Metrics Box (Tariff & GPS Coordinates) */}
+        <div className="grid grid-cols-2 gap-2.5">
+          <div className="p-2.5 rounded-xl bg-slate-950/80 border border-gold-subtle/60">
+            <span className="text-[9px] font-cinzel font-bold text-slate-400 block uppercase tracking-wider">
+              ROYAL TARIFF
+            </span>
+            <span className="text-xs sm:text-[13px] font-sans-luxury font-bold text-[#FCE7AC] block mt-0.5">
+              {destination.priceEstimate}
+            </span>
+          </div>
+          <div className="p-2.5 rounded-xl bg-slate-950/80 border border-gold-subtle/60">
+            <span className="text-[9px] font-cinzel font-bold text-slate-400 block uppercase tracking-wider">
+              GPS POSITION
+            </span>
+            <span className="text-[11px] font-mono font-medium text-slate-300 block mt-0.5 truncate" title={destination.coordinates}>
+              {destination.coordinates}
+            </span>
+          </div>
+        </div>
 
-        <div className="pt-2">
+        {/* Box 5: Privilege Highlight Chips */}
+        <div className="flex flex-wrap gap-1.5 pt-0.5">
+          <span className="px-2.5 py-1 rounded-lg bg-slate-950/90 border border-gold-subtle/40 text-[10px] font-cinzel text-slate-300">
+            ✦ 24/7 Butler Service
+          </span>
+          <span className="px-2.5 py-1 rounded-lg bg-slate-950/90 border border-gold-subtle/40 text-[10px] font-cinzel text-slate-300">
+            ✦ Heritage Courtyard
+          </span>
+          <span className="px-2.5 py-1 rounded-lg bg-slate-950/90 border border-gold-subtle/40 text-[10px] font-cinzel text-slate-300">
+            ✦ 360° Living View
+          </span>
+        </div>
+
+        {/* Box 6: Action Button Container */}
+        <div className="pt-1.5">
           <button
             onClick={onOpenFullPanorama}
-            className="px-5 py-2.5 rounded-full border border-gold-bright bg-slate-950/80 hover:bg-[#D4AF37] text-slate-200 hover:text-slate-950 font-cinzel text-xs font-bold tracking-widest transition-all flex items-center space-x-2 cursor-pointer shadow-lg shadow-[#D4AF37]/10 group"
+            className="w-full px-5 py-2.5 rounded-full border border-gold-bright bg-gradient-to-r from-slate-950 to-slate-900 hover:from-[#D4AF37] hover:to-[#B89628] text-slate-200 hover:text-slate-950 font-cinzel text-xs font-bold tracking-widest transition-all flex items-center justify-center space-x-2 cursor-pointer shadow-lg shadow-[#D4AF37]/10 group"
           >
             <Compass className="w-3.5 h-3.5 text-[#D4AF37] group-hover:text-slate-950 transition-colors" />
-            <span>EXPLORE IN 360°</span>
+            <span>EXPLORE FULL 360° PANORAMA</span>
           </button>
         </div>
       </div>
 
       {/* Right Interactive 360 Panorama Viewport */}
-      <div className="w-full lg:w-7/12 h-60 sm:h-72 relative rounded-xl overflow-hidden border border-gold-subtle/80 bg-slate-950 shadow-inner group">
+      <div className="w-full lg:w-7/12 min-h-[380px] sm:min-h-[460px] lg:min-h-[500px] lg:h-auto lg:self-stretch relative rounded-xl overflow-hidden border border-gold-subtle/80 bg-slate-950 shadow-inner group flex-1">
         {/* WebGL Canvas */}
         <div
           ref={canvasContainerRef}
