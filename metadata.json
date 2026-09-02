@@ -1,6 +1,6 @@
 {
-  "name": "JOURNEY//X - Travel Orchestration & Recovery Command Center",
-  "description": "AI-powered disruption-aware travel orchestration, 3D trip graph digital twin, deterministic refund intelligence, and multi-objective recovery planning platform for HackCelestial 3.0.",
+  "name": "RouteForge // Vogue Travel & 3D Panorama",
+  "description": "Luxury editorial travel portal, 3D WebGL panoramic suite preview, Catmull-Rom flight corridor visualizer, and disruption-aware concierge recovery.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

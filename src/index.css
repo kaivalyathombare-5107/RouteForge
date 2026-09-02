@@ -2,14 +2,27 @@
 
 @layer base {
   body {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #05070B;
-    color: #F8FAFC;
+    font-family: 'Plus Jakarta Sans', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #08090C;
+    color: #F3EFE6;
   }
   
-  h1, h2, h3, .font-display {
-    font-family: 'Space Grotesk', sans-serif;
-    letter-spacing: -0.02em;
+  h1, h2, h3, .font-serif-display {
+    font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+    letter-spacing: -0.015em;
+  }
+
+  .font-editorial {
+    font-family: 'Playfair Display', 'Cormorant Garamond', serif;
+  }
+
+  .font-cinzel {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.08em;
+  }
+
+  .font-sans-luxury {
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
   }
 
   code, pre, .font-mono {
@@ -17,71 +30,114 @@
   }
 }
 
-/* Custom visual utilities for spatial command center */
+/* Luxury Editorial & Metallic Gold Utilities */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #FFF6E5 0%, #D4AF37 50%, #A88325 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gold-light {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F3E5AB 60%, #D4AF37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-champagne-gradient {
+  background: linear-gradient(135deg, #FAF8F5 0%, #E5DACB 50%, #C5A880 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.border-gold-subtle {
+  border-color: rgba(212, 175, 55, 0.22);
+}
+
+.border-gold-bright {
+  border-color: rgba(212, 175, 55, 0.65);
+}
+
+.bg-gold-glow {
+  box-shadow: 0 0 35px -5px rgba(212, 175, 55, 0.2);
+}
+
+.bg-gold-glass {
+  background: linear-gradient(135deg, rgba(20, 22, 29, 0.85) 0%, rgba(12, 13, 18, 0.95) 100%);
+  backdrop-filter: blur(16px);
+}
+
+.luxury-card-sheen {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.04) 0%, rgba(212, 175, 55, 0.02) 40%, rgba(0, 0, 0, 0.4) 100%);
+}
+
+.gold-gradient-bar {
+  background: linear-gradient(90deg, #997825 0%, #D4AF37 50%, #F5E6B3 100%);
+}
+
+/* Custom visual utilities for spatial & editorial portal */
 .bg-grid-pattern {
   background-size: 32px 32px;
   background-image: 
-    linear-gradient(to right, rgba(37, 99, 235, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgba(212, 175, 55, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(212, 175, 55, 0.04) 1px, transparent 1px);
 }
 
 .bg-dot-pattern {
   background-size: 24px 24px;
-  background-image: radial-gradient(rgba(6, 182, 212, 0.12) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(212, 175, 55, 0.12) 1px, transparent 1px);
 }
 
-.glow-blue {
-  box-shadow: 0 0 30px -5px rgba(37, 99, 235, 0.4);
-}
-
-.glow-cyan {
-  box-shadow: 0 0 30px -5px rgba(6, 182, 212, 0.45);
+.glow-gold {
+  box-shadow: 0 0 30px -5px rgba(212, 175, 55, 0.35);
 }
 
 .glow-amber {
-  box-shadow: 0 0 30px -5px rgba(245, 158, 11, 0.45);
+  box-shadow: 0 0 30px -5px rgba(245, 158, 11, 0.4);
 }
 
 .glow-red {
-  box-shadow: 0 0 35px -5px rgba(239, 68, 68, 0.55);
+  box-shadow: 0 0 35px -5px rgba(239, 68, 68, 0.45);
 }
 
 .glow-emerald {
-  box-shadow: 0 0 30px -5px rgba(16, 185, 129, 0.45);
-}
-
-.radar-sweep {
-  background: conic-gradient(from 0deg at 50% 50%, rgba(6, 182, 212, 0) 0deg, rgba(6, 182, 212, 0.25) 300deg, rgba(6, 182, 212, 0.6) 360deg);
-  animation: radarRotate 4s linear infinite;
-}
-
-@keyframes radarRotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  box-shadow: 0 0 30px -5px rgba(16, 185, 129, 0.35);
 }
 
 @keyframes pulseDisruption {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.08); }
+  50% { opacity: 0.7; transform: scale(1.04); }
 }
 
 .animate-disruption-pulse {
-  animation: pulseDisruption 1.4s ease-in-out infinite;
+  animation: pulseDisruption 1.6s ease-in-out infinite;
 }
 
-/* Custom futuristic scrollbar */
+/* Editorial Drop Cap styling */
+.drop-cap:first-letter {
+  font-family: 'Cormorant Garamond', serif;
+  float: left;
+  font-size: 3.2rem;
+  line-height: 2.7rem;
+  padding-top: 4px;
+  padding-right: 8px;
+  padding-bottom: 2px;
+  color: #D4AF37;
+  font-weight: 600;
+}
+
+/* Luxury Smooth scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #080C16;
+  background: #08090C;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1E293B;
-  border-radius: 3px;
+  background: #252833;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #D4AF37;
 }
 
