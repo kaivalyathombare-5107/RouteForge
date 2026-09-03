@@ -78,19 +78,19 @@ export const RecoveryPlannerSection: React.FC<RecoveryPlannerSectionProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           {priorities.map(p => (
             <button
               key={p.id}
               onClick={() => onChangePriority(p.id)}
-              className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+              className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                 userPreferences.priority === p.id
                   ? 'bg-gradient-to-b from-[#D4AF37]/25 to-slate-950 border-gold-bright text-[#FCE7AC] shadow-lg shadow-[#D4AF37]/10'
                   : 'bg-slate-950/60 border-gold-subtle/50 text-slate-400 hover:border-gold-subtle hover:text-slate-200'
               }`}
             >
-              <div className="font-cinzel text-xs font-bold mb-0.5 tracking-wider">{p.label}</div>
-              <div className="text-[10px] text-slate-400 font-sans-luxury font-light truncate">{p.desc}</div>
+              <div className="font-cinzel text-xs font-bold mb-1 tracking-wider">{p.label}</div>
+              <div className="text-[11px] text-slate-400 font-sans-luxury font-light">{p.desc}</div>
             </button>
           ))}
         </div>
@@ -110,7 +110,7 @@ export const RecoveryPlannerSection: React.FC<RecoveryPlannerSectionProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {recoveryOptions.map((option, idx) => {
             const isSelected = selectedOptionId === option.id;
             const isRankOne = idx === 0;
@@ -120,9 +120,9 @@ export const RecoveryPlannerSection: React.FC<RecoveryPlannerSectionProps> = ({
                 key={option.id}
                 onMouseEnter={() => onHoverRecoveryOption(option)}
                 onMouseLeave={() => onHoverRecoveryOption(null)}
-                className={`p-6 rounded-3xl border transition-all flex flex-col justify-between relative overflow-hidden backdrop-blur-xl ${
+                className={`p-7 sm:p-8 rounded-3xl border transition-all flex flex-col justify-between relative overflow-hidden backdrop-blur-xl ${
                   isSelected
-                    ? 'bg-emerald-950/30 border-emerald-500/80 shadow-2xl shadow-emerald-950/40 scale-[1.02]'
+                    ? 'bg-emerald-950/30 border-emerald-500/80 shadow-2xl shadow-emerald-950/40 scale-[1.01]'
                     : isRankOne
                     ? 'bg-[#0E1017]/95 border-gold-bright shadow-xl shadow-[#D4AF37]/10'
                     : 'bg-[#0B0D13]/90 border-gold-subtle hover:border-gold-bright/60'

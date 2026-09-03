@@ -133,30 +133,31 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
       </div>
 
       {/* Quick Questions Pills */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2.5">
         {quickQuestions.map((q, idx) => (
           <button
             key={idx}
             onClick={() => handleSend(q)}
-            className="px-3.5 py-2 rounded-xl bg-[#0B0D13]/90 hover:bg-slate-900 border border-gold-subtle text-xs font-sans-luxury text-slate-300 hover:text-[#FCE7AC] hover:border-gold-bright transition-all text-left cursor-pointer shadow-sm"
+            className="px-4 py-2.5 rounded-xl bg-[#0B0D13]/90 hover:bg-slate-900 border border-gold-subtle text-xs font-sans-luxury text-slate-300 hover:text-[#FCE7AC] hover:border-gold-bright transition-all text-left cursor-pointer shadow-sm flex items-center space-x-2"
           >
-            "{q}"
+            <Sparkles className="w-3 h-3 text-[#D4AF37] flex-shrink-0" />
+            <span>"{q}"</span>
           </button>
         ))}
       </div>
 
       {/* Chat Messages Log */}
-      <div className="p-6 rounded-3xl bg-[#0B0D13]/85 border border-gold-subtle backdrop-blur-xl min-h-[360px] max-h-[480px] overflow-y-auto space-y-4 shadow-xl">
+      <div className="p-6 sm:p-8 rounded-3xl bg-[#0B0D13]/85 border border-gold-subtle backdrop-blur-xl min-h-[380px] max-h-[540px] overflow-y-auto space-y-5 shadow-xl">
         {messages.map(msg => (
           <div
             key={msg.id}
             className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
           >
             <div className="text-[10px] font-mono text-slate-400 mb-1 px-1">
-              {msg.sender === 'user' ? 'You' : 'ReRoute Concierge'} • {msg.timestamp}
+              {msg.sender === 'user' ? 'You' : 'ReRoute Privé Concierge'} • {msg.timestamp}
             </div>
             <div
-              className={`p-4 rounded-2xl max-w-2xl text-xs font-sans-luxury leading-relaxed shadow-lg ${
+              className={`p-5 rounded-2xl max-w-3xl lg:max-w-4xl text-xs sm:text-sm font-sans-luxury leading-relaxed shadow-lg ${
                 msg.sender === 'user'
                   ? 'bg-gradient-to-r from-[#D4AF37] to-[#A88325] text-slate-950 font-medium rounded-tr-none'
                   : 'bg-slate-950/90 text-slate-200 border border-gold-subtle rounded-tl-none'
@@ -166,12 +167,12 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
 
               {/* Action Chips */}
               {msg.actionChips && msg.actionChips.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-gold-subtle/30 flex flex-wrap gap-2">
+                <div className="mt-4 pt-3 border-t border-gold-subtle/30 flex flex-wrap gap-2.5">
                   {msg.actionChips.map((chip, cIdx) => (
                     <button
                       key={cIdx}
                       onClick={chip.action}
-                      className="px-3 py-1.5 rounded-full bg-slate-900 hover:bg-[#D4AF37] hover:text-slate-950 border border-gold-subtle text-[11px] font-cinzel font-bold text-[#FCE7AC] flex items-center space-x-1.5 transition-all cursor-pointer shadow-sm"
+                      className="px-3.5 py-1.5 rounded-full bg-slate-900 hover:bg-[#D4AF37] hover:text-slate-950 border border-gold-subtle text-xs font-cinzel font-bold text-[#FCE7AC] flex items-center space-x-1.5 transition-all cursor-pointer shadow-sm"
                     >
                       <span>{chip.label}</span>
                       <ArrowRight className="w-3 h-3" />
@@ -184,7 +185,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
         ))}
 
         {isThinking && (
-          <div className="flex items-center space-x-2 text-xs font-sans-luxury text-[#D4AF37] p-2">
+          <div className="flex items-center space-x-2 text-xs sm:text-sm font-sans-luxury text-[#D4AF37] p-3">
             <Sparkles className="w-4 h-4 animate-spin" />
             <span>ReRoute Concierge is evaluating real-time itinerary parameters and statutory policies...</span>
           </div>
@@ -199,15 +200,15 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
           onChange={e => setInputVal(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSend()}
           placeholder="Ask anything about your flights, royal stays, transfer buffers, or refund rules..."
-          className="w-full bg-[#0B0D13]/90 border border-gold-subtle rounded-2xl px-5 py-4 pr-32 text-xs font-sans-luxury text-slate-100 placeholder-slate-400 focus:outline-none focus:border-gold-bright transition-colors shadow-2xl"
+          className="w-full bg-[#0B0D13]/90 border border-gold-subtle rounded-2xl px-6 py-4 sm:py-5 pr-32 text-xs sm:text-sm font-sans-luxury text-slate-100 placeholder-slate-400 focus:outline-none focus:border-gold-bright transition-colors shadow-2xl"
         />
         <button
           onClick={() => handleSend()}
           disabled={!inputVal.trim() || isThinking}
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#A88325] hover:from-[#FCE7AC] hover:to-[#D4AF37] disabled:opacity-40 text-slate-950 text-xs font-cinzel font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-md"
+          className="absolute right-3 top-1/2 -translate-y-1/2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#A88325] hover:from-[#FCE7AC] hover:to-[#D4AF37] disabled:opacity-40 text-slate-950 text-xs font-cinzel font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-md"
         >
           <span>SEND</span>
-          <Send className="w-3 h-3" />
+          <Send className="w-3.5 h-3.5" />
         </button>
       </div>
     </div>

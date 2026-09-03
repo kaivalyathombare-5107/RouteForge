@@ -1,6 +1,6 @@
 {
   "name": "RouteForge // Vogue Travel & 3D Panorama",
-  "description": "Luxury editorial travel portal, 3D WebGL panoramic suite preview, Catmull-Rom flight corridor visualizer, and disruption-aware concierge recovery.",
+  "description": "Luxury editorial travel and disruption recovery platform tailored for Indian families, executives, and travelers across Bharat and premier global circuits.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -71,11 +71,11 @@ export const FEATURED_DESTINATIONS: DestinationItem[] = [
     heroImage: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=2400&q=90',
     cardImage: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=800&q=85',
     panoramaImage: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=2000&q=90',
-    description: 'The quintessential dream European vacation: Jungfraujoch Top of Europe, Glacier Express panoramic rail, crystal lakes, and alpine luxury.',
-    subtitle: 'Iconic alpine peaks, Swiss chocolate ateliers, and mountain railways.',
+    description: 'The quintessential dream European vacation for Indian families: Bollywood Yash Chopra trails, Jungfraujoch Top of Europe, Glacier Express panoramic rail, and alpine luxury with pure veg dining.',
+    subtitle: 'Iconic Yash Chopra alpine trails, Jungfraujoch Top of Europe, and scenic mountain railways.',
     villaName: 'VICTORIA-JUNGFRAU GRAND HOTEL & SPA',
     villaLocation: 'INTERLAKEN, SWITZERLAND',
-    villaDescription: 'Belle Époque palace facing the Jungfrau massif with premier thermal wellness, gourmet dining, and private alpine excursions.',
+    villaDescription: 'Belle Époque palace facing the Jungfrau massif with premier thermal wellness, gourmet Indian cuisine on request, and private alpine excursions.',
     coordinates: '46.6863° N, 7.8632° E',
     priceEstimate: 'From ₹82,000 / night (CHF 880)',
   },
@@ -95,7 +95,7 @@ export const DestinationTiltCards: React.FC<DestinationTiltCardsProps> = ({
   return (
     <div className="w-full space-y-3">
       <div className="flex items-center space-x-2 text-xs font-cinzel font-semibold tracking-[0.2em] text-[#D4AF37]">
-        <span>FEATURED DESTINATIONS</span>
+        <span>FEATURED DESTINATIONS • BHARAT & BEYOND</span>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">

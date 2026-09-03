@@ -88,11 +88,11 @@ export const RefundIntelligenceSection: React.FC<RefundIntelligenceSectionProps>
           Active Case Records & Audit Logs
         </h3>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           {refundCases.map(c => (
             <div
               key={c.id}
-              className="p-6 rounded-3xl bg-[#0B0D13]/90 border border-gold-subtle backdrop-blur-xl space-y-4 flex flex-col justify-between hover:border-gold-bright/60 transition-all shadow-xl"
+              className="p-7 sm:p-8 rounded-3xl bg-[#0B0D13]/90 border border-gold-subtle backdrop-blur-xl space-y-5 flex flex-col justify-between hover:border-gold-bright/60 transition-all shadow-xl"
             >
               <div className="space-y-3">
                 <div className="flex items-start justify-between gap-3">
@@ -132,22 +132,22 @@ export const RefundIntelligenceSection: React.FC<RefundIntelligenceSectionProps>
                 </div>
 
                 {/* Audit Rule Tags */}
-                <div className="flex flex-col gap-2 text-[11px] font-mono">
-                  <div className="px-3 py-2 rounded-xl bg-slate-950 border border-gold-subtle/40 text-slate-300">
-                    <span className="text-slate-400 block mb-0.5">Rule:</span>
-                    <strong className="text-[#D4AF37] break-all">{c.ruleId}</strong>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-[11px] font-mono">
+                  <div className="px-3 py-2.5 rounded-xl bg-slate-950 border border-gold-subtle/40 text-slate-300">
+                    <span className="text-slate-400 block mb-0.5 text-[10px] uppercase tracking-wider">Rule</span>
+                    <strong className="text-[#D4AF37] break-words">{c.ruleId}</strong>
                   </div>
-                  <div className="px-3 py-2 rounded-xl bg-slate-950 border border-gold-subtle/40 text-slate-300">
-                    <span className="text-slate-400 block mb-0.5">Policy:</span>
-                    <strong className="text-slate-200 break-all">{c.policyVersion}</strong>
+                  <div className="px-3 py-2.5 rounded-xl bg-slate-950 border border-gold-subtle/40 text-slate-300">
+                    <span className="text-slate-400 block mb-0.5 text-[10px] uppercase tracking-wider">Policy</span>
+                    <strong className="text-slate-200 break-words">{c.policyVersion}</strong>
                   </div>
-                  <div className={`px-3 py-2 rounded-xl border ${
+                  <div className={`px-3 py-2.5 rounded-xl border ${
                     c.tdrRequired
                       ? 'bg-[#D4AF37]/10 border-gold-bright text-[#FCE7AC]'
                       : 'bg-slate-950 border-gold-subtle/30 text-slate-400'
                   }`}>
-                    <span className="opacity-70 block mb-0.5">TDR:</span>
-                    <strong className="break-words">{c.tdrRequired ? 'Required (Auto-Filing Ready)' : 'Not Required (Direct Credit)'}</strong>
+                    <span className="opacity-70 block mb-0.5 text-[10px] uppercase tracking-wider">TDR Status</span>
+                    <strong className="break-words">{c.tdrRequired ? 'Required (Auto-Queue)' : 'Direct Gateway Credit'}</strong>
                   </div>
                 </div>
 

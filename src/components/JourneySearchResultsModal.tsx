@@ -16,7 +16,7 @@ import {
 import { JourneyMode } from './HeroJourneySection';
 import { DestinationItem } from './DestinationTiltCards';
 
-interface JourneySearchParams {
+export interface JourneySearchParams {
   origin: string;
   destination: string;
   departDate: string;
@@ -52,44 +52,60 @@ export const JourneySearchResultsModal: React.FC<JourneySearchResultsModalProps>
   const itineraryOptions = [
     {
       id: 'opt-1',
-      title: 'Maharaja Business Flight + Taj Royal Chauffeur & Shikara',
-      provider: 'Air India Maharaja Suite + Taj Luxury Fleet',
-      time: '3h 45m Total',
-      depTime: '08:30 IST',
-      arrTime: '12:15 IST',
-      price: '₹34,800',
-      co2: '88 kg',
-      disruptionShield: 'DGCA CAR 100% full refund guarantee & automatic IndiGo Stretch rebooking on delay',
+      title: 'Vande Bharat 2.0 Executive Express + Heritage Chauffeur',
+      provider: 'Indian Railways Vande Bharat & Heritage Fleet',
+      time: '4h 45m Scenic',
+      depTime: '06:10 IST',
+      arrTime: '10:55 IST',
+      price: '₹5,850 / person',
+      co2: '16 kg (86% Lower Carbon)',
+      disruptionShield: 'Automated IRCTC TDR filing with 100% refund guarantee & standby private cab transfer',
       legs: [
-        { type: 'flight', label: `${originCity} → ${destCity} Airport`, carrier: 'Air India A350-900 Maharaja Suite', time: '1h 35m' },
-        { type: 'transfer', label: `Airport VIP Gate → Palace Pier / Resort Jetty`, carrier: 'Taj Chauffeur BMW 7-Series + Royal Shikara Boat', time: '40m' },
+        { type: 'train', label: 'Vande Bharat Executive (180° Rotating Seats)', carrier: 'Train 20901 / Executive Anubhuti Chair Car & Gourmet Hot Breakfast', time: '4h 10m' },
+        { type: 'transfer', label: `Junction Station → Palace / Resort Doorstep`, carrier: 'Verified Sanitized Chauffeur (Innova Crysta / Sedan)', time: '35m' },
+      ],
+      badge: 'MOST POPULAR • INDIAN FAMILY FAVORITE',
+    },
+    {
+      id: 'opt-2',
+      title: 'Air India / IndiGo Stretch Business + Taj Royal Chauffeur & Shikara',
+      provider: 'Air India / IndiGo 6E Stretch + Taj Luxury Fleet',
+      time: '3h 30m Total',
+      depTime: '08:30 IST',
+      arrTime: '12:00 IST',
+      price: '₹18,400 / person',
+      co2: '88 kg',
+      disruptionShield: 'DGCA CAR 100% full refund guarantee & automatic rebooking on delay > 2 hours',
+      legs: [
+        { type: 'flight', label: `${originCity} → ${destCity} Airport`, carrier: 'Air India A350 / IndiGo 6E Stretch (T2/T3 Lounge Access)', time: '1h 35m' },
+        { type: 'transfer', label: `Airport VIP Gate → Palace Pier / Resort Jetty`, carrier: 'Taj Chauffeur BMW 7-Series + Royal Lake Shikara Boat', time: '40m' },
       ],
       badge: 'TOP CONCIERGE RECOMMENDATION',
     },
     {
-      id: 'opt-2',
-      title: 'Vande Bharat 2.0 Executive Express + Heritage Chauffeur',
-      provider: 'Indian Railways Vande Bharat & Oberoi Fleet',
-      time: '5h 15m Scenic',
-      depTime: '06:10 IST',
-      arrTime: '11:25 IST',
-      price: '₹12,450',
-      co2: '16 kg (86% Lower Carbon)',
-      disruptionShield: 'Automated IRCTC TDR filing with 100% refund guarantee & standby private Mercedes transfer',
+      id: 'opt-3',
+      title: 'Bharat Family Smart Multi-Modal (Family & Elders)',
+      provider: 'Tejas / Rajdhani 2-Tier AC + Family Innova Crysta',
+      time: '5h 30m Total',
+      depTime: '07:15 IST',
+      arrTime: '12:45 IST',
+      price: '₹3,450 / person',
+      co2: '22 kg',
+      disruptionShield: 'Senior citizen lower berth assistance, luggage porter escort, and pure veg/Jain meal coordination',
       legs: [
-        { type: 'train', label: 'Vande Bharat Executive (180° Rotating Seats)', carrier: 'Train 20901 / Executive Chair Car & Gourmet Dining', time: '4h 30m' },
-        { type: 'transfer', label: `Junction Station → Royal Heritage Suite`, carrier: 'Oberoi Chauffeur Mercedes E-Class', time: '35m' },
+        { type: 'train', label: 'Tejas Express AC Chair Car / 2A Sleeper', carrier: 'Indian Railways / IRCTC Tejas Superfast with verified pantry', time: '4h 30m' },
+        { type: 'transfer', label: `Station → Hotel with Pure Veg Breakfast Halt`, carrier: 'Dedicated Air-Conditioned Innova Crysta Family Cab', time: '45m' },
       ],
-      badge: 'FAST & SCENIC LUXURY RAIL',
+      badge: 'SMART VALUE FOR INDIAN FAMILIES',
     },
     {
-      id: 'opt-3',
+      id: 'opt-4',
       title: 'Club One Air Private Jet Charter + Mountain 4x4 Cruiser',
       provider: 'Club One Air Aviation + Luxury Alpine Chauffeur',
       time: '2h 10m Direct',
       depTime: '10:00 IST',
       arrTime: '12:10 IST',
-      price: '₹1,85,000',
+      price: '₹1,65,000 Total',
       co2: '135 kg',
       disruptionShield: 'Priority VIP slot clearance, dedicated GA ramp handling, and 0-minute wait security escort',
       legs: [
