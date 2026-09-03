@@ -29,7 +29,7 @@ export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
         </div>
         <div className="flex flex-col">
           <span className="font-serif-display text-lg tracking-[0.2em] text-white">
-            RE ROUTE
+            RouteForge
           </span>
           <span className="text-[9px] font-cinzel tracking-widest text-[#D4AF37] uppercase">
             Bharat Privé Edition
