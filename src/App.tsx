@@ -128,7 +128,7 @@ export default function App() {
 
     setTrip((prev) => ({
       ...prev,
-      status: 'impacted',
+      status: 'disrupted',
       bookings: updatedBookings,
       edges: propagationResult.updatedEdges,
     }));
@@ -148,7 +148,6 @@ export default function App() {
       edges: INITIAL_EDGES.map((e) => ({ ...e })),
       refundCases: INITIAL_REFUND_CASES.map((rc) => ({ ...rc })),
       preferences: { ...INITIAL_USER_PREFERENCES },
-      disruptionSummary: null,
     });
   };
 
@@ -159,7 +158,7 @@ export default function App() {
     const recoveredBookings = trip.bookings.map((b) => ({
       ...b,
       status: 'recovered' as const,
-      riskLevel: 'nominal' as const,
+      riskLevel: 'none' as const,
     }));
 
     setTrip((prev) => ({

@@ -1,4 +1,4 @@
-import { Booking, TripEdge, DisruptionEvent, RecoveryOption, RefundCase, UserPreferences, PriorityPreference } from '../types';
+import { Booking, TripEdge, DisruptionEvent, RecoveryOption, RefundCase, UserPreferences, PriorityPreference, Trip } from '../types';
 
 /**
  * Deterministic Rules & Policy Engine for IRCTC and Aviation charters.
@@ -398,7 +398,7 @@ export function propagateDisruption(
  */
 export function generateRecoveryOptions(
   disruptedBooking: Booking,
-  trip: { bookings: Booking[]; preferences: UserPreferences }
+  trip: Pick<Trip, 'bookings' | 'preferences'> | Trip
 ): RecoveryOption[] {
   const prefs = trip.preferences;
 
