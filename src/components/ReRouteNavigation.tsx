@@ -1,210 +1,119 @@
 import React, { useState } from 'react';
-import { Search, Globe, User, X, Sparkles, ShieldCheck } from 'lucide-react';
+import { X, Crown, Sparkles, ShieldCheck, Check, ArrowRight, Lock } from 'lucide-react';
 
-export type ReRouteSection = 'destinations' | 'experiences' | 'journeys' | 'concierge' | 'membership';
-
-interface ReRouteNavigationProps {
-  activeSection: ReRouteSection;
-  onSelectSection: (section: ReRouteSection) => void;
-  onOpenSignIn: () => void;
-  onOpenSearch: () => void;
-  selectedCurrency: string;
-  onSelectCurrency: (curr: string) => void;
+interface ReRouteSignInModalProps {
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
-  activeSection,
-  onSelectSection,
-  onOpenSignIn,
-  onOpenSearch,
-  selectedCurrency,
-  onSelectCurrency,
-}) => {
-  const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+export const ReRouteSignInModal: React.FC<ReRouteSignInModalProps> = ({ isOpen, onClose }) => {
+  const [email, setEmail] = useState('');
+  const [membershipId, setMembershipId] = useState('');
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const currencies = ['INR (₹)', 'USD ($)', 'AED (د.إ)', 'EUR (€)', 'GBP (£)', 'SGD (S$)'];
+  if (!isOpen) return null;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitted(true);
+    setTimeout(() => {
+      onClose();
+      setIsSubmitted(false);
+    }, 1800);
+  };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full px-6 lg:px-12 py-5 flex items-center justify-between pointer-events-none">
-      {/* Background soft blur gradient on scroll */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#08090C]/90 via-[#08090C]/60 to-transparent backdrop-blur-md pointer-events-none -z-10" />
+    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+      <div className="relative w-full max-w-lg rounded-3xl bg-[#0B0D13] border border-gold-bright shadow-2xl p-6 sm:p-8 overflow-hidden">
+        {/* Background ambient glow */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Left: Brand Monogram & Luxury Title */}
-      <div
-        onClick={() => onSelectSection('destinations')}
-        className="pointer-events-auto flex items-center space-x-3.5 cursor-pointer group"
-        id="reroute-brand-logo"
-      >
-        {/* Regal "R" Monogram Logo */}
-        <div className="relative flex items-center justify-center">
-          <div className="w-9 h-9 border border-[#D4AF37] rounded-sm flex items-center justify-center bg-gradient-to-br from-[#1C1A14] to-[#0A0B0E] shadow-lg shadow-[#D4AF37]/15 group-hover:border-[#FCE7AC] transition-all">
-            <span className="font-serif-display font-normal text-xl text-[#F3E5AB] tracking-tighter leading-none italic">
-              R
-            </span>
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-900 border border-gold-subtle hover:border-[#D4AF37] flex items-center justify-center text-slate-400 hover:text-white transition-colors cursor-pointer"
+        >
+          <X className="w-4 h-4" />
+        </button>
+
+        {/* Header */}
+        <div className="space-y-2 mb-6">
+          <div className="flex items-center space-x-2 text-[10px] font-cinzel font-semibold tracking-[0.25em] text-[#D4AF37]">
+            <Crown className="w-4 h-4" />
+            <span>RE ROUTE PRIVÉ ACCESS</span>
           </div>
-          {/* Subtle gold diamond accent corner */}
-          <span className="absolute -top-0.5 -right-0.5 w-1 h-1 bg-[#D4AF37] rotate-45" />
+          <h2 className="font-serif-display font-medium text-2xl sm:text-3xl text-white">
+            Clientele & VIP Membership
+          </h2>
+          <p className="text-xs font-sans-luxury text-slate-300 font-light">
+            Access private jet charters, 24/7 dedicated AI concierge disruption recovery, and suite upgrades worldwide.
+          </p>
         </div>
 
-        {/* Brand Text */}
-        <div className="flex flex-col">
-          <span className="font-serif-display font-medium text-lg sm:text-xl tracking-[0.25em] text-[#F3E5AB] group-hover:text-white transition-colors">
-            RE ROUTE
-          </span>
-        </div>
-      </div>
-
-      {/* Center: Navigation Links */}
-      <nav className="pointer-events-auto hidden md:flex items-center space-x-8 text-[11px] font-cinzel font-medium tracking-[0.2em] text-slate-300">
-        <button
-          onClick={() => onSelectSection('destinations')}
-          className={`transition-all py-1 cursor-pointer relative hover:text-white ${
-            activeSection === 'destinations' ? 'text-[#F3E5AB] font-bold' : ''
-          }`}
-        >
-          <span>DESTINATIONS</span>
-          {activeSection === 'destinations' && (
-            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-[1px] bg-[#D4AF37]" />
-          )}
-        </button>
-
-        <button
-          onClick={() => onSelectSection('experiences')}
-          className={`transition-all py-1 cursor-pointer relative hover:text-white ${
-            activeSection === 'experiences' ? 'text-[#F3E5AB] font-bold' : ''
-          }`}
-        >
-          <span>EXPERIENCES</span>
-          {activeSection === 'experiences' && (
-            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-[1px] bg-[#D4AF37]" />
-          )}
-        </button>
-
-        <button
-          onClick={() => onSelectSection('journeys')}
-          className={`transition-all py-1 cursor-pointer relative hover:text-white ${
-            activeSection === 'journeys' ? 'text-[#F3E5AB] font-bold' : ''
-          }`}
-        >
-          <span>JOURNEYS</span>
-          {activeSection === 'journeys' && (
-            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-[1px] bg-[#D4AF37]" />
-          )}
-        </button>
-
-        <button
-          onClick={() => onSelectSection('concierge')}
-          className={`transition-all py-1 cursor-pointer relative hover:text-white ${
-            activeSection === 'concierge' ? 'text-[#F3E5AB] font-bold' : ''
-          }`}
-        >
-          <span>CONCIERGE</span>
-          {activeSection === 'concierge' && (
-            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-[1px] bg-[#D4AF37]" />
-          )}
-        </button>
-
-        <button
-          onClick={() => onSelectSection('membership')}
-          className={`transition-all py-1 cursor-pointer relative hover:text-white ${
-            activeSection === 'membership' ? 'text-[#F3E5AB] font-bold' : ''
-          }`}
-        >
-          <span>MEMBERSHIP</span>
-          {activeSection === 'membership' && (
-            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-[1px] bg-[#D4AF37]" />
-          )}
-        </button>
-      </nav>
-
-      {/* Right: Search, Globe, User & Sign In */}
-      <div className="pointer-events-auto flex items-center space-x-4 sm:space-x-5">
-        {/* Search button / input */}
-        <div className="relative flex items-center">
-          {isSearchOpen ? (
-            <div className="flex items-center bg-slate-950/90 border border-[#D4AF37]/50 rounded-full px-3 py-1.5 shadow-xl text-xs">
-              <Search className="w-3.5 h-3.5 text-[#D4AF37] mr-2" />
+        {isSubmitted ? (
+          <div className="p-8 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37] text-center space-y-3 animate-fadeIn">
+            <div className="w-12 h-12 rounded-full bg-[#D4AF37] text-slate-950 flex items-center justify-center mx-auto shadow-lg">
+              <Check className="w-6 h-6 stroke-[3]" />
+            </div>
+            <h3 className="font-serif-display font-medium text-xl text-[#FCE7AC]">
+              Welcome Back, ReRoute Member
+            </h3>
+            <p className="text-xs text-slate-300 font-sans-luxury">
+              Your credentials are authenticated. Disruption shield and 24/7 concierge are active.
+            </p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-[10px] font-cinzel font-semibold tracking-widest text-[#D4AF37] block">
+                EMAIL ADDRESS
+              </label>
               <input
-                type="text"
-                autoFocus
-                placeholder="Search Udaipur, Kashmir, Swiss Alps, Dubai..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    onOpenSearch();
-                    setIsSearchOpen(false);
-                  }
-                }}
-                className="bg-transparent border-none outline-none text-white text-xs w-36 sm:w-48 placeholder-slate-500 font-sans-luxury"
+                type="email"
+                required
+                placeholder="client@luxury-domain.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 focus:border-[#D4AF37] text-sm text-white outline-none font-sans-luxury transition-colors"
               />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-cinzel font-semibold tracking-widest text-[#D4AF37] block">
+                MEMBERSHIP KEY / PASSPORT NUMBER
+              </label>
+              <input
+                type="password"
+                required
+                placeholder="••••••••••••••••"
+                value={membershipId}
+                onChange={(e) => setMembershipId(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 focus:border-[#D4AF37] text-sm text-white outline-none font-mono transition-colors"
+              />
+            </div>
+
+            <div className="pt-2">
               <button
-                onClick={() => setIsSearchOpen(false)}
-                className="text-slate-400 hover:text-white p-0.5"
+                type="submit"
+                className="w-full py-3.5 rounded-xl gold-gradient-bar hover:opacity-95 text-slate-950 font-cinzel text-xs font-bold tracking-[0.25em] transition-all flex items-center justify-center space-x-2 shadow-lg shadow-[#D4AF37]/25 cursor-pointer"
               >
-                <X className="w-3.5 h-3.5" />
+                <Lock className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>AUTHENTICATE & ENTER</span>
               </button>
             </div>
-          ) : (
-            <button
-              onClick={() => setIsSearchOpen(true)}
-              className="text-slate-300 hover:text-[#F3E5AB] transition-colors p-1.5 cursor-pointer"
-              title="Search Destinations & Journeys"
-            >
-              <Search className="w-4 h-4 stroke-[1.5]" />
-            </button>
-          )}
-        </div>
 
-        {/* Currency / Region Globe */}
-        <div className="relative">
-          <button
-            onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
-            className="text-slate-300 hover:text-[#F3E5AB] transition-colors p-1.5 cursor-pointer flex items-center space-x-1"
-            title="Select Region & Currency"
-          >
-            <Globe className="w-4 h-4 stroke-[1.5]" />
-          </button>
-
-          {showCurrencyDropdown && (
-            <div className="absolute right-0 mt-2 w-32 rounded-xl bg-[#0F1117] border border-gold-subtle shadow-2xl py-1 text-xs font-mono z-50">
-              {currencies.map((curr) => (
-                <button
-                  key={curr}
-                  onClick={() => {
-                    onSelectCurrency(curr.split(' ')[0]);
-                    setShowCurrencyDropdown(false);
-                  }}
-                  className={`w-full text-left px-3 py-1.5 hover:bg-[#1A1E29] transition-colors flex items-center justify-between ${
-                    selectedCurrency === curr.split(' ')[0] ? 'text-[#D4AF37] font-bold' : 'text-slate-300'
-                  }`}
-                >
-                  <span>{curr}</span>
-                </button>
-              ))}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 font-mono">
+              <span className="flex items-center space-x-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
+                <span>256-bit Swiss Encrypted</span>
+              </span>
+              <a href="#apply" onClick={(e) => { e.preventDefault(); alert("VIP Membership application initiated. A ReRoute private concierge will contact your office."); }} className="text-[#D4AF37] hover:underline">
+                Apply for ReRoute Black Tier
+              </a>
             </div>
-          )}
-        </div>
-
-        {/* User Account Circle */}
-        <button
-          onClick={onOpenSignIn}
-          className="w-7 h-7 rounded-full border border-slate-700 bg-slate-900/80 flex items-center justify-center text-slate-300 hover:text-white hover:border-[#D4AF37] transition-all cursor-pointer"
-          title="Account Profile"
-        >
-          <User className="w-3.5 h-3.5 stroke-[1.5]" />
-        </button>
-
-        {/* Sign In Luxury Button */}
-        <button
-          onClick={onOpenSignIn}
-          className="px-4 py-1.5 rounded-full border border-slate-700 hover:border-[#D4AF37] bg-slate-950/60 hover:bg-[#D4AF37]/10 text-xs font-cinzel tracking-widest text-slate-200 hover:text-[#F3E5AB] transition-all cursor-pointer"
-        >
-          SIGN IN
-        </button>
+          </form>
+        )}
       </div>
-    </header>
+    </div>
   );
 };
