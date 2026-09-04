@@ -33,6 +33,7 @@ import { ValuePropositionBar } from './components/ValuePropositionBar';
 import { Full360PanoramaModal } from './components/Full360PanoramaModal';
 import { ReRouteSignInModal } from './components/ReRouteSignInModal';
 import { JourneySearchResultsModal, JourneySearchParams } from './components/JourneySearchResultsModal';
+import { useAuth } from './hooks/useAuth';
 
 // Disruption & 3D Spatial Systems
 import { ThreeTripGraph } from './components/ThreeTripGraph';
@@ -87,6 +88,9 @@ export default function App() {
   // Settings
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [reducedMotion, setReducedMotion] = useState<boolean>(false);
+
+  // Authentication
+  const { user, loading } = useAuth();
 
   // Autoplay Carousel Effect
   useEffect(() => {
@@ -185,6 +189,16 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#08090C] text-[#F3EFE6] relative overflow-x-hidden font-sans-luxury selection:bg-[#D4AF37]/30 selection:text-[#FCE7AC]">
+      {/* Loading Screen */}
+      {loading && (
+        <div className="fixed inset-0 z-[9999] bg-[#08090C] flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <div className="w-12 h-12 border-2 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin mx-auto" />
+            <p className="text-xs font-cinzel tracking-[0.25em] text-[#D4AF37]/60 uppercase">Loading ReRoute</p>
+          </div>
+        </div>
+      )}
+
       {/* Top Fixed ReRoute Navigation Header */}
       <ReRouteNavigation
         activeSection={activeSection}
@@ -295,7 +309,7 @@ export default function App() {
         )}
 
         {/* SECTION 2: JOURNEYS & 3D SPATIAL CORRIDORS */}
-        {activeSection === 'journeys' && (
+        {user && activeSection === 'journeys' && (
           <div className="space-y-8 animate-fadeIn">
             <div className="flex items-center justify-between border-b border-gold-subtle pb-4">
               <div>
@@ -411,7 +425,7 @@ export default function App() {
         )}
 
         {/* SECTION 3: EXPERIENCES & PANORAMAS */}
-        {activeSection === 'experiences' && (
+        {user && activeSection === 'experiences' && (
           <div className="space-y-8 animate-fadeIn">
             <div className="border-b border-gold-subtle pb-4">
               <span className="text-[10px] font-cinzel font-semibold tracking-[0.25em] text-[#D4AF37]">
@@ -426,7 +440,7 @@ export default function App() {
         )}
 
         {/* SECTION 4: CONCIERGE & DISRUPTION RECOVERY */}
-        {activeSection === 'concierge' && (
+        {user && activeSection === 'concierge' && (
           <div className="space-y-16 animate-fadeIn w-full">
             {/* Top Concierge Hero & Quick Jump Navigation Bar */}
             <div className="p-6 sm:p-8 rounded-3xl bg-[#0B0D13]/90 border border-gold-subtle backdrop-blur-xl shadow-2xl space-y-6">
@@ -589,7 +603,7 @@ export default function App() {
         )}
 
         {/* SECTION 5: MEMBERSHIP */}
-        {activeSection === 'membership' && (
+        {user && activeSection === 'membership' && (
           <div className="space-y-8 animate-fadeIn max-w-4xl mx-auto py-8">
             <div className="text-center space-y-3">
               <span className="text-[11px] font-cinzel font-semibold tracking-[0.35em] text-[#D4AF37] uppercase">
