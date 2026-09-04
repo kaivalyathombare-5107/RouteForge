@@ -34,6 +34,9 @@ import { Full360PanoramaModal } from './components/Full360PanoramaModal';
 import { ReRouteSignInModal } from './components/ReRouteSignInModal';
 import { JourneySearchResultsModal, JourneySearchParams } from './components/JourneySearchResultsModal';
 import { useAuth } from './hooks/useAuth';
+import { TravellerProfileModal } from './components/TravellerProfileModal';
+import { fetchTravellerProfile } from './lib/api/profile';
+import { TravellerProfile } from './types/profile';
 
 // Disruption & 3D Spatial Systems
 import { ThreeTripGraph } from './components/ThreeTripGraph';
@@ -89,8 +92,46 @@ export default function App() {
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [reducedMotion, setReducedMotion] = useState<boolean>(false);
 
-  // Authentication
+  // Authentication & Onboarding
   const { user, loading } = useAuth();
+  const [travellerProfile, setTravellerProfile] = useState<TravellerProfile | null>(null);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
+
+  // Check profile upon authentication (Spec Section 1 & 2: First-time user onboarding)
+  useEffect(() => {
+    if (!user) {
+      setTravellerProfile(null);
+      setIsOnboardingOpen(false);
+      return;
+    }
+
+    let isMounted = true;
+    fetchTravellerProfile(user.uid, user.email || undefined).then((res) => {
+      if (!isMounted) return;
+      if (res.success && res.profile && res.profile.isComplete) {
+        setTravellerProfile(res.profile);
+        setIsOnboardingOpen(false);
+      } else {
+        // First-time user onboarding
+        setIsOnboardingOpen(true);
+      }
+    }).catch((err) => {
+      console.warn('[App] Profile fetch error, opening onboarding:', err);
+      if (isMounted) setIsOnboardingOpen(true);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
+
+  const handleProfileComplete = (profile: TravellerProfile) => {
+    playSound('success', soundEnabled);
+    setTravellerProfile(profile);
+    setIsOnboardingOpen(false);
+    // Spec requirement: First-time user: Google login → Traveller Profile → Provider Connections → Plan Your Journey
+    setActiveSection('journeys');
+  };
 
   // Autoplay Carousel Effect
   useEffect(() => {
@@ -711,6 +752,17 @@ export default function App() {
         isOpen={isSignInOpen}
         onClose={() => setIsSignInOpen(false)}
       />
+
+      {/* First-Login Traveller Profile & Onboarding Modal */}
+      {user && (
+        <TravellerProfileModal
+          isOpen={isOnboardingOpen}
+          userId={user.uid}
+          userEmail={user.email || ''}
+          defaultName={user.displayName || ''}
+          onComplete={handleProfileComplete}
+        />
+      )}
 
       {/* Curated Journey Search Results Modal */}
       <JourneySearchResultsModal

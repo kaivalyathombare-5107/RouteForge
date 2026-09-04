@@ -5,12 +5,77 @@ import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
 import { propagateDisruption, generateRecoveryOptions, calculateIRCTCRefund, calculateFlightRefund } from './src/lib/deterministic-engines.js';
 
+import { ProfileStore } from './src/lib/db.js';
+
 dotenv.config();
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+
+// Helper to extract UID from request
+function getRequestUid(req: express.Request): { uid: string; email: string } | null {
+  const headerUid = req.headers['x-firebase-uid'] as string;
+  const headerEmail = (req.headers['x-firebase-email'] as string) || '';
+  if (headerUid) {
+    return { uid: headerUid, email: headerEmail };
+  }
+  const bodyUid = req.body?.userId || req.body?.uid;
+  const bodyEmail = req.body?.email || '';
+  if (bodyUid) {
+    return { uid: bodyUid, email: bodyEmail };
+  }
+  const queryUid = req.query.uid as string;
+  const queryEmail = (req.query.email as string) || '';
+  if (queryUid) {
+    return { uid: queryUid, email: queryEmail };
+  }
+  return null;
+}
+
+// Traveller Profile API Endpoints
+app.get('/api/profile', (req, res) => {
+  try {
+    const userAuth = getRequestUid(req);
+    if (!userAuth || !userAuth.uid) {
+      return res.status(401).json({ success: false, error: 'Authentication required. Pass x-firebase-uid or uid query parameter.' });
+    }
+
+    const profile = ProfileStore.getProfileByUid(userAuth.uid);
+    if (!profile || !profile.isComplete) {
+      return res.status(404).json({ success: false, isComplete: false, message: 'Traveller profile not yet completed' });
+    }
+
+    res.json({ success: true, isComplete: true, profile });
+  } catch (error: any) {
+    console.error('[API] Error fetching profile:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.put('/api/profile', (req, res) => {
+  try {
+    const userAuth = getRequestUid(req);
+    const uid = userAuth?.uid || req.body?.profile?.userId;
+    const email = userAuth?.email || req.body?.email || '';
+
+    if (!uid) {
+      return res.status(401).json({ success: false, error: 'Authentication required to save profile.' });
+    }
+
+    const profileData = req.body?.profile || req.body;
+    if (!profileData || !profileData.fullName || !profileData.phoneNumber) {
+      return res.status(400).json({ success: false, error: 'Missing required profile fields (fullName, phoneNumber, etc.)' });
+    }
+
+    const savedProfile = ProfileStore.upsertProfile(uid, email, profileData);
+    res.json({ success: true, isComplete: true, profile: savedProfile });
+  } catch (error: any) {
+    console.error('[API] Error saving profile:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 // Initialize Google GenAI client lazily & securely
 let aiClient: GoogleGenAI | null = null;
