@@ -9,7 +9,7 @@ import {
 import { DestinationItem } from './DestinationTiltCards';
 import { DepthShaderHeroCanvas } from './DepthShaderHeroCanvas';
 
-export type JourneyMode = 'flight' | 'train' | 'multimodal';
+export type JourneyMode = 'flight' | 'train' | 'bus' | 'uber' | 'car' | 'multimodal';
 
 interface HeroJourneySectionProps {
   currentDestination: DestinationItem;
@@ -60,14 +60,14 @@ export const HeroJourneySection: React.FC<HeroJourneySectionProps> = ({
           {/* Eyebrow */}
           <div className="flex items-center space-x-2">
             <span className="text-[11px] font-cinzel font-semibold tracking-[0.35em] text-[#D4AF37] uppercase">
-              DESIGNED FOR INDIAN TRAVELERS • AIR • RAIL • HERITAGE
+              DESIGNED FOR TRAVELERS • AIR • RAIL • ROAD
             </span>
           </div>
 
           {/* Headline with Staggered Visual Typography */}
           <div className="space-y-1 sm:space-y-2">
             <h1 className="font-serif-display font-light text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight text-white leading-[0.95] drop-shadow-2xl">
-              <span className="block font-normal">SEEN</span>
+              <span className="block font-normal">EXPLORE</span>
               <span className="block italic text-[#FCE7AC]">THE</span>
               <span className="block font-normal">UNSEEN</span>
             </h1>
@@ -82,8 +82,10 @@ export const HeroJourneySection: React.FC<HeroJourneySectionProps> = ({
           <div className="flex flex-wrap items-center gap-6 pt-2">
             {/* Gold bordered Glass Button */}
             <button
+              id="hero-explore-journeys-btn"
               onClick={onExploreJourneys}
-              className="px-6 py-3 rounded-full border border-gold-bright bg-slate-950/70 hover:bg-[#D4AF37] text-slate-100 hover:text-slate-950 font-cinzel text-xs font-bold tracking-[0.2em] transition-all flex items-center space-x-2.5 cursor-pointer shadow-xl shadow-[#D4AF37]/15 group"
+              className="px-6 py-3.5 rounded-full border border-[#D4AF37] bg-slate-950/80 hover:bg-[#D4AF37] text-slate-100 hover:text-slate-950 font-cinzel text-xs font-bold tracking-[0.2em] transition-all duration-300 active:scale-95 flex items-center space-x-2.5 cursor-pointer shadow-xl shadow-[#D4AF37]/20 hover:shadow-2xl hover:shadow-[#D4AF37]/40 group"
+              title="Navigate to living transit corridors and Journey Planner"
             >
               <span>EXPLORE INDIAN & GLOBAL JOURNEYS</span>
               <ArrowRight className="w-4 h-4 text-[#D4AF37] group-hover:text-slate-950 group-hover:translate-x-1 transition-all" />

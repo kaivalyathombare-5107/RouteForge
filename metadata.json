@@ -1,6 +1,6 @@
 {
   "name": "RouteForge // Vogue Travel & 3D Panorama",
-  "description": "Luxury editorial travel and disruption recovery platform tailored for Indian families, executives, and travelers across Bharat and premier global circuits.",
-  "requestFramePermissions": [],
+  "description": "RouteForge — Intelligent travel disruption recovery platform. Understands complete multi-modal itineraries across air, rail, transfers, and stays, identifies direct and downstream impacts, and generates deterministic recovery plans with statutory IRCTC and DGCA refund tracking.",
+  "requestFramePermissions": ["microphone"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

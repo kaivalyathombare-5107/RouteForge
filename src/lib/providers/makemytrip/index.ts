@@ -90,7 +90,7 @@ export class MakeMyTripAdapter implements ProviderAdapter {
               }
             ],
             pax: {
-              adults: params.travellers || 1,
+              adults: (params as any).travelers || (params as any).travellers || 1,
               children: 0,
               infants: 0,
             },

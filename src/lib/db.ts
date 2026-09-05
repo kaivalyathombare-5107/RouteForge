@@ -55,6 +55,8 @@ export const ProfileStore = {
       fullName: profile.fullName || existing?.fullName || '',
       phoneNumber: profile.phoneNumber || existing?.phoneNumber || '',
       homeCity: profile.homeCity || existing?.homeCity || '',
+      ageGroup: profile.ageGroup || existing?.ageGroup || '26-35',
+      preferredCurrency: profile.preferredCurrency || existing?.preferredCurrency || 'INR',
       ...(existing || {}),
       ...profile,
       userId: uid,

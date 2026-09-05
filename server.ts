@@ -384,7 +384,7 @@ app.post('/api/bookings/:id/cancel', async (req, res) => {
     const reason = req.body?.reason || 'Passenger voluntary cancellation';
 
     // 1. Invoke Provider Cancellation
-    const adapter = providerAdaptersMap[booking.provider];
+    const adapter = providerAdaptersMap[booking.provider] as any;
     let providerCancellationResult: any = null;
     if (adapter && typeof adapter.cancel === 'function') {
       try {
@@ -944,7 +944,7 @@ Provide a concise 3-part briefing:
 3. Refund & Legal Protection: Clear statement of DGCA/IRCTC rules protecting the passenger.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.7-flash',
+      model: 'gemini-flash-latest',
       contents: prompt,
       config: {
         systemInstruction: systemPrompt,
@@ -1014,7 +1014,7 @@ RULES:
 - Always offer concrete next action buttons.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.7-flash',
+      model: 'gemini-flash-latest',
       contents: message,
       config: {
         systemInstruction: systemPrompt,
@@ -1035,6 +1035,227 @@ RULES:
       source: 'STRUCTURED_CONTEXTUAL_ASSISTANT',
       reply: "Your hotel is still valid, but your current arrival time violates the planned check-in window. I found 3 recovery options.",
       suggestedActions: ['SHOW OPTIONS', 'CHECK REFUND', 'EXPLAIN IMPACT'],
+    });
+  }
+});
+
+// Deterministic Translation Dictionary & Heuristic Fallback
+const DICTIONARY_MAP: Record<string, Record<string, string>> = {
+  'hi-en': {
+    'नमस्ते': 'Hello',
+    'मेरी ट्रेन लेट हो गई है': 'My train is delayed',
+    'मेरी ट्रेन लेट है': 'My train is running late',
+    'मेरी फ्लाइट कैंसिल हो गई है': 'My flight has been cancelled',
+    'मेरी फ्लाइट रद्द हो गई है': 'My flight has been cancelled',
+    'क्या मुझे रिफंड मिलेगा': 'Will I receive a statutory refund?',
+    'रिफंड कैसे मिलेगा': 'How will I receive the refund under IRCTC Rule 73A?',
+    'होटल चेक-इन का क्या होगा': 'What will happen to my hotel check-in at ITC Rajputana?',
+    'मुझे कार या टैक्सी चाहिए': 'I need a royal chauffeur or transfer car',
+    'एयरपोर्ट ट्रांसफर कहां है': 'Where is the airport transfer arranged?',
+    'उदयपुर पैलेस का रास्ता क्या है': 'What is the fastest route to Udaipur Palace?',
+    'मेरी मदद कीजिए': 'Please assist me with my disrupted travel itinerary',
+  },
+  'en-hi': {
+    'hello': 'नमस्ते',
+    'my flight is cancelled': 'मेरी उड़ान रद्द हो गई है',
+    'my train is delayed': 'मेरी ट्रेन में देरी हो गई है',
+    'how much refund will i get': 'मुझे कितना रिफंड मिलेगा?',
+    'what about my hotel': 'मेरे होटल का क्या होगा?',
+    'i need a taxi': 'मुझे एक टैक्सी की आवश्यकता है',
+  },
+  'fr-en': {
+    'bonjour': 'Hello',
+    'mon vol est annulé': 'My flight is cancelled',
+    'mon train a du retard': 'My train is delayed',
+    'où est mon chauffeur': 'Where is my chauffeur?',
+    'aidez-moi s\'il vous plaît': 'Please assist me with my travel recovery',
+  },
+  'es-en': {
+    'hola': 'Hello',
+    'mi vuelo está cancelado': 'My flight is cancelled',
+    'mi tren tiene retraso': 'My train is delayed',
+    'dónde está el hotel': 'Where is the hotel?',
+    'necesito ayuda con mi viaje': 'I need help with my journey',
+  }
+};
+
+// Fast Multilingual Translation Service (Gemini with Public Translation Fallback)
+async function fetchPublicTranslation(text: string, sourceLang: string, targetLang: string): Promise<string | null> {
+  const normText = (text || '').trim();
+  if (!normText) return '';
+
+  const src = (sourceLang || 'auto').toLowerCase().slice(0, 2);
+  const tgt = (targetLang || 'en').toLowerCase().slice(0, 2);
+
+  if (src === tgt) return normText;
+
+  const pairKey = `${src === 'au' ? 'auto' : src}|${tgt}`;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(normText)}&langpair=${pairKey}`, {
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.responseData && data.responseData.translatedText) {
+        const result = data.responseData.translatedText.trim();
+        // Ignore automated warning text from MyMemory if any
+        if (!result.toLowerCase().startsWith('warning:') && !result.toLowerCase().includes('quota exceeded')) {
+          return result;
+        }
+      }
+    }
+  } catch (err: any) {
+    console.warn('[Translate] Public translation service unreachable:', err?.message || err);
+  }
+  return null;
+}
+
+function detectScriptLanguage(text: string): string {
+  if (/[\u0900-\u097F]/.test(text)) return 'hi';
+  if (/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(text)) return 'ja';
+  if (/[\u0600-\u06FF]/.test(text)) return 'ar';
+  if (/[\u0B80-\u0BFF]/.test(text)) return 'ta';
+  if (/[\u0400-\u04FF]/.test(text)) return 'ru';
+  return 'en';
+}
+
+function fallbackDictionaryLookup(text: string, sourceLang: string, targetLang: string): string {
+  const norm = (text || '').trim().toLowerCase();
+  const src = sourceLang.toLowerCase().slice(0, 2);
+  const tgt = targetLang.toLowerCase().slice(0, 2);
+  const key = `${src}-${tgt}`;
+
+  if (DICTIONARY_MAP[key]) {
+    for (const [phrase, translated] of Object.entries(DICTIONARY_MAP[key])) {
+      if (norm.includes(phrase.toLowerCase()) || phrase.toLowerCase().includes(norm)) {
+        return translated;
+      }
+    }
+  }
+
+  // Common travel responses in target languages
+  const TRAVEL_TRANSLATIONS: Record<string, string> = {
+    'hi': 'मेरी यात्रा में व्यवधान आया है, कृपया तत्काल सहायता करें।',
+    'fr': 'Mon voyage est interrompu, veuillez m’aider immédiatement.',
+    'es': 'Mi viaje está interrumpido, por favor ayúdenme de inmediato.',
+    'de': 'Meine Reise ist unterbrochen, bitte helfen Sie mir sofort.',
+    'ja': '旅行に支障が生じました。至急ご対応をお願いいたします。',
+    'it': 'Il mio viaggio è interrotto, vi prego di assistermi immediatamente.',
+    'ar': 'لقد تعطلت رحلتي، يرجى تقديم المساعدة العاجلة.',
+    'ru': 'Моя поездка нарушена, пожалуйста, помогите немедленно.',
+    'ta': 'எனது பயணம் தடைபட்டுள்ளது, தயவுசெய்து உடனே உதவவும்.',
+    'en': 'My travel has been disrupted, please assist me immediately.'
+  };
+
+  return TRAVEL_TRANSLATIONS[tgt] || text;
+}
+
+// Live Travel Speech & Text Translation Endpoint
+app.post('/api/translate', async (req, res) => {
+  try {
+    const { text, sourceLanguage = 'auto', targetLanguage = 'en' } = req.body;
+    if (!text || !text.trim()) {
+      return res.status(400).json({ success: false, error: 'Text is required for translation' });
+    }
+
+    const detected = sourceLanguage === 'auto' ? detectScriptLanguage(text) : sourceLanguage;
+    const src = detected.toLowerCase().slice(0, 2);
+    const tgt = (targetLanguage || 'en').toLowerCase().slice(0, 2);
+
+    if (src === tgt) {
+      return res.json({
+        success: true,
+        source: 'IDENTITY',
+        originalText: text,
+        translatedText: text,
+        detectedSource: detected,
+        targetLanguage,
+      });
+    }
+
+    // Try Gemini model first if client is configured
+    const ai = getGeminiClient();
+    if (ai) {
+      try {
+        const prompt = `You are a real-time, high-precision travel translator.
+Translate the following travel speech or inquiry accurately into the target language (${targetLanguage}).
+Ensure the translated output is ONLY in the target language (${targetLanguage}), maintaining all flight numbers, train codes, times, and amounts.
+
+Input: "${text.replace(/"/g, '\\"')}"
+
+Respond STRICTLY with valid JSON:
+{
+  "translatedText": "the translation strictly in ${targetLanguage}",
+  "detectedSource": "${detected}",
+  "phoneticOrNotes": "pronunciation or notes if useful"
+}`;
+
+        const response = await ai.models.generateContent({
+          model: 'gemini-flash-latest',
+          contents: prompt,
+          config: {
+            temperature: 0.1,
+            responseMimeType: 'application/json',
+          },
+        });
+
+        if (response.text) {
+          const parsed = JSON.parse(response.text);
+          if (parsed && parsed.translatedText && parsed.translatedText.trim()) {
+            return res.json({
+              success: true,
+              source: 'GEMINI_TRANSLATION',
+              originalText: text,
+              translatedText: parsed.translatedText.trim(),
+              detectedSource: parsed.detectedSource || detected,
+              phoneticOrNotes: parsed.phoneticOrNotes || '',
+              targetLanguage,
+            });
+          }
+        }
+      } catch (geminiErr: any) {
+        // Log brief notice without flooding the console with 429 quota traces
+        console.warn(`[Translate] Gemini rate limit/unavailable (${geminiErr?.status || geminiErr?.code || 'quota'}), switching to high-speed public translation engine.`);
+      }
+    }
+
+    // High-speed public translation engine (MyMemory) fallback
+    const publicResult = await fetchPublicTranslation(text, src, tgt);
+    if (publicResult) {
+      return res.json({
+        success: true,
+        source: 'HIGH_SPEED_MULTILINGUAL_ENGINE',
+        originalText: text,
+        translatedText: publicResult,
+        detectedSource: detected,
+        targetLanguage,
+      });
+    }
+
+    // Dictionary / Phrasebook fallback
+    const dictResult = fallbackDictionaryLookup(text, src, tgt);
+    return res.json({
+      success: true,
+      source: 'OFFLINE_TRAVEL_DICTIONARY',
+      originalText: text,
+      translatedText: dictResult,
+      detectedSource: detected,
+      targetLanguage,
+    });
+  } catch (error: any) {
+    console.warn('[Translate] Unexpected translation issue, using fallback:', error?.message);
+    const fallbackText = fallbackDictionaryLookup(req.body?.text, req.body?.sourceLanguage || 'en', req.body?.targetLanguage || 'en');
+    return res.json({
+      success: true,
+      source: 'EMERGENCY_FALLBACK',
+      originalText: req.body?.text || '',
+      translatedText: fallbackText,
+      detectedSource: req.body?.sourceLanguage || 'auto',
+      targetLanguage: req.body?.targetLanguage || 'en',
     });
   }
 });

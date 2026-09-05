@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { motion } from 'motion/react';
-import { ArrowRight, MapPin, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 export interface DestinationItem {
   id: string;
@@ -94,8 +94,17 @@ export const DestinationTiltCards: React.FC<DestinationTiltCardsProps> = ({
 }) => {
   return (
     <div className="w-full space-y-3">
-      <div className="flex items-center space-x-2 text-xs font-cinzel font-semibold tracking-[0.2em] text-[#D4AF37]">
-        <span>FEATURED DESTINATIONS • BHARAT & BEYOND</span>
+      <div 
+        id="featured-destinations-header"
+        className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-gold-subtle/50 text-xs font-cinzel font-semibold tracking-[0.2em] text-[#D4AF37]"
+      >
+        <div className="flex items-center space-x-2">
+          <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
+          <span>FEATURED DESTINATIONS • BHARAT &amp; BEYOND</span>
+        </div>
+        <span className="px-2.5 py-0.5 rounded-full bg-slate-900/80 border border-gold-subtle text-[10px] text-slate-400 tracking-widest font-mono">
+          4 CURATED ROYAL SANCTUARIES
+        </span>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
@@ -180,7 +189,7 @@ const SingleDestinationCard: React.FC<{
       />
 
       {/* Card Header & Country Tag in Structured Glass Box */}
-      <div className="relative z-10 p-3 sm:p-3.5 h-full flex flex-col justify-between">
+      <div className="relative z-10 p-3 sm:p-3.5 h-full flex flex-col justify-start">
         <div className="p-2.5 rounded-xl bg-slate-950/80 backdrop-blur-md border border-gold-subtle/60 shadow-lg space-y-0.5">
           <h3 className="font-serif-display font-medium text-base sm:text-lg text-white tracking-wide leading-tight group-hover:text-[#F3E5AB] transition-colors">
             {dest.name}
@@ -188,20 +197,6 @@ const SingleDestinationCard: React.FC<{
           <span className="text-[9px] font-cinzel font-semibold tracking-[0.2em] text-slate-300 block truncate">
             {dest.country}
           </span>
-        </div>
-
-        {/* Bottom Price Tag Box and Action Icon */}
-        <div className="flex items-center justify-between pt-2">
-          <div className="px-2 py-1 rounded-lg bg-slate-950/85 backdrop-blur-md border border-gold-subtle/60 text-[10px] font-sans-luxury text-[#FCE7AC] font-medium shadow-md">
-            {dest.priceEstimate.split(' ')[1] || dest.priceEstimate}
-          </div>
-          <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
-            isSelected
-              ? 'bg-[#D4AF37] text-slate-950 shadow-md shadow-[#D4AF37]/40 scale-105'
-              : 'border border-gold-subtle bg-slate-950/80 text-slate-300 group-hover:bg-[#D4AF37] group-hover:text-slate-950 group-hover:border-[#D4AF37]'
-          }`}>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </div>
         </div>
       </div>
     </div>

@@ -291,5 +291,141 @@ export const INITIAL_TRIP: Trip = {
   recoveryPlans: [],
   refundCases: INITIAL_REFUND_CASES,
   preferences: INITIAL_USER_PREFERENCES,
+  history: [
+    {
+      id: 'hist_init_01',
+      timestamp: '08:30 IST',
+      eventType: 'booked',
+      title: 'Itinerary Synchronized',
+      description: 'Connected multi-modal journey (Flight 6E-204 → Train 12952 → ITC Rajputana → HackCelestial Keynote) registered into ReRoute Disruption Shield.',
+      badgeColor: '#10B981',
+      financialImpact: '₹26,800',
+    },
+    {
+      id: 'hist_init_02',
+      timestamp: '08:45 IST',
+      eventType: 'at_risk_warning',
+      title: 'Continuous Connection Audit Active',
+      description: 'Transfer buffer between BOM-DEL flight (11:40 Arr) and DEL-JPR train (13:00 Dep) is 80 mins. Minimum safe threshold is 60 mins. System surveillance active.',
+      badgeColor: '#F59E0B',
+    },
+  ],
+  proactiveWarnings: [
+    {
+      id: 'warn_init_tight_buffer',
+      severity: 'info',
+      title: 'Monitored Connection: Delhi Airport to NDLS',
+      message: 'Flight arrival (11:40 IST) leaves an 80-minute window before Train 12952 departs (13:00 IST). Requires 45 minutes Airport Express transit.',
+      recommendation: 'Use Express Metro Gate 2 to ensure minimum 35-minute boarding margin.',
+      edgeId: 'edge_flight_to_train',
+      bufferRemainingMinutes: 80,
+      timestamp: '09:00 IST',
+    },
+  ],
+  totalJourneyCost: 26800,
+  totalRefundEstimated: 7060,
   lastUpdated: '13:42 IST',
 };
+
+export interface DisruptionScenarioDefinition {
+  id: string;
+  name: string;
+  category: 'primary' | 'rail' | 'connection' | 'airline' | 'weather' | 'transit' | 'stay' | 'activity';
+  badge: string;
+  description: string;
+  rootBookingId: string;
+  disruptionType: 'delay' | 'cancellation' | 'missed_connection';
+  delayMinutes: number;
+  reason: string;
+}
+
+export const DISRUPTION_SCENARIOS: DisruptionScenarioDefinition[] = [
+  {
+    id: 'flight_delay_90',
+    name: 'Scenario 1 (Primary): Flight Delayed 90m (BOM → DEL)',
+    category: 'primary',
+    badge: 'Curated #1',
+    description: 'IndiGo flight delayed by 90 mins. Lands at 13:10 IST. Train departs at 13:00 IST (-10m buffer!). Connection breaks, threatening hotel check-in and HackCelestial keynote.',
+    rootBookingId: 'bkg_flight_01',
+    disruptionType: 'delay',
+    delayMinutes: 90,
+    reason: 'Air traffic control congestion at BOM Runway 27',
+  },
+  {
+    id: 'train_cancel',
+    name: 'Scenario 2: IRCTC Train Cancelled (DEL → JPR)',
+    category: 'rail',
+    badge: 'Curated #2',
+    description: 'Northern Railways cancels Train 12952 due to track maintenance. Traveler is in Delhi with hotel check-in and evening keynote at risk. Generates rail/flight/cab alternatives.',
+    rootBookingId: 'bkg_train_02',
+    disruptionType: 'cancellation',
+    delayMinutes: 0,
+    reason: 'Unscheduled track block between Delhi Cantt and Rewari Junction (IRCTC PRS)',
+  },
+  {
+    id: 'missed_connection',
+    name: 'Scenario 3: Missed Connection (45m Transfer vs 20m Window)',
+    category: 'connection',
+    badge: 'Curated #3',
+    description: 'Flight delayed 60 mins (arr 12:40 IST). Only 20 mins remain before train departs at 13:00 IST. With 45 mins required transfer time, connection is physically impossible.',
+    rootBookingId: 'bkg_flight_01',
+    disruptionType: 'missed_connection',
+    delayMinutes: 60,
+    reason: 'Insufficient transfer window (20m available vs 45m required minimum)',
+  },
+  {
+    id: 'flight_cancel',
+    name: 'Scenario 4: Flight Cancelled (BOM → DEL)',
+    category: 'airline',
+    badge: 'Airline Ops',
+    description: 'IndiGo cancels 6E-204 due to technical snag. Downstream train, hotel, and activity all impacted. 100% full refund eligible under DGCA Section 3.',
+    rootBookingId: 'bkg_flight_01',
+    disruptionType: 'cancellation',
+    delayMinutes: 0,
+    reason: 'Aircraft technical unserviceability at BOM T2',
+  },
+  {
+    id: 'weather_disruption',
+    name: 'Scenario 5: Weather Grounding (+180m Monsoon/Fog Delay)',
+    category: 'weather',
+    badge: 'Force Majeure',
+    description: 'Severe weather grounds departures for 3 hours. Train missed, hotel check-in at risk, keynote impossible without fast-track re-route.',
+    rootBookingId: 'bkg_flight_01',
+    disruptionType: 'delay',
+    delayMinutes: 180,
+    reason: 'Monsoon squall and zero-visibility alert at BOM airport',
+  },
+  {
+    id: 'transfer_failure',
+    name: 'Scenario 6: Transfer Failure (Airport Metro Breakdown +60m)',
+    category: 'transit',
+    badge: 'Transit Breakdown',
+    description: 'Delhi Airport Express metro line suffers power failure, adding 60 mins to transfer. Buffer is violated and train connection is missed.',
+    rootBookingId: 'bkg_flight_01',
+    disruptionType: 'missed_connection',
+    delayMinutes: 60,
+    reason: 'Airport Express overhead traction line failure at Dhaula Kuan',
+  },
+  {
+    id: 'hotel_cancel',
+    name: 'Scenario 7: Hotel Overbooking (ITC Rajputana)',
+    category: 'stay',
+    badge: 'Lodging Outage',
+    description: 'ITC Rajputana reports VIP delegation overbooking. Emergency luxury relocation to Rambagh Palace or Fairmont Jaipur with upgrade compensation.',
+    rootBookingId: 'bkg_hotel_03',
+    disruptionType: 'cancellation',
+    delayMinutes: 0,
+    reason: 'Palace state delegation requisition & room inventory outage',
+  },
+  {
+    id: 'activity_cancel',
+    name: 'Scenario 8: Activity Curfew Shift (HackCelestial Keynote)',
+    category: 'activity',
+    badge: 'Schedule Shift',
+    description: 'Summit keynote advanced from 20:00 to 18:30 IST. Arriving at 19:30 will miss the event; requires fastest express corridor to beat the new curfew.',
+    rootBookingId: 'bkg_event_04',
+    disruptionType: 'cancellation',
+    delayMinutes: 90,
+    reason: 'HackCelestial 3.0 organizing committee moved keynote schedule earlier',
+  },
+];

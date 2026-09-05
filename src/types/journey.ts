@@ -14,8 +14,9 @@ export interface JourneySearchParams {
 }
 
 export interface NormalizedPolicy {
-  refundable: boolean;
+  refundable?: boolean;
   terms: string;
+  allowed?: boolean;
   penaltyAmount?: number;
   freeCancellationUntil?: string;
 }
@@ -100,7 +101,7 @@ export interface NormalizedStayOption {
 
 export interface NormalizedJourneyLeg {
   id: string;
-  type: 'flight' | 'train' | 'bus' | 'transfer' | 'stay';
+  type: 'flight' | 'train' | 'bus' | 'transfer' | 'car' | 'stay';
   label: string;
   carrier: string;
   time: string;
@@ -117,7 +118,16 @@ export interface NormalizedJourneyLeg {
   rawDetails?: any;
 }
 
-export type JourneyPlanCategory = 'FASTEST' | 'CHEAPEST' | 'BEST_BALANCE' | 'MOST_FLEXIBLE';
+export type JourneyPlanCategory = 
+  | 'FASTEST' 
+  | 'CHEAPEST' 
+  | 'BEST_BALANCE' 
+  | 'MOST_FLEXIBLE' 
+  | 'PREMIUM_RAIL' 
+  | 'COMFORT_BUS' 
+  | 'DOOR_TO_DOOR_CAB' 
+  | 'MULTIMODAL_LUXURY' 
+  | string;
 
 export interface JourneyPlanOption {
   id: string;
@@ -143,7 +153,7 @@ export interface JourneyPlanOption {
     confidenceScore: number;
   };
   explanation: string;
-  bookingMethods: ('OFFICIAL_PARTNER' | 'DIRECT_API' | 'DEEP_LINK')[];
+  bookingMethods: ('OFFICIAL_PARTNER' | 'DIRECT_API' | 'DEEP_LINK' | 'CONCIERGE_DESK')[];
 }
 
 export interface JourneySearchResponse {

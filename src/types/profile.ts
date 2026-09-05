@@ -73,11 +73,11 @@ export interface TravellerProfile {
   fullName: string;
   phoneNumber: string;
   homeCity: string;
-  ageGroup: AgeGroup;
-  preferredCurrency: PreferredCurrency;
+  ageGroup?: AgeGroup;
+  preferredCurrency?: PreferredCurrency;
 
   // Travel Preferences
-  preferences: TravelPreferences;
+  preferences?: TravelPreferences;
 
   // Optional
   foodPreference?: FoodPreference;
@@ -87,7 +87,9 @@ export interface TravellerProfile {
 
   // Metadata
   userId?: string;
+  userEmail?: string;
   isComplete: boolean;
   createdAt?: string;
   updatedAt?: string;
+  [key: string]: any;
 }

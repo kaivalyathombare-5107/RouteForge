@@ -35,6 +35,7 @@ export interface CreateBookingParams {
   cancellationPolicy?: any;
   modificationPolicy?: any;
   disruptionShield?: string;
+  provenance?: any;
 }
 
 export async function createBookingIntent(

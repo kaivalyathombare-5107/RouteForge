@@ -128,8 +128,14 @@ const CITY_COORDINATES_MAP: { [key: string]: [number, number, 'airport' | 'railw
   'sin': [103.9915, 1.3644, 'airport'],
   'new york': [-74.0060, 40.7128, 'airport'],
   'jfk': [-73.7781, 40.6413, 'airport'],
-  'san francisco': [-122.4194, 37.7749, 'airport'],
+  'san francisco': [-122.3790, 37.6213, 'airport'],
+  'sfo': [-122.3790, 37.6213, 'airport'],
+  'sao paulo': [-46.4731, -23.4356, 'airport'],
+  'gru': [-46.4731, -23.4356, 'airport'],
+  'cape town': [18.6021, -33.9715, 'airport'],
+  'cpt': [18.6021, -33.9715, 'airport'],
   'los angeles': [-118.2437, 34.0522, 'airport'],
+  'lax': [-118.4085, 33.9416, 'airport'],
   'sydney': [151.2093, -33.8688, 'airport'],
   'maldives': [73.5089, 4.1755, 'waterway'],
   'male': [73.5292, 4.1918, 'waterway'],
@@ -452,3 +458,91 @@ export function generateJourneyCorridor(
 
   return segments;
 }
+
+export interface RadarHub {
+  name: string;
+  city: string;
+  code: string;
+  lat: number;
+  lon: number;
+  isMainHub?: boolean;
+}
+
+export const GLOBAL_RADAR_HUBS: RadarHub[] = [
+  { name: 'New York JFK', city: 'New York', code: 'JFK', lat: 40.6413, lon: -73.7781, isMainHub: true },
+  { name: 'London Heathrow', city: 'London', code: 'LHR', lat: 51.4700, lon: -0.4543 },
+  { name: 'Mumbai CSMIA', city: 'Mumbai', code: 'BOM', lat: 19.0896, lon: 72.8656 },
+  { name: 'San Francisco SFO', city: 'San Francisco', code: 'SFO', lat: 37.6213, lon: -122.3790 },
+  { name: 'Sao Paulo Guarulhos', city: 'Sao Paulo', code: 'GRU', lat: -23.4356, lon: -46.4731 },
+  { name: 'Cape Town CPT', city: 'Cape Town', code: 'CPT', lat: -33.9715, lon: 18.6021 },
+];
+
+/**
+ * Returns the exact intercontinental flight corridor network matching the reference radar image:
+ * Glowing cyan routes + amber/orange routes with flying aircraft.
+ */
+export function generateGlobalAirCorridors(): TransportRouteSegment[] {
+  const hubsMap = new Map<string, RadarHub>();
+  GLOBAL_RADAR_HUBS.forEach((h) => hubsMap.set(h.code, h));
+
+  const routesConfig = [
+    // Cyan Arcs
+    { from: 'JFK', to: 'LHR', color: 0x22D3EE, altitude: 0.28, carrier: 'BA-178 / Dreamliner Jet' },
+    { from: 'JFK', to: 'CPT', color: 0x06B6D4, altitude: 0.42, carrier: 'SA-204 / Intercontinental A350' },
+    { from: 'JFK', to: 'SFO', color: 0x38BDF8, altitude: 0.22, carrier: 'UA-412 / Cross-Country 777' },
+    // Amber / Orange Arcs
+    { from: 'SFO', to: 'JFK', color: 0xF59E0B, altitude: 0.26, carrier: 'DL-882 / Transcontinental Jet' },
+    { from: 'JFK', to: 'GRU', color: 0xF97316, altitude: 0.35, carrier: 'LA-8103 / LatAm Executive Air' },
+    { from: 'JFK', to: 'BOM', color: 0xFB923C, altitude: 0.45, carrier: 'AI-102 / Direct Boeing 787-9' },
+    { from: 'BOM', to: 'CPT', color: 0xF59E0B, altitude: 0.38, carrier: 'ET-601 / Trans-Oceanic Express' },
+  ];
+
+  const segments: TransportRouteSegment[] = [];
+
+  routesConfig.forEach((cfg, idx) => {
+    const fromHub = hubsMap.get(cfg.from);
+    const toHub = hubsMap.get(cfg.to);
+    if (!fromHub || !toHub) return;
+
+    const fromVec = latLonToVector3(fromHub.lat, fromHub.lon);
+    const toVec = latLonToVector3(toHub.lat, toHub.lon);
+    const { curve, points } = createGreatCircleParabolicCurve(fromVec, toVec, cfg.altitude, 80);
+    const dist = calculateHaversineDistance(fromHub.lat, fromHub.lon, toHub.lat, toHub.lon);
+
+    segments.push({
+      id: `global-corridor-${fromHub.code}-${toHub.code}-${idx}`,
+      from: {
+        name: fromHub.name,
+        code: fromHub.code,
+        city: fromHub.city,
+        country: 'Global',
+        lat: fromHub.lat,
+        lon: fromHub.lon,
+        type: 'airport',
+      },
+      to: {
+        name: toHub.name,
+        code: toHub.code,
+        city: toHub.city,
+        country: 'Global',
+        lat: toHub.lat,
+        lon: toHub.lon,
+        type: 'airport',
+      },
+      mode: 'flight',
+      title: `${fromHub.city} (${fromHub.code}) → ${toHub.city} (${toHub.code})`,
+      carrierOrLine: cfg.carrier,
+      distanceKm: dist,
+      durationStr: `${Math.floor(dist / 880)}h ${Math.round((dist % 880) / 14.6)}m`,
+      speedKmh: 910,
+      altitudeFt: Math.round(36000 + cfg.altitude * 8000),
+      curve,
+      waypoints: points,
+      color: cfg.color,
+      status: 'active',
+    });
+  });
+
+  return segments;
+}
+

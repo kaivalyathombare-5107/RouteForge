@@ -6,7 +6,20 @@ export type BookingStatus =
   | 'cancelled' 
   | 'at_risk' 
   | 'impacted' 
+  | 'missed' 
+  | 'requires_action' 
   | 'recovered';
+
+export type DisruptionScenarioType = 
+  | 'flight_delay_90'
+  | 'flight_cancel'
+  | 'missed_connection'
+  | 'train_cancel'
+  | 'hotel_cancel'
+  | 'activity_cancel'
+  | 'transfer_failure'
+  | 'weather_disruption'
+  | 'traveler_change';
 
 export type DependencyStatus = 'safe' | 'warning' | 'critical' | 'broken';
 
@@ -128,6 +141,52 @@ export interface RecoveryOption {
   color: string;
   replacementBookings: Partial<Booking>[];
   branchWaypoints: [number, number, number][]; // 3D coordinates for spatial alternative route
+  // Recovery comparison metrics
+  numberOfChanges: number;
+  affectedBookingsCount: number;
+  totalJourneyCost: number;
+  travelDurationString: string;
+  convenienceRating: 'High' | 'Very High' | 'Executive VIP';
+  riskLevel: 'Minimal' | 'Low' | 'Moderate';
+  recommendationReason: string;
+  preservedBookings: string[];
+  cancelledBookingIds: string[];
+}
+
+export interface ItineraryHistoryEntry {
+  id: string;
+  timestamp: string;
+  eventType: 
+    | 'booked' 
+    | 'delay_detected' 
+    | 'cancellation' 
+    | 'missed_connection' 
+    | 'at_risk_warning' 
+    | 'recovery_generated' 
+    | 'recovery_selected' 
+    | 'rebooked' 
+    | 'postponed' 
+    | 'refund_requested' 
+    | 'refund_settled';
+  title: string;
+  description: string;
+  bookingId?: string;
+  previousStatus?: string;
+  newStatus?: string;
+  financialImpact?: string;
+  badgeColor?: string;
+}
+
+export interface ProactiveWarning {
+  id: string;
+  severity: 'info' | 'warning' | 'critical';
+  title: string;
+  message: string;
+  recommendation: string;
+  bookingId?: string;
+  edgeId?: string;
+  bufferRemainingMinutes?: number;
+  timestamp: string;
 }
 
 export interface RefundBreakdown {
@@ -176,6 +235,11 @@ export interface Trip {
   recoveryPlans: RecoveryOption[];
   refundCases: RefundCase[];
   preferences: UserPreferences;
+  history: ItineraryHistoryEntry[];
+  proactiveWarnings: ProactiveWarning[];
+  originalBookings?: Booking[];
+  totalJourneyCost?: number;
+  totalRefundEstimated?: number;
   activeRecoveryPlanId?: string;
   lastUpdated: string;
 }

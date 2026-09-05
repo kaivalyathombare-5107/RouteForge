@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Plane, 
   Train, 
+  Bus,
+  Car,
   ArrowRightLeft, 
   Calendar, 
-  ChevronDown, 
   ArrowRight, 
   Sparkles,
   Layers
@@ -22,30 +23,54 @@ interface PlanJourneyWidgetProps {
     cabinClass: string;
     mode: JourneyMode;
   }) => void;
+  initialOrigin?: string;
   initialDestination?: string;
   onRouteChange?: (origin: string, destination: string, mode: JourneyMode) => void;
 }
 
 export const PlanJourneyWidget: React.FC<PlanJourneyWidgetProps> = ({
   onSearchSubmit,
-  initialDestination = 'UDR Udaipur (Taj Lake Palace)',
+  initialOrigin = '',
+  initialDestination = '',
   onRouteChange
 }) => {
   const [mode, setMode] = useState<JourneyMode>('flight');
-  const [origin, setOrigin] = useState('BOM Mumbai (CSMIA T2)');
+  const [origin, setOrigin] = useState(initialOrigin);
   const [destinationCity, setDestinationCity] = useState(initialDestination);
   const [departDate, setDepartDate] = useState('15 Oct, 2026');
   const [returnDate, setReturnDate] = useState('22 Oct, 2026');
-  const [travelers, setTravelers] = useState('2 Adults, 2 Children (Family Holiday)');
-  const [cabinClass, setCabinClass] = useState('Vande Bharat Executive / Anubhuti');
+  const [travelers] = useState('2 Adults, 2 Children (Family Holiday)');
+  const [cabinClass] = useState('Vande Bharat Executive / Anubhuti');
 
-  const [showTravelerDropdown, setShowTravelerDropdown] = useState(false);
-  const [showClassDropdown, setShowClassDropdown] = useState(false);
+  const lastNotifiedRef = useRef<{ origin: string; destination: string; mode: string }>({
+    origin: '',
+    destination: '',
+    mode: '',
+  });
+  const onRouteChangeRef = useRef(onRouteChange);
 
-  // Notify parent in real-time when destination, origin or mode updates
   useEffect(() => {
-    onRouteChange?.(origin, destinationCity, mode);
-  }, [origin, destinationCity, mode, onRouteChange]);
+    onRouteChangeRef.current = onRouteChange;
+  }, [onRouteChange]);
+
+  // Keep destination city in sync when initialDestination prop updates from the carousel
+  useEffect(() => {
+    if (initialDestination) {
+      setDestinationCity(initialDestination);
+    }
+  }, [initialDestination]);
+
+  // Notify parent in real-time when destination, origin or mode updates, strictly guarded against re-render loops
+  useEffect(() => {
+    if (
+      lastNotifiedRef.current.origin !== origin ||
+      lastNotifiedRef.current.destination !== destinationCity ||
+      lastNotifiedRef.current.mode !== mode
+    ) {
+      lastNotifiedRef.current = { origin, destination: destinationCity, mode };
+      onRouteChangeRef.current?.(origin, destinationCity, mode);
+    }
+  }, [origin, destinationCity, mode]);
 
   const swapCities = () => {
     const temp = origin;
@@ -81,45 +106,73 @@ export const PlanJourneyWidget: React.FC<PlanJourneyWidgetProps> = ({
         <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
       </div>
 
-      {/* Mode Selector Tabs (FLIGHT, TRAIN, MULTI-MODAL) */}
-      <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-slate-950/80 border border-gold-subtle/40 text-[10px] font-cinzel font-semibold tracking-wider">
+      {/* Mode Selector Tabs (FLIGHT, TRAIN, BUS, UBER, MULTI-MODAL) */}
+      <div className="grid grid-cols-5 gap-1 p-1 rounded-xl bg-slate-950/80 border border-gold-subtle/40 text-[9px] sm:text-[10px] font-cinzel font-semibold tracking-wider">
         <button
           type="button"
           onClick={() => setMode('flight')}
-          className={`py-2 rounded-lg flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
+          className={`py-2 px-1 rounded-lg flex items-center justify-center space-x-1 transition-all cursor-pointer ${
             mode === 'flight'
               ? 'bg-gradient-to-r from-[#D4AF37]/30 to-[#D4AF37]/10 text-[#FCE7AC] border border-gold-bright shadow-sm'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          <Plane className="w-3 h-3" />
-          <span>FLIGHT</span>
+          <Plane className="w-3 h-3 shrink-0" />
+          <span className="hidden sm:inline">FLIGHT</span>
+          <span className="sm:hidden">AIR</span>
         </button>
 
         <button
           type="button"
           onClick={() => setMode('train')}
-          className={`py-2 rounded-lg flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
+          className={`py-2 px-1 rounded-lg flex items-center justify-center space-x-1 transition-all cursor-pointer ${
             mode === 'train'
               ? 'bg-gradient-to-r from-[#D4AF37]/30 to-[#D4AF37]/10 text-[#FCE7AC] border border-gold-bright shadow-sm'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          <Train className="w-3 h-3" />
+          <Train className="w-3 h-3 shrink-0" />
           <span>TRAIN</span>
         </button>
 
         <button
           type="button"
+          onClick={() => setMode('bus')}
+          className={`py-2 px-1 rounded-lg flex items-center justify-center space-x-1 transition-all cursor-pointer ${
+            mode === 'bus'
+              ? 'bg-gradient-to-r from-[#D4AF37]/30 to-[#D4AF37]/10 text-[#FCE7AC] border border-gold-bright shadow-sm'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Bus className="w-3 h-3 shrink-0" />
+          <span>BUS</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMode('uber')}
+          className={`py-2 px-1 rounded-lg flex items-center justify-center space-x-1 transition-all cursor-pointer ${
+            mode === 'uber' || mode === 'car'
+              ? 'bg-gradient-to-r from-[#D4AF37]/30 to-[#D4AF37]/10 text-[#FCE7AC] border border-gold-bright shadow-sm'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Car className="w-3 h-3 shrink-0" />
+          <span>UBER</span>
+        </button>
+
+        <button
+          type="button"
           onClick={() => setMode('multimodal')}
-          className={`py-2 rounded-lg flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
+          className={`py-2 px-1 rounded-lg flex items-center justify-center space-x-1 transition-all cursor-pointer ${
             mode === 'multimodal'
               ? 'bg-gradient-to-r from-[#D4AF37]/30 to-[#D4AF37]/10 text-[#FCE7AC] border border-gold-bright shadow-sm'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          <Layers className="w-3 h-3" />
-          <span>MULTI-MODAL</span>
+          <Layers className="w-3 h-3 shrink-0" />
+          <span className="hidden sm:inline">MULTI</span>
+          <span className="sm:hidden">ALL</span>
         </button>
       </div>
 
@@ -155,10 +208,53 @@ export const PlanJourneyWidget: React.FC<PlanJourneyWidgetProps> = ({
           label="TO"
           value={destinationCity}
           onChange={setDestinationCity}
-          placeholder="e.g. CDG Paris"
+          placeholder="e.g. UDR Udaipur, LHR London, DXB Dubai"
           mode={mode}
           otherLocationValue={origin}
         />
+      </div>
+
+      {/* Popular Corridor Quick Chips & Clear Button */}
+      <div className="flex items-center justify-between gap-1 flex-wrap text-[10px] font-sans-luxury">
+        <div className="flex items-center space-x-1.5 flex-wrap gap-y-1">
+          <span className="text-[9px] font-cinzel text-slate-400">Popular:</span>
+          <button
+            type="button"
+            onClick={() => {
+              setOrigin('BOM Mumbai (CSMIA T2)');
+              setDestinationCity('UDR Udaipur (Taj Lake Palace)');
+              setMode('flight');
+            }}
+            className="text-[9px] px-1.5 py-0.5 rounded bg-slate-900 border border-gold-subtle/40 text-slate-300 hover:text-white hover:border-[#D4AF37] transition-all cursor-pointer"
+          >
+            Mumbai ➔ Udaipur
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setOrigin('DEL New Delhi (IGI T3)');
+              setDestinationCity('LHR London (Heathrow T5)');
+              setMode('flight');
+            }}
+            className="text-[9px] px-1.5 py-0.5 rounded bg-slate-900 border border-gold-subtle/40 text-slate-300 hover:text-white hover:border-[#D4AF37] transition-all cursor-pointer"
+          >
+            Delhi ➔ London
+          </button>
+        </div>
+
+        {(origin || destinationCity) && (
+          <button
+            type="button"
+            onClick={() => {
+              setOrigin('');
+              setDestinationCity('');
+            }}
+            className="text-[9px] font-cinzel text-slate-400 hover:text-rose-400 flex items-center space-x-1 cursor-pointer transition-colors"
+            title="Clear current route"
+          >
+            <span>Reset</span>
+          </button>
+        )}
       </div>
 
       {/* Dates: DEPART and RETURN */}
@@ -187,90 +283,6 @@ export const PlanJourneyWidget: React.FC<PlanJourneyWidgetProps> = ({
             onChange={(e) => setReturnDate(e.target.value)}
             className="w-full bg-transparent text-xs font-sans-luxury text-slate-200 outline-none mt-0.5"
           />
-        </div>
-      </div>
-
-      {/* Travelers & Class selectors */}
-      <div className="grid grid-cols-2 gap-2.5">
-        {/* Travelers */}
-        <div className="relative">
-          <div
-            onClick={() => setShowTravelerDropdown(!showTravelerDropdown)}
-            className="rounded-xl bg-slate-950/60 border border-slate-800 hover:border-[#D4AF37] px-3 py-2 transition-colors cursor-pointer"
-          >
-            <span className="block text-[9px] font-cinzel font-semibold tracking-widest text-[#D4AF37]">
-              TRAVELERS
-            </span>
-            <div className="flex items-center justify-between mt-0.5">
-              <span className="text-xs font-sans-luxury text-slate-200">{travelers}</span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
-            </div>
-          </div>
-
-          {showTravelerDropdown && (
-            <div className="absolute bottom-full mb-1 left-0 right-0 bg-[#0F1117] border border-gold-subtle rounded-xl py-1 shadow-2xl z-30 text-xs font-mono">
-              {[
-                '2 Adults, 2 Children (Family Holiday)',
-                '2 Adults, 1 Child (Family Vacation)',
-                'Joint Family & Elders (4-8 Guests)',
-                '2 Adults (Couple / Honeymoon)',
-                '1 Adult (Corporate / Solo)',
-                'Wedding Party & VIP Delegation'
-              ].map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => {
-                    setTravelers(t);
-                    setShowTravelerDropdown(false);
-                  }}
-                  className="w-full text-left px-3 py-1.5 hover:bg-[#1A1E29] text-slate-200 hover:text-[#D4AF37]"
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Class */}
-        <div className="relative">
-          <div
-            onClick={() => setShowClassDropdown(!showClassDropdown)}
-            className="rounded-xl bg-slate-950/60 border border-slate-800 hover:border-[#D4AF37] px-3 py-2 transition-colors cursor-pointer"
-          >
-            <span className="block text-[9px] font-cinzel font-semibold tracking-widest text-[#D4AF37]">
-              CLASS
-            </span>
-            <div className="flex items-center justify-between mt-0.5">
-              <span className="text-xs font-sans-luxury text-slate-200">{cabinClass}</span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
-            </div>
-          </div>
-
-          {showClassDropdown && (
-            <div className="absolute bottom-full mb-1 left-0 right-0 bg-[#0F1117] border border-gold-subtle rounded-xl py-1 shadow-2xl z-30 text-xs font-mono">
-              {[
-                'Vande Bharat Executive / Anubhuti',
-                'Business Class / 6E Stretch',
-                'First AC (1A) / Tejas Deluxe',
-                'Premium Economy / AC 2-Tier (2A)',
-                'Maharaja Express Suite / Private Charter'
-              ].map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => {
-                    setCabinClass(c);
-                    setShowClassDropdown(false);
-                  }}
-                  className="w-full text-left px-3 py-1.5 hover:bg-[#1A1E29] text-slate-200 hover:text-[#D4AF37]"
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       </div>
 

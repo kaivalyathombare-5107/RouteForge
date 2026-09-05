@@ -1,6 +1,7 @@
-import { Search, User, Compass, Layers } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Search, User, Compass, Layers, ShieldAlert, Menu, X, Languages } from 'lucide-react';
 
-export type ReRouteSection = 'destinations' | 'journeys' | 'experiences' | 'concierge' | 'membership';
+export type ReRouteSection = 'destinations' | 'journeys' | 'emergency' | 'concierge' | 'translator' | 'membership';
 
 interface ReRouteNavigationProps {
   activeSection: ReRouteSection;
@@ -25,6 +26,19 @@ export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
   selectedCurrency,
   onSelectCurrency
 }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <header className="fixed top-0 left-0 right-0 h-20 bg-[#06070A]/80 backdrop-blur-xl border-b border-gold-subtle/30 z-50 px-4 sm:px-8 flex items-center justify-between">
       {/* Brand */}
@@ -42,52 +56,8 @@ export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
         </div>
       </div>
 
-      {/* Navigation Links (Desktop) */}
-      <nav className="hidden lg:flex items-center space-x-1 border border-slate-800 bg-slate-950/50 p-1 rounded-full">
-        <button
-          onClick={() => onSelectSection('destinations')}
-          className={`px-5 py-2 rounded-full text-xs font-cinzel font-semibold tracking-wider transition-all ${
-            activeSection === 'destinations'
-              ? 'bg-[#D4AF37]/10 text-[#D4AF37] shadow-sm'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Destinations
-        </button>
-        <button
-          onClick={() => onSelectSection('journeys')}
-          className={`px-5 py-2 rounded-full text-xs font-cinzel font-semibold tracking-wider transition-all ${
-            activeSection === 'journeys'
-              ? 'bg-[#D4AF37]/10 text-[#D4AF37] shadow-sm'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Journeys
-        </button>
-        <button
-          onClick={() => onSelectSection('experiences')}
-          className={`px-5 py-2 rounded-full text-xs font-cinzel font-semibold tracking-wider transition-all ${
-            activeSection === 'experiences'
-              ? 'bg-[#D4AF37]/10 text-[#D4AF37] shadow-sm'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Experiences
-        </button>
-        <button
-          onClick={() => onSelectSection('concierge')}
-          className={`px-5 py-2 rounded-full text-xs font-cinzel font-semibold tracking-wider transition-all ${
-            activeSection === 'concierge'
-              ? 'bg-[#D4AF37]/10 text-[#D4AF37] shadow-sm'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Concierge
-        </button>
-      </nav>
-
       {/* Actions */}
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-3 sm:space-x-4 ml-auto mr-2.5 sm:mr-3.5">
         {/* Currency Selector */}
         <select
           value={selectedCurrency}
@@ -108,35 +78,127 @@ export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
           <Search className="w-4 h-4" />
         </button>
 
-        {user && onOpenProviders && (
-          <button
-            onClick={onOpenProviders}
-            title="Provider Connection Center"
-            className="hidden sm:flex items-center space-x-1.5 px-3.5 py-2 rounded-full border border-gold-subtle hover:border-[#D4AF37] text-slate-300 hover:text-[#D4AF37] text-xs font-cinzel tracking-wider transition-all cursor-pointer bg-slate-950/60"
-          >
-            <Layers className="w-3.5 h-3.5 text-[#D4AF37]" />
-            <span>PROVIDERS</span>
-          </button>
-        )}
-
+        {/* Account Tab */}
         {user ? (
-          <div
-            onClick={onOpenAccount || onOpenSignIn}
-            className="hidden sm:flex items-center space-x-2 px-4 py-2 rounded-full border border-gold-subtle bg-[#0B0D13] text-[#D4AF37] font-cinzel text-[11px] font-bold tracking-[0.15em] transition-all cursor-pointer hover:border-gold-bright hover:shadow-lg hover:shadow-[#D4AF37]/10"
+          <button
+            id="nav-account-tab"
+            onClick={onOpenAccount}
+            className="flex items-center space-x-1.5 sm:space-x-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[#D4AF37]/50 bg-[#0B0D13] hover:bg-[#D4AF37]/10 text-[#D4AF37] hover:text-[#FCE7AC] font-cinzel text-[11px] sm:text-xs font-bold tracking-[0.18em] transition-all cursor-pointer hover:border-gold-bright hover:shadow-lg hover:shadow-[#D4AF37]/15"
           >
-            <User className="w-3.5 h-3.5" />
-            <span className="max-w-[140px] truncate">{user.displayName || user.email?.split('@')[0] || 'PRIVÉ'}</span>
-          </div>
+            <User className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <span>ACCOUNT</span>
+          </button>
         ) : (
           <button
+            id="nav-signin-tab"
             onClick={onOpenSignIn}
-            className="hidden sm:flex items-center space-x-2 px-5 py-2.5 rounded-full gold-gradient-bar hover:opacity-95 text-slate-950 font-cinzel text-[11px] font-bold tracking-[0.2em] transition-all shadow-lg shadow-[#D4AF37]/20 cursor-pointer"
+            className="flex items-center space-x-1.5 sm:space-x-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full gold-gradient-bar hover:opacity-95 text-slate-950 font-cinzel text-[11px] sm:text-xs font-bold tracking-[0.18em] transition-all shadow-lg shadow-[#D4AF37]/20 cursor-pointer"
           >
             <User className="w-3.5 h-3.5" />
             <span>SIGN IN</span>
           </button>
         )}
       </div>
+
+      {/* Navigation Links - Contracted Menu Button */}
+      <nav
+        ref={menuRef}
+        id="header-nav-menu"
+        className="relative flex items-center shrink-0"
+      >
+        <div className="relative">
+          <button
+            id="nav-mobile-menu-btn"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="flex items-center space-x-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full border border-gold-subtle/50 bg-[#0A0C14]/90 hover:bg-[#121520] text-slate-200 hover:text-[#FCE7AC] hover:border-[#D4AF37] transition-all cursor-pointer shadow-md"
+            title="Toggle Menu"
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-4 h-4 text-[#D4AF37]" />
+            ) : (
+              <Menu className="w-4 h-4 text-[#D4AF37]" />
+            )}
+            <span className="text-[10px] sm:text-[11px] font-cinzel font-bold tracking-[0.2em] text-[#FCE7AC]">
+              MENU
+            </span>
+          </button>
+
+          {/* Dropdown Panel */}
+          {isMobileMenuOpen && (
+            <div className="absolute right-0 mt-3 w-56 sm:w-60 rounded-2xl bg-[#090B10]/95 border border-gold-subtle/60 backdrop-blur-2xl shadow-2xl p-2 z-50 flex flex-col space-y-1 animate-fadeIn">
+              <button
+                onClick={() => {
+                  onSelectSection('destinations');
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-cinzel font-semibold tracking-wider transition-all cursor-pointer ${
+                  activeSection === 'destinations'
+                    ? 'bg-[#D4AF37]/20 text-[#FCE7AC] border border-[#D4AF37]/40'
+                    : 'text-slate-300 hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                Destinations
+              </button>
+              <button
+                onClick={() => {
+                  onSelectSection('journeys');
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-cinzel font-semibold tracking-wider transition-all cursor-pointer ${
+                  activeSection === 'journeys'
+                    ? 'bg-[#D4AF37]/20 text-[#FCE7AC] border border-[#D4AF37]/40'
+                    : 'text-slate-300 hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                Journeys
+              </button>
+              <button
+                id="nav-emergency-button"
+                onClick={() => {
+                  onSelectSection('emergency');
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-cinzel font-semibold tracking-wider transition-all flex items-center space-x-2 cursor-pointer ${
+                  activeSection === 'emergency'
+                    ? 'bg-red-500/20 text-red-300 border border-red-500/40 font-bold'
+                    : 'text-red-400 hover:bg-red-950/40 hover:text-red-300'
+                }`}
+              >
+                <ShieldAlert className="w-3.5 h-3.5 text-red-400" />
+                <span>Emergency</span>
+              </button>
+              <button
+                onClick={() => {
+                  onSelectSection('concierge');
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-cinzel font-semibold tracking-wider transition-all cursor-pointer ${
+                  activeSection === 'concierge'
+                    ? 'bg-[#D4AF37]/20 text-[#FCE7AC] border border-[#D4AF37]/40'
+                    : 'text-slate-300 hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                Disruption Shield
+              </button>
+              <button
+                id="nav-translator-button"
+                onClick={() => {
+                  onSelectSection('translator');
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-cinzel font-semibold tracking-wider transition-all flex items-center space-x-2 cursor-pointer ${
+                  activeSection === 'translator'
+                    ? 'bg-[#D4AF37]/20 text-[#FCE7AC] border border-[#D4AF37]/40'
+                    : 'text-slate-300 hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <Languages className="w-3.5 h-3.5 text-[#D4AF37]" />
+                <span>Live Translator</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </nav>
     </header>
   );
 };

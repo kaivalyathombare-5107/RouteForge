@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bot, Send, Sparkles, ShieldCheck, ArrowRight, CornerDownLeft, RefreshCw, MessageSquare, Crown } from 'lucide-react';
+import { Bot, Send, Sparkles, ShieldCheck, ArrowRight, CornerDownLeft, RefreshCw, MessageSquare, Crown, Languages, Mic } from 'lucide-react';
 import { Trip, RecoveryOption } from '../types';
 
 interface AIAssistantDrawerProps {
@@ -15,6 +15,8 @@ interface ChatMessage {
   sender: 'user' | 'ai';
   text: string;
   timestamp: string;
+  originalSpoken?: string;
+  sourceLang?: string;
   actionChips?: { label: string; action: () => void }[];
 }
 
@@ -51,7 +53,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
     'Can you arrange a Taj Royal Chauffeur fallback transfer?',
   ];
 
-  const handleSend = async (questionText?: string) => {
+  const handleSend = async (questionText?: string, voiceMeta?: { originalSpoken?: string; sourceLang?: string }) => {
     const textToSend = questionText || inputVal.trim();
     if (!textToSend || isThinking) return;
 
@@ -60,6 +62,8 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
       sender: 'user',
       text: textToSend,
       timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) + ' IST',
+      originalSpoken: voiceMeta?.originalSpoken,
+      sourceLang: voiceMeta?.sourceLang,
     };
 
     setMessages(prev => [...prev, userMsg]);
@@ -111,9 +115,9 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
   };
 
   return (
-    <div className="w-full space-y-6">
+    <div id="concierge-terminal-drawer" className="w-full space-y-6">
       {/* Header */}
-      <div className="p-6 rounded-3xl bg-[#0B0D13]/90 border border-gold-subtle backdrop-blur-xl flex items-center justify-between shadow-xl">
+      <div className="p-6 rounded-3xl bg-[#0B0D13]/90 border border-gold-subtle backdrop-blur-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
         <div className="flex items-center space-x-3.5">
           <div className="w-11 h-11 rounded-2xl bg-slate-950 border border-gold-bright flex items-center justify-center text-[#D4AF37] shadow-md shadow-[#D4AF37]/10">
             <Crown className="w-5 h-5" />
@@ -165,6 +169,14 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
             >
               {msg.text}
 
+              {/* Voice Translation Annotation if user spoke in another language */}
+              {msg.originalSpoken && (
+                <div className="mt-2.5 pt-2 border-t border-slate-950/20 text-[11px] font-mono text-slate-900 flex items-center space-x-1.5 opacity-90">
+                  <Mic className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span>Transcribed from mic: "{msg.originalSpoken}"</span>
+                </div>
+              )}
+
               {/* Action Chips */}
               {msg.actionChips && msg.actionChips.length > 0 && (
                 <div className="mt-4 pt-3 border-t border-gold-subtle/30 flex flex-wrap gap-2.5">
@@ -199,17 +211,30 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
           value={inputVal}
           onChange={e => setInputVal(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSend()}
-          placeholder="Ask anything about your flights, royal stays, transfer buffers, or refund rules..."
-          className="w-full bg-[#0B0D13]/90 border border-gold-subtle rounded-2xl px-6 py-4 sm:py-5 pr-32 text-xs sm:text-sm font-sans-luxury text-slate-100 placeholder-slate-400 focus:outline-none focus:border-gold-bright transition-colors shadow-2xl"
+          placeholder="Ask the ReRoute Privé AI Concierge about connections, palace holds, refunds..."
+          className="w-full bg-[#0B0D13]/90 border border-gold-subtle rounded-2xl px-6 py-4 sm:py-5 pr-48 text-xs sm:text-sm font-sans-luxury text-slate-100 placeholder-slate-400 focus:outline-none focus:border-gold-bright transition-colors shadow-2xl"
         />
-        <button
-          onClick={() => handleSend()}
-          disabled={!inputVal.trim() || isThinking}
-          className="absolute right-3 top-1/2 -translate-y-1/2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#A88325] hover:from-[#FCE7AC] hover:to-[#D4AF37] disabled:opacity-40 text-slate-950 text-xs font-cinzel font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-md"
-        >
-          <span>SEND</span>
-          <Send className="w-3.5 h-3.5" />
-        </button>
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center space-x-2">
+          <button
+            id="chat-mic-translator-btn"
+            type="button"
+            onClick={() => onNavigateTab('translator')}
+            className="p-2.5 sm:px-3 rounded-xl border text-xs font-sans-luxury flex items-center space-x-1.5 transition-all cursor-pointer shadow-md bg-slate-900/90 text-[#FCE7AC] border-gold-subtle/60 hover:bg-[#D4AF37]/20 hover:border-gold-bright"
+            title="Open Live Voice & Speech Translator"
+          >
+            <Languages className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <span className="hidden md:inline text-[11px] font-cinzel">VOICE TRANSLATOR</span>
+          </button>
+
+          <button
+            onClick={() => handleSend()}
+            disabled={!inputVal.trim() || isThinking}
+            className="px-5 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#A88325] hover:from-[#FCE7AC] hover:to-[#D4AF37] disabled:opacity-40 text-slate-950 text-xs font-cinzel font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-md"
+          >
+            <span>SEND</span>
+            <Send className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -110,7 +110,7 @@ export const RecoveryPlannerSection: React.FC<RecoveryPlannerSectionProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
           {recoveryOptions.map((option, idx) => {
             const isSelected = selectedOptionId === option.id;
             const isRankOne = idx === 0;
@@ -120,7 +120,7 @@ export const RecoveryPlannerSection: React.FC<RecoveryPlannerSectionProps> = ({
                 key={option.id}
                 onMouseEnter={() => onHoverRecoveryOption(option)}
                 onMouseLeave={() => onHoverRecoveryOption(null)}
-                className={`p-7 sm:p-8 rounded-3xl border transition-all flex flex-col justify-between relative overflow-hidden backdrop-blur-xl ${
+                className={`p-6 rounded-3xl border transition-all flex flex-col justify-between relative overflow-hidden backdrop-blur-xl ${
                   isSelected
                     ? 'bg-emerald-950/30 border-emerald-500/80 shadow-2xl shadow-emerald-950/40 scale-[1.01]'
                     : isRankOne
@@ -141,7 +141,7 @@ export const RecoveryPlannerSection: React.FC<RecoveryPlannerSectionProps> = ({
                     <span className="text-[10px] font-cinzel uppercase px-2.5 py-1 rounded-full bg-slate-950 border border-gold-subtle text-[#D4AF37] font-semibold">
                       {option.strategy}
                     </span>
-                    <h4 className="text-lg font-bold font-serif-display text-white mt-2.5">
+                    <h4 className="text-base font-bold font-serif-display text-white mt-2.5 leading-snug">
                       {option.title}
                     </h4>
                     <p className="text-xs text-slate-300 font-sans-luxury font-light mt-1.5 leading-relaxed">
@@ -149,27 +149,49 @@ export const RecoveryPlannerSection: React.FC<RecoveryPlannerSectionProps> = ({
                     </p>
                   </div>
 
+                  {/* Key Comparison Badges */}
+                  <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-slate-950/70 border border-gold-subtle/30 text-[10px] font-mono">
+                    <div>
+                      <span className="text-slate-500 block">Changes:</span>
+                      <span className="text-slate-200 font-bold">{option.numberOfChanges !== undefined ? `${option.numberOfChanges} Transfer` : '1 Transfer'}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 block">Arrival Delta:</span>
+                      <span className={option.arrivalDeltaMinutes <= 30 ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
+                        +{option.arrivalDeltaMinutes}m
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 block">Convenience:</span>
+                      <span className="text-[#FCE7AC] font-bold">{option.convenienceRating || 9.2}/10</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 block">Risk Level:</span>
+                      <span className="text-cyan-300 font-bold capitalize">{option.riskLevel || 'low'}</span>
+                    </div>
+                  </div>
+
                   {/* Tags */}
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-1">
                     {option.tags.map((tag, i) => (
-                      <span key={i} className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-950 border border-gold-subtle/40 text-slate-300">
+                      <span key={i} className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-slate-950 border border-gold-subtle/40 text-slate-300">
                         {tag}
                       </span>
                     ))}
                   </div>
 
                   {/* Financial Reconciliation Box */}
-                  <div className="p-3.5 rounded-2xl bg-slate-950/90 border border-gold-subtle space-y-2 text-xs font-mono">
-                    <div className="flex justify-between text-slate-400">
-                      <span>Alternate Rebooking Cost:</span>
+                  <div className="p-3 rounded-2xl bg-slate-950/90 border border-gold-subtle space-y-1.5 text-xs font-mono">
+                    <div className="flex justify-between text-slate-400 text-[11px]">
+                      <span>Rebooking Cost:</span>
                       <span className="text-slate-200 font-semibold">₹{option.additionalCost.toLocaleString('en-IN')}</span>
                     </div>
-                    <div className="flex justify-between text-slate-400">
-                      <span>Mandated Refund Credit:</span>
+                    <div className="flex justify-between text-slate-400 text-[11px]">
+                      <span>Refund Credit:</span>
                       <span className="text-emerald-400 font-semibold">-₹{option.refundRecoveryAmount.toLocaleString('en-IN')}</span>
                     </div>
-                    <div className="border-t border-gold-subtle/30 pt-1.5 flex justify-between font-bold">
-                      <span className="text-slate-300">Net Financial Impact:</span>
+                    <div className="border-t border-gold-subtle/30 pt-1.5 flex justify-between font-bold text-xs">
+                      <span className="text-slate-300">Net Impact:</span>
                       <span className={option.netFinancialImpact <= 0 ? 'text-emerald-400' : 'text-[#FCE7AC]'}>
                         {option.netFinancialImpact < 0 ? `-₹${Math.abs(option.netFinancialImpact)} (Surplus)` : `+₹${option.netFinancialImpact}`}
                       </span>
@@ -177,29 +199,34 @@ export const RecoveryPlannerSection: React.FC<RecoveryPlannerSectionProps> = ({
                   </div>
 
                   {/* Step Sequence Preview */}
-                  <div className="space-y-2">
-                    <div className="text-[10px] font-cinzel text-[#D4AF37] uppercase tracking-wider">EXECUTION STEPS:</div>
-                    {option.steps.map((step, sIdx) => (
-                      <div key={step.id} className="text-xs p-2.5 rounded-xl bg-slate-950/60 border border-gold-subtle/30 flex items-start space-x-2.5">
-                        <span className="text-[#D4AF37] font-cinzel font-bold text-[11px]">0{sIdx + 1}</span>
+                  <div className="space-y-1.5">
+                    <div className="text-[10px] font-cinzel text-[#D4AF37] uppercase tracking-wider">SEQUENCE:</div>
+                    {option.steps.slice(0, 2).map((step, sIdx) => (
+                      <div key={step.id} className="text-xs p-2 rounded-xl bg-slate-950/60 border border-gold-subtle/30 flex items-start space-x-2">
+                        <span className="text-[#D4AF37] font-cinzel font-bold text-[10px]">0{sIdx + 1}</span>
                         <div className="leading-tight">
-                          <div className="text-slate-200 font-sans-luxury text-xs font-medium">{step.title}</div>
-                          <div className="text-[10px] font-mono text-slate-400 mt-0.5">{step.timing} • {step.provider}</div>
+                          <div className="text-slate-200 font-sans-luxury text-[11px] font-medium truncate">{step.title}</div>
+                          <div className="text-[9px] font-mono text-slate-400">{step.timing} • {step.provider}</div>
                         </div>
                       </div>
                     ))}
+                    {option.steps.length > 2 && (
+                      <div className="text-[10px] font-mono text-slate-500 pl-2">
+                        +{option.steps.length - 2} more coordinated step(s)
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Select CTA */}
-                <div className="mt-6 pt-4 border-t border-gold-subtle/40">
-                  <div className="text-[11px] font-sans-luxury text-slate-400 mb-3 italic">
+                <div className="mt-5 pt-3 border-t border-gold-subtle/40">
+                  <div className="text-[10px] font-sans-luxury text-slate-400 mb-2.5 italic line-clamp-2">
                     {option.matchReason}
                   </div>
                   <button
                     id={`btn-select-plan-${option.id}`}
                     onClick={() => onSelectRecoveryOption(option)}
-                    className="w-full py-3 rounded-full font-cinzel text-xs font-bold bg-gradient-to-r from-[#D4AF37] to-[#A88325] hover:from-[#FCE7AC] hover:to-[#D4AF37] text-slate-950 shadow-lg shadow-[#D4AF37]/20 flex items-center justify-center space-x-2 transition-all transform active:scale-95 cursor-pointer"
+                    className="w-full py-2.5 rounded-full font-cinzel text-xs font-bold bg-gradient-to-r from-[#D4AF37] to-[#A88325] hover:from-[#FCE7AC] hover:to-[#D4AF37] text-slate-950 shadow-lg shadow-[#D4AF37]/20 flex items-center justify-center space-x-2 transition-all transform active:scale-95 cursor-pointer"
                   >
                     <span>SELECT THIS PLAN</span>
                     <ArrowRight className="w-3.5 h-3.5" />

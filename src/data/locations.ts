@@ -10,9 +10,15 @@ export interface LocationSuggestion {
   region: 'India & Subcontinent' | 'Europe' | 'Americas' | 'Asia & Pacific' | 'Middle East & Africa' | 'Oceania';
   coordinates?: [number, number];
   isLiveResult?: boolean;
+  tier?: string;
+  zone?: string;
 }
 
-export const LOCATION_SUGGESTIONS: LocationSuggestion[] = [
+import { INDIAN_CITIES } from './indian-cities';
+
+export { INDIAN_CITIES };
+
+const RAW_ADDITIONAL_SUGGESTIONS: LocationSuggestion[] = [
   // --- India & Subcontinent (Targeted Premier Hubs) ---
   {
     id: 'bom-mumbai',
@@ -947,18 +953,6 @@ export const LOCATION_SUGGESTIONS: LocationSuggestion[] = [
     coordinates: [135.2327, 34.432],
   },
   {
-    id: 'sin-singapore',
-    code: 'SIN',
-    city: 'Singapore',
-    state: 'Singapore',
-    country: 'Singapore',
-    terminal: 'Changi Airport (Jewel & JetQuay VIP Hub)',
-    type: 'flight',
-    popular: true,
-    region: 'Asia & Pacific',
-    coordinates: [103.9915, 1.3644],
-  },
-  {
     id: 'icn-seoul',
     code: 'ICN',
     city: 'Seoul',
@@ -981,54 +975,6 @@ export const LOCATION_SUGGESTIONS: LocationSuggestion[] = [
     popular: true,
     region: 'Asia & Pacific',
     coordinates: [113.9145, 22.308],
-  },
-  {
-    id: 'bkk-bangkok',
-    code: 'BKK',
-    city: 'Bangkok',
-    state: 'Bangkok',
-    country: 'Thailand',
-    terminal: 'Suvarnabhumi Airport (Royal First)',
-    type: 'flight',
-    popular: true,
-    region: 'Asia & Pacific',
-    coordinates: [100.7501, 13.69],
-  },
-  {
-    id: 'hkt-phuket',
-    code: 'HKT',
-    city: 'Phuket & Phi Phi',
-    state: 'Phuket',
-    country: 'Thailand',
-    terminal: 'Phuket International & Luxury Marina',
-    type: 'multimodal',
-    popular: true,
-    region: 'Asia & Pacific',
-    coordinates: [98.3065, 8.1132],
-  },
-  {
-    id: 'dps-bali',
-    code: 'DPS',
-    city: 'Bali (Ubud & Seminyak)',
-    state: 'Bali',
-    country: 'Indonesia',
-    terminal: 'Ngurah Rai International & Private Helipad',
-    type: 'multimodal',
-    popular: true,
-    region: 'Asia & Pacific',
-    coordinates: [115.1668, -8.7467],
-  },
-  {
-    id: 'mle-maldives',
-    code: 'MLE',
-    city: 'Malé & Baa Atoll',
-    state: 'Kaafu',
-    country: 'Maldives',
-    terminal: 'Velana International & Trans Maldivian Seaplane Lounge',
-    type: 'multimodal',
-    popular: true,
-    region: 'Asia & Pacific',
-    coordinates: [73.5291, 4.1918],
   },
   {
     id: 'del-delhi',
@@ -1275,3 +1221,39 @@ export const LOCATION_SUGGESTIONS: LocationSuggestion[] = [
     coordinates: [55.5219, -4.6743],
   }
 ];
+
+const INTERNATIONAL_SUGGESTIONS: LocationSuggestion[] = RAW_ADDITIONAL_SUGGESTIONS.filter(
+  (loc) => loc.country !== 'India'
+);
+
+const RAW_INDIAN_ADDITIONS: LocationSuggestion[] = RAW_ADDITIONAL_SUGGESTIONS.filter(
+  (loc) =>
+    loc.country === 'India' &&
+    !INDIAN_CITIES.some(
+      (ic) =>
+        ic.code.toLowerCase() === loc.code.toLowerCase() ||
+        ic.city.toLowerCase() === loc.city.toLowerCase()
+    )
+);
+
+// Balanced union prioritizing top global hubs outside India and top Indian metros
+const COMBINED_LOCATIONS: LocationSuggestion[] = [
+  // Top iconic international hubs outside India
+  ...INTERNATIONAL_SUGGESTIONS.filter((l) => l.popular),
+  // Top iconic Indian metros & cities
+  ...INDIAN_CITIES.filter((l) => l.popular),
+  // Remaining international locations
+  ...INTERNATIONAL_SUGGESTIONS.filter((l) => !l.popular),
+  // Remaining Indian locations
+  ...INDIAN_CITIES.filter((l) => !l.popular),
+  // Indian special multimodal / rail additions
+  ...RAW_INDIAN_ADDITIONS,
+];
+
+// Deduplicate strictly by ID
+const seenLocationIds = new Set<string>();
+export const LOCATION_SUGGESTIONS: LocationSuggestion[] = COMBINED_LOCATIONS.filter((loc) => {
+  if (seenLocationIds.has(loc.id)) return false;
+  seenLocationIds.add(loc.id);
+  return true;
+});
