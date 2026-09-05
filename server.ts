@@ -1264,7 +1264,20 @@ Respond STRICTLY with valid JSON:
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        watch: {
+          ignored: [
+            '**/data/**',
+            '**/data/*.json',
+            '**/.git/**',
+            '**/scratch/**',
+            '**/dist/**',
+            '**/*.log',
+            /[/\\]data[/\\].*/,
+          ],
+        },
+      },
       appType: 'spa',
     });
     app.use(vite.middlewares);

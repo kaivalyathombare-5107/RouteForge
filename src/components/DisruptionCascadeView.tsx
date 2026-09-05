@@ -24,6 +24,7 @@ interface DisruptionCascadeViewProps {
   onOpenRecovery: () => void;
   onSelectBooking: (id: string) => void;
   activeScenarioId?: string;
+  isRecoveryOpen?: boolean;
 }
 
 export const DisruptionCascadeView: React.FC<DisruptionCascadeViewProps> = ({
@@ -36,6 +37,7 @@ export const DisruptionCascadeView: React.FC<DisruptionCascadeViewProps> = ({
   onOpenRecovery,
   onSelectBooking,
   activeScenarioId = 'flight_delay_90',
+  isRecoveryOpen = false,
 }) => {
   const disruptedCount = bookings.filter(b => b.status === 'cancelled' || b.status === 'delayed').length;
   const impactedCount = bookings.filter(b => b.status === 'impacted' || b.status === 'missed' || b.status === 'at_risk').length;
@@ -286,16 +288,21 @@ export const DisruptionCascadeView: React.FC<DisruptionCascadeViewProps> = ({
               </div>
             </div>
 
-            {isDisrupted && (
-              <button
-                id="btn-open-recovery-from-cascade"
-                onClick={onOpenRecovery}
-                className="w-full py-3 rounded-xl font-mono text-xs font-bold bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 flex items-center justify-center space-x-2 shadow-xl shadow-emerald-950/40 transition-all cursor-pointer"
-              >
-                <span>GENERATE RECOVERY OPTIONS</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            )}
+            <button
+              id="btn-open-recovery-from-cascade"
+              type="button"
+              onClick={onOpenRecovery}
+              className={`w-full py-3.5 rounded-xl font-mono text-xs font-bold flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-xl ${
+                isRecoveryOpen
+                  ? 'bg-emerald-950/80 hover:bg-emerald-900/90 text-emerald-300 border border-emerald-500/60 shadow-emerald-950/40'
+                  : isDisrupted
+                  ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 shadow-emerald-950/40 animate-pulse'
+                  : 'bg-gradient-to-r from-[#D4AF37] to-[#F3E5AB] hover:from-[#e5bd3c] hover:to-[#fff0bd] text-slate-950 shadow-gold-subtle/30'
+              }`}
+            >
+              <span>{isRecoveryOpen ? 'RECOVERY PLANS ACTIVE ↓' : 'GENERATE RECOVERY OPTIONS'}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
 
           {/* IRCTC & Aviation Compliance Rules Box */}

@@ -33,7 +33,7 @@ import { ValuePropositionBar } from './components/ValuePropositionBar';
 import { Full360PanoramaModal } from './components/Full360PanoramaModal';
 import { ReRouteSignInModal } from './components/ReRouteSignInModal';
 import { JourneySearchResultsModal } from './components/JourneySearchResultsModal';
-import { JourneySearchParams } from './types/journey';
+import { JourneyPlanOption, JourneySearchParams } from './types/journey';
 import { useAuth } from './hooks/useAuth';
 import { TravellerProfileModal } from './components/TravellerProfileModal';
 import { ProviderConnectionModal } from './components/ProviderConnectionModal';
@@ -46,7 +46,6 @@ import { cancelBooking } from './lib/api/refunds';
 
 // Disruption & 2D Spatial Systems
 import { TwoDimTripGraph } from './components/TwoDimTripGraph';
-import { TripTimeline } from './components/TripTimeline';
 import { SpatialNodeInspector } from './components/SpatialNodeInspector';
 import { DisruptionCascadeView } from './components/DisruptionCascadeView';
 import { RecoveryPlannerSection } from './components/RecoveryPlannerSection';
@@ -63,10 +62,18 @@ import { PlanJourneyWidget } from './components/PlanJourneyWidget';
 import { Sparkles, Shield, AlertCircle, ArrowDown } from 'lucide-react';
 
 export default function App() {
+  const readStored = <T,>(key: string, fallback: T): T => {
+    try {
+      const stored = localStorage.getItem(key);
+      return stored ? JSON.parse(stored) as T : fallback;
+    } catch {
+      return fallback;
+    }
+  };
+
   // Navigation & Category States
-  const [activeSection, setActiveSection] = useState<ReRouteSection>('destinations');
+  const [activeSection, setActiveSection] = useState<ReRouteSection>(() => readStored('routeforge_active_section', 'destinations'));
   const [activeCategory, setActiveCategory] = useState<SidebarCategory>('home');
-  const [selectedCurrency, setSelectedCurrency] = useState('INR');
 
   // Destination & Carousel State
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
@@ -77,8 +84,8 @@ export default function App() {
   const [isFullPanoramaOpen, setIsFullPanoramaOpen] = useState(false);
   const [isSignInOpen, setIsSignInOpen] = useState(false);
   const [isSearchResultsOpen, setIsSearchResultsOpen] = useState(false);
-  const [hasUserEnteredJourney, setHasUserEnteredJourney] = useState<boolean>(false);
-  const [searchParams, setSearchParams] = useState<JourneySearchParams>({
+  const [hasUserEnteredJourney, setHasUserEnteredJourney] = useState<boolean>(() => readStored('routeforge_has_entered_journey', false));
+  const [searchParams, setSearchParams] = useState<JourneySearchParams>(() => readStored('routeforge_search_params', {
     origin: '',
     destination: '',
     departDate: '15 Oct, 2026',
@@ -86,19 +93,22 @@ export default function App() {
     travelers: '2 Adults, 2 Children (Family Holiday)',
     cabinClass: 'Vande Bharat Executive / Anubhuti',
     mode: 'flight',
-  });
+  }));
 
   // Canonical Trip & Recovery State (Engine Core)
   const [trip, setTrip] = useState<Trip>(INITIAL_TRIP);
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
-  const [isDisrupted, setIsDisrupted] = useState<boolean>(false);
-  const [recoveryOptions, setRecoveryOptions] = useState<RecoveryOption[]>([]);
+  const [isTimelineReset, setIsTimelineReset] = useState<boolean>(() => readStored('routeforge_timeline_reset', false));
+  const [confirmedTimelineBookings, setConfirmedTimelineBookings] = useState<Booking[]>(() => readStored('routeforge_confirmed_timeline_bookings', []));
+  const [isDisrupted, setIsDisrupted] = useState<boolean>(() => readStored('routeforge_is_disrupted', false));
+  const [recoveryOptions, setRecoveryOptions] = useState<RecoveryOption[]>(() => readStored('routeforge_recovery_options', []));
   const [hoveredRecoveryOption, setHoveredRecoveryOption] = useState<RecoveryOption | null>(null);
   const [activeRecoveryPlan, setActiveRecoveryPlan] = useState<RecoveryOption | null>(null);
   const [modalOptionToExecute, setModalOptionToExecute] = useState<RecoveryOption | null>(null);
   const [isInfeasibleState, setIsInfeasibleState] = useState<boolean>(false);
-  const [activeScenarioId, setActiveScenarioId] = useState<string>('flight_delay_90');
+  const [activeScenarioId, setActiveScenarioId] = useState<string>(() => readStored('routeforge_active_scenario', 'flight_delay_90'));
   const [isReportProblemOpen, setIsReportProblemOpen] = useState<boolean>(false);
+  const [showRecoveryPlans, setShowRecoveryPlans] = useState<boolean>(() => readStored('routeforge_show_recovery_plans', false));
 
   // Settings
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
@@ -111,6 +121,18 @@ export default function App() {
   const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
   const [isProviderConnectionOpen, setIsProviderConnectionOpen] = useState<boolean>(false);
   const [isAccountDetailsOpen, setIsAccountDetailsOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    localStorage.setItem('routeforge_active_section', JSON.stringify(activeSection));
+    localStorage.setItem('routeforge_is_disrupted', JSON.stringify(isDisrupted));
+    localStorage.setItem('routeforge_active_scenario', JSON.stringify(activeScenarioId));
+    localStorage.setItem('routeforge_recovery_options', JSON.stringify(recoveryOptions));
+    localStorage.setItem('routeforge_show_recovery_plans', JSON.stringify(showRecoveryPlans));
+    localStorage.setItem('routeforge_has_entered_journey', JSON.stringify(hasUserEnteredJourney));
+    localStorage.setItem('routeforge_search_params', JSON.stringify(searchParams));
+    localStorage.setItem('routeforge_timeline_reset', JSON.stringify(isTimelineReset));
+    localStorage.setItem('routeforge_confirmed_timeline_bookings', JSON.stringify(confirmedTimelineBookings));
+  }, [activeSection, isDisrupted, activeScenarioId, recoveryOptions, showRecoveryPlans, hasUserEnteredJourney, searchParams, isTimelineReset, confirmedTimelineBookings]);
 
   // Check profile upon authentication (Spec Section 1 & 2: First-time user onboarding)
   useEffect(() => {
@@ -384,14 +406,38 @@ export default function App() {
     setRecoveryOptions(generatedOptions);
   };
 
+  const handleGenerateRecoveryOptions = () => {
+    playSound('click', soundEnabled);
+    if (recoveryOptions.length === 0) {
+      const targetBooking =
+        trip.bookings.find((b) => b.status === 'delayed' || b.status === 'cancelled' || b.status === 'impacted') ||
+        trip.bookings[0];
+      const generated = generateRecoveryOptions(targetBooking, trip);
+      setRecoveryOptions(generated);
+    }
+    setShowRecoveryPlans(true);
+    setTimeout(() => {
+      document.getElementById('concierge-recovery-planner')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
+  };
+
   const handleResetTrip = () => {
     playSound('click', soundEnabled);
+    setConfirmedTimelineBookings([]);
+    setIsTimelineReset(true);
     setIsDisrupted(false);
+    setShowRecoveryPlans(false);
     setActiveScenarioId('flight_delay_90');
     setRecoveryOptions([]);
     setHoveredRecoveryOption(null);
     setActiveRecoveryPlan(null);
     setSelectedBookingId(null);
+    try {
+      localStorage.removeItem('routeforge_is_disrupted');
+      localStorage.removeItem('routeforge_recovery_options');
+      localStorage.removeItem('routeforge_active_scenario');
+      localStorage.removeItem('routeforge_show_recovery_plans');
+    } catch {}
     setTrip({
       ...INITIAL_TRIP,
       bookings: INITIAL_BOOKINGS.map((b) => ({ ...b })),
@@ -400,6 +446,40 @@ export default function App() {
       preferences: { ...INITIAL_USER_PREFERENCES },
       status: 'monitoring',
     });
+  };
+
+  const handlePlanConfirmed = (plan: JourneyPlanOption) => {
+    const firstLeg = plan.legs[0];
+    const confirmedBooking: Booking = {
+      id: `confirmed-${plan.id}`,
+      type: firstLeg?.type === 'car' ? 'transfer' : firstLeg?.type === 'stay' ? 'hotel' : firstLeg?.type || 'flight',
+      provider: firstLeg?.provider || 'confirmed-plan',
+      providerCode: firstLeg?.provider || 'confirmed-plan',
+      title: plan.title,
+      referenceCode: firstLeg?.bookingReference || plan.id,
+      origin: firstLeg?.label || 'Confirmed journey origin',
+      destination: firstLeg?.label || 'Confirmed journey destination',
+      departureTime: firstLeg?.depTime || firstLeg?.time || 'Scheduled',
+      arrivalTime: firstLeg?.arrTime || firstLeg?.time || 'Scheduled',
+      departureTimestamp: Date.now(),
+      arrivalTimestamp: Date.now(),
+      price: plan.totalPrice || 0,
+      currency: plan.currency || 'INR',
+      status: 'normal',
+      location: { city: firstLeg?.label || 'Confirmed destination', venue: plan.title, code: firstLeg?.bookingReference || plan.id, x: 0, y: 0, z: 0 },
+      riskLevel: 'none',
+      delayMinutes: 0,
+      downstreamImpactIds: [],
+      lastVerifiedAt: new Date().toISOString(),
+      isImportedStatus: false,
+      policy: { ruleId: 'CONFIRMED_PLAN', policyVersion: '1.0', cancellationCutoffHours: 24, baseDeduction: 0, percentageDeduction: 0, tdrEligible: false, tdrWindowHours: 0, termsSummary: plan.disruptionShield },
+    };
+    setIsTimelineReset(false);
+    setConfirmedTimelineBookings([confirmedBooking]);
+    setActiveSection('journeys');
+    setTimeout(() => {
+      document.getElementById('chronological-spatial-timeline')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
   };
 
   // Recovery Execution Handler (Sections 15, 20)
@@ -527,20 +607,6 @@ export default function App() {
         onOpenProviders={() => setIsProviderConnectionOpen(true)}
         onOpenAccount={() => setIsAccountDetailsOpen(true)}
         user={user}
-        onOpenSearch={() => {
-          setSearchParams({
-            origin: 'JFK New York',
-            destination: currentDestination.name,
-            departDate: '24 May, 2025',
-            returnDate: '31 May, 2025',
-            travelers: '2 Adults',
-            cabinClass: 'Business',
-            mode: 'flight',
-          });
-          setIsSearchResultsOpen(true);
-        }}
-        selectedCurrency={selectedCurrency}
-        onSelectCurrency={setSelectedCurrency}
       />
 
       {/* Left Floating Category Dock & Vertical "SCROLL TO EXPLORE" */}
@@ -734,17 +800,6 @@ export default function App() {
                   </AnimatePresence>
                 </div>
 
-                {/* Timeline */}
-                <TripTimeline
-                  bookings={trip.bookings}
-                  edges={trip.edges}
-                  selectedBookingId={selectedBookingId}
-                  onSelectBooking={(id) => {
-                    playSound('click', soundEnabled);
-                    setSelectedBookingId(id);
-                  }}
-                  isDisrupted={isDisrupted}
-                />
               </div>
             </div>
           </div>
@@ -811,22 +866,24 @@ export default function App() {
                     <span>🚨 REPORT MID-JOURNEY PROBLEM</span>
                   </button>
                   <button
-                    onClick={() => document.getElementById('concierge-ai-terminal')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="px-4 py-2 rounded-full bg-slate-950/90 hover:bg-[#D4AF37]/10 border border-gold-subtle hover:border-gold-bright text-xs font-cinzel font-semibold text-slate-200 hover:text-[#FCE7AC] transition-all cursor-pointer"
-                  >
-                    1. AI CONCIERGE TERMINAL
-                  </button>
-                  <button
                     onClick={() => document.getElementById('concierge-cascade-radar')?.scrollIntoView({ behavior: 'smooth' })}
                     className="px-4 py-2 rounded-full bg-slate-950/90 hover:bg-[#D4AF37]/10 border border-gold-subtle hover:border-gold-bright text-xs font-cinzel font-semibold text-slate-200 hover:text-[#FCE7AC] transition-all cursor-pointer"
                   >
                     1B. CASCADE RADAR
                   </button>
                   <button
-                    onClick={() => document.getElementById('concierge-recovery-planner')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="px-4 py-2 rounded-full bg-slate-950/90 hover:bg-[#D4AF37]/10 border border-gold-subtle hover:border-gold-bright text-xs font-cinzel font-semibold text-slate-200 hover:text-[#FCE7AC] transition-all cursor-pointer"
+                    id="btn-nav-generate-recovery"
+                    type="button"
+                    onClick={handleGenerateRecoveryOptions}
+                    className={`px-4 py-2 rounded-full border text-xs font-cinzel font-semibold transition-all cursor-pointer ${
+                      showRecoveryPlans
+                        ? 'bg-emerald-950/60 border-emerald-500/80 text-emerald-200 hover:text-white shadow-lg shadow-emerald-950/30'
+                        : 'bg-slate-950/90 hover:bg-[#D4AF37]/10 border-gold-subtle hover:border-gold-bright text-slate-200 hover:text-[#FCE7AC]'
+                    }`}
                   >
-                    2. MULTI-MODAL RECOVERY PLANS ({recoveryOptions.length > 0 ? recoveryOptions.length : 3})
+                    {showRecoveryPlans
+                      ? `2. RECOVERY PLANS ACTIVE (${recoveryOptions.length > 0 ? recoveryOptions.length : 3}) ↓`
+                      : '2. GENERATE RECOVERY OPTIONS'}
                   </button>
                   <button
                     onClick={() => document.getElementById('concierge-refund-engine')?.scrollIntoView({ behavior: 'smooth' })}
@@ -858,42 +915,6 @@ export default function App() {
 
               <ConciergeTripExtensionsSection
                 onNavigateSection={(sec) => setActiveSection(sec as any)}
-              />
-            </section>
-
-            {/* PART 1: AI CONCIERGE TERMINAL (WIDE & SPACIOUS) */}
-            <section id="concierge-ai-terminal" className="scroll-mt-28 space-y-4">
-              <div className="flex items-center justify-between border-b border-gold-subtle/50 pb-3">
-                <div className="flex items-center space-x-3">
-                  <span className="w-7 h-7 rounded-full bg-[#D4AF37] text-slate-950 font-cinzel font-bold text-xs flex items-center justify-center shadow-md">
-                    01
-                  </span>
-                  <div>
-                    <h3 className="text-xl sm:text-2xl font-bold font-serif-display text-white">
-                      ReRoute Privé AI Concierge Terminal
-                    </h3>
-                    <p className="text-xs text-slate-400 font-sans-luxury">
-                      Natural language travel assistant grounded strictly in verified itinerary facts, IRCTC rules, and palace coordination.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <AIAssistantDrawer
-                trip={trip}
-                isDisrupted={isDisrupted}
-                recoveryOptions={recoveryOptions}
-                onSelectOption={(opt) => setModalOptionToExecute(opt)}
-                onNavigateTab={(tab) => {
-                  if (tab === 'command_center') setActiveSection('journeys');
-                  if (tab === 'translator') setActiveSection('translator');
-                  if (tab === 'recovery_planner') {
-                    document.getElementById('concierge-recovery-planner')?.scrollIntoView({ behavior: 'smooth' });
-                  }
-                  if (tab === 'refund_intelligence') {
-                    document.getElementById('concierge-refund-engine')?.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
               />
             </section>
 
@@ -930,48 +951,57 @@ export default function App() {
                 proactiveWarnings={trip.proactiveWarnings}
                 onSimulateScenario={(scId) => handleSimulateDisruption(scId)}
                 onReset={handleResetTrip}
-                onOpenRecovery={() => {
-                  document.getElementById('concierge-recovery-planner')?.scrollIntoView({ behavior: 'smooth' });
-                }}
+                onOpenRecovery={handleGenerateRecoveryOptions}
+                isRecoveryOpen={showRecoveryPlans}
                 onSelectBooking={(id) => setSelectedBookingId(id)}
                 activeScenarioId={activeScenarioId}
               />
             </section>
 
-            {/* PART 2: AUTONOMOUS MULTI-MODAL RECOVERY PLANS (WIDE & SPACIOUS) */}
-            <section id="concierge-recovery-planner" className="scroll-mt-28 space-y-4">
-              <div className="flex items-center justify-between border-b border-gold-subtle/50 pb-3">
-                <div className="flex items-center space-x-3">
-                  <span className="w-7 h-7 rounded-full bg-[#D4AF37] text-slate-950 font-cinzel font-bold text-xs flex items-center justify-center shadow-md">
-                    02
-                  </span>
-                  <div>
-                    <h3 className="text-xl sm:text-2xl font-bold font-serif-display text-white">
-                      Autonomous Multi-Modal Recovery Plans ({recoveryOptions.length > 0 ? recoveryOptions.length : 3})
-                    </h3>
-                    <p className="text-xs text-slate-400 font-sans-luxury">
-                      Compare feasible rebooking corridors with net financial impact, timing buffers, and royal comfort scores.
-                    </p>
+            {/* PART 2: AUTONOMOUS MULTI-MODAL RECOVERY PLANS (SHOWN ONLY ON "GENERATE RECOVERY OPTIONS") */}
+            {showRecoveryPlans && (
+              <section id="concierge-recovery-planner" className="scroll-mt-28 space-y-4 animate-fadeIn">
+                <div className="flex items-center justify-between border-b border-gold-subtle/50 pb-3">
+                  <div className="flex items-center space-x-3">
+                    <span className="w-7 h-7 rounded-full bg-[#D4AF37] text-slate-950 font-cinzel font-bold text-xs flex items-center justify-center shadow-md">
+                      02
+                    </span>
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-bold font-serif-display text-white">
+                        Autonomous Multi-Modal Recovery Plans ({recoveryOptions.length > 0 ? recoveryOptions.length : 3})
+                      </h3>
+                      <p className="text-xs text-slate-400 font-sans-luxury">
+                        Compare feasible rebooking corridors with net financial impact, timing buffers, and royal comfort scores.
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              <RecoveryPlannerSection
-                recoveryOptions={recoveryOptions.length > 0 ? recoveryOptions : generateRecoveryOptions(trip.bookings[0], trip)}
-                userPreferences={trip.preferences}
-                onChangePriority={(newP) => {
-                  const up = { ...trip.preferences, priority: newP };
-                  setTrip((prev) => ({ ...prev, preferences: up }));
-                  if (isDisrupted) {
-                    setRecoveryOptions(generateRecoveryOptions(trip.bookings[0], { ...trip, preferences: up }));
-                  }
-                }}
-                onHoverRecoveryOption={setHoveredRecoveryOption}
-                onSelectRecoveryOption={(opt) => setModalOptionToExecute(opt)}
-                selectedOptionId={activeRecoveryPlan?.id}
-                isInfeasibleState={isInfeasibleState}
-              />
-            </section>
+                  <button
+                    type="button"
+                    onClick={() => setShowRecoveryPlans(false)}
+                    className="px-3 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] font-cinzel text-slate-400 hover:text-slate-200 transition-all cursor-pointer"
+                  >
+                    Hide Plans ✕
+                  </button>
+                </div>
+
+                <RecoveryPlannerSection
+                  recoveryOptions={recoveryOptions.length > 0 ? recoveryOptions : generateRecoveryOptions(trip.bookings[0], trip)}
+                  userPreferences={trip.preferences}
+                  onChangePriority={(newP) => {
+                    const up = { ...trip.preferences, priority: newP };
+                    setTrip((prev) => ({ ...prev, preferences: up }));
+                    if (isDisrupted) {
+                      setRecoveryOptions(generateRecoveryOptions(trip.bookings[0], { ...trip, preferences: up }));
+                    }
+                  }}
+                  onHoverRecoveryOption={setHoveredRecoveryOption}
+                  onSelectRecoveryOption={(opt) => setModalOptionToExecute(opt)}
+                  selectedOptionId={activeRecoveryPlan?.id}
+                  isInfeasibleState={isInfeasibleState}
+                />
+              </section>
+            )}
 
             {/* PART 3: DETERMINISTIC REFUND & STATUTORY TDR ENGINE (WIDE & SPACIOUS) */}
             <section id="concierge-refund-engine" className="scroll-mt-28 space-y-4">
@@ -1100,6 +1130,28 @@ export default function App() {
         )}
       </main>
 
+      {!isAccountDetailsOpen && (
+        <AIAssistantDrawer
+          trip={trip}
+          isDisrupted={isDisrupted}
+          recoveryOptions={recoveryOptions}
+          isFloating
+          onSelectOption={(opt) => setModalOptionToExecute(opt)}
+          onNavigateTab={(tab) => {
+            if (tab === 'command_center') setActiveSection('journeys');
+            if (tab === 'translator') setActiveSection('translator');
+            if (tab === 'recovery_planner') {
+              setActiveSection('concierge');
+              handleGenerateRecoveryOptions();
+            }
+            if (tab === 'refund_intelligence') {
+              setActiveSection('concierge');
+              document.getElementById('concierge-refund-engine')?.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+        />
+      )}
+
       {/* Fullscreen 360 Panorama Modal */}
       <Full360PanoramaModal
         destination={currentDestination}
@@ -1159,6 +1211,7 @@ export default function App() {
         params={searchParams}
         destinationItem={currentDestination}
         onNavigateToConcierge={() => setActiveSection('concierge')}
+        onPlanConfirmed={handlePlanConfirmed}
       />
 
       {/* Report Mid-Journey Problem Modal */}
@@ -1167,9 +1220,10 @@ export default function App() {
         onClose={() => setIsReportProblemOpen(false)}
         onTriggerDisruption={(scenarioId, customDetails) => {
           handleSimulateDisruption(scenarioId, customDetails);
+          setActiveSection('concierge');
           setTimeout(() => {
-            document.getElementById('concierge-cascade-radar')?.scrollIntoView({ behavior: 'smooth' });
-          }, 250);
+            document.getElementById('concierge-cascade-radar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 350);
         }}
       />
 

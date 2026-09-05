@@ -1,5 +1,5 @@
-import React from 'react';
-import { Plane, Train, Hotel, Ticket, Clock, AlertTriangle, CheckCircle2, Sparkles } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Plane, Train, Hotel, Ticket, Clock, Plus, RotateCcw, Sparkles } from 'lucide-react';
 import { Booking, TripEdge } from '../types';
 import { TiltCard } from './TiltCard';
 
@@ -8,6 +8,9 @@ interface TripTimelineProps {
   edges: TripEdge[];
   selectedBookingId?: string | null;
   onSelectBooking: (id: string) => void;
+  onAddPlan: () => void;
+  onResetTimeline: () => void;
+  isReset: boolean;
   isDisrupted: boolean;
 }
 
@@ -16,8 +19,45 @@ export const TripTimeline: React.FC<TripTimelineProps> = ({
   edges,
   selectedBookingId,
   onSelectBooking,
+  onAddPlan,
+  onResetTimeline,
+  isReset,
   isDisrupted,
 }) => {
+  const [journeys, setJourneys] = useState<Array<{ id: string; label: string; bookings: Booking[] }>>([
+    { id: 'journey-1', label: 'JOURNEY 01', bookings: isReset ? [] : bookings },
+  ]);
+  const [activeJourneyId, setActiveJourneyId] = useState('journey-1');
+  const previousBookingsRef = useRef(bookings);
+  const activeJourney = journeys.find((journey) => journey.id === activeJourneyId) || journeys[0];
+  const activeBookings = activeJourney?.bookings || [];
+  const activeBookingIds = new Set(activeBookings.map((booking) => booking.id));
+  const activeEdges = edges.filter(
+    (edge) => activeBookingIds.has(edge.fromBookingId) && activeBookingIds.has(edge.toBookingId)
+  );
+
+  useEffect(() => {
+    if (isReset) {
+      setJourneys([{ id: 'journey-1', label: 'JOURNEY 01', bookings: [] }]);
+      setActiveJourneyId('journey-1');
+      return;
+    }
+
+    if (previousBookingsRef.current !== bookings) {
+      setJourneys((current) => current.map((journey, index) => (
+        index === 0 ? { ...journey, bookings } : journey
+      )));
+      previousBookingsRef.current = bookings;
+    }
+  }, [bookings, isReset]);
+
+  const resetJourney = () => {
+    setJourneys([{ id: 'journey-1', label: 'JOURNEY 01', bookings: [] }]);
+    setActiveJourneyId('journey-1');
+    onSelectBooking('');
+    onResetTimeline();
+  };
+
   const getIcon = (type: string) => {
     switch (type) {
       case 'flight': return <Plane className="w-3.5 h-3.5 text-[#D4AF37]" />;
@@ -29,22 +69,71 @@ export const TripTimeline: React.FC<TripTimelineProps> = ({
   };
 
   return (
-    <div className="w-full p-5 sm:p-6 rounded-2xl bg-slate-950/85 border border-gold-subtle backdrop-blur-xl space-y-4 shadow-xl">
-      <div className="flex items-center justify-between border-b border-gold-subtle pb-3">
+    <div id="chronological-spatial-timeline" className="w-full p-5 sm:p-6 rounded-2xl bg-slate-950/85 border border-gold-subtle backdrop-blur-xl space-y-4 shadow-xl">
+      <div className="flex flex-col gap-3 border-b border-gold-subtle pb-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center space-x-2">
           <Sparkles className="w-4 h-4 text-[#D4AF37]" />
           <span className="text-xs font-cinzel font-semibold text-[#FCE7AC] uppercase tracking-wider">
             CHRONOLOGICAL SPATIAL TIMELINE & BUFFER GAUGES
           </span>
         </div>
-        <span className="text-[10px] font-sans-luxury text-slate-400">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onAddPlan}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-gold-subtle px-2.5 py-1.5 text-[10px] font-cinzel font-semibold tracking-wider text-[#FCE7AC] transition-colors hover:border-gold-bright hover:bg-[#D4AF37]/10"
+            title="Plan a new journey"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>ADD PLAN</span>
+          </button>
+          <button
+            type="button"
+            onClick={resetJourney}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-2.5 py-1.5 text-[10px] font-cinzel font-semibold tracking-wider text-slate-400 transition-colors hover:border-rose-400 hover:text-rose-300"
+            title="Reset active journey"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+            <span>RESET</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        {journeys.map((journey) => (
+          <button
+            key={journey.id}
+            type="button"
+            onClick={() => setActiveJourneyId(journey.id)}
+            className={`rounded-lg border px-3 py-1.5 text-[10px] font-cinzel font-semibold tracking-wider transition-colors ${
+              journey.id === activeJourneyId
+                ? 'border-gold-bright bg-[#D4AF37]/15 text-[#FCE7AC]'
+                : 'border-slate-700 text-slate-400 hover:border-gold-subtle hover:text-slate-200'
+            }`}
+          >
+            {journey.label} ({journey.bookings.length})
+          </button>
+        ))}
+        <span className="ml-auto text-[10px] font-sans-luxury text-slate-400">
           Click any card to orbit 3D camera
         </span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3.5 relative">
-        {bookings.map((booking, idx) => {
-          const edge = edges.find(e => e.fromBookingId === booking.id);
+      {activeBookings.length === 0 ? (
+        <button
+          type="button"
+          onClick={onAddPlan}
+          className="flex min-h-44 w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-gold-subtle bg-slate-950/40 text-[#FCE7AC] transition-colors hover:border-gold-bright hover:bg-[#D4AF37]/10"
+          title="Plan a new journey"
+        >
+          <Plus className="h-8 w-8" />
+          <span className="font-cinzel text-xs font-semibold tracking-wider">ADD PLAN</span>
+          <span className="text-[11px] text-slate-400">Plan a new journey from the journey planner</span>
+        </button>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3.5 relative">
+        {activeBookings.map((booking) => {
+          const edge = activeEdges.find(e => e.fromBookingId === booking.id);
           const isSelected = selectedBookingId === booking.id;
           const isDisruptedNode = booking.status === 'cancelled' || booking.status === 'delayed';
           const isImpactedNode = booking.status === 'impacted';
@@ -112,7 +201,8 @@ export const TripTimeline: React.FC<TripTimelineProps> = ({
             </TiltCard>
           );
         })}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

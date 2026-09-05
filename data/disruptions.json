@@ -148,5 +148,185 @@
     "status": "ACTIVE",
     "createdAt": "2026-09-05T02:16:57.546Z",
     "updatedAt": "2026-09-05T02:16:57.546Z"
+  },
+  "dis_1788633727493_r86a5c": {
+    "id": "dis_1788633727493_r86a5c",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingId": "bkg_flight_01",
+    "provider": "Uber Mobility • Professional Chauffeur",
+    "disruptionType": "delay",
+    "delayMinutes": 90,
+    "rootCause": "Air traffic control congestion at BOM Runway 27",
+    "affectedSegmentIds": [
+      "bkg_flight_01"
+    ],
+    "cascadeSummary": "Delay propagated to 1 connected travel segments.",
+    "source": "LIVE_TELEMETRY",
+    "severity": "high",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T18:42:07.493Z",
+    "updatedAt": "2026-09-05T18:42:07.493Z"
+  },
+  "dis_1788633777527_0aua75": {
+    "id": "dis_1788633777527_0aua75",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingId": "bkg_flight_01",
+    "provider": "Uber Mobility • Professional Chauffeur",
+    "disruptionType": "cancellation",
+    "delayMinutes": 180,
+    "rootCause": "Aircraft technical unserviceability at BOM T2",
+    "affectedSegmentIds": [
+      "bkg_flight_01"
+    ],
+    "cascadeSummary": "Cancellation propagated to 1 connected travel segments.",
+    "source": "LIVE_TELEMETRY",
+    "severity": "critical",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T18:42:57.527Z",
+    "updatedAt": "2026-09-05T18:42:57.527Z"
+  },
+  "dis_1788633799468_xmoniz": {
+    "id": "dis_1788633799468_xmoniz",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingId": "bkg_flight_01",
+    "provider": "Uber Mobility • Professional Chauffeur",
+    "disruptionType": "delay",
+    "delayMinutes": 90,
+    "rootCause": "Air traffic control congestion at BOM Runway 27",
+    "affectedSegmentIds": [
+      "bkg_flight_01"
+    ],
+    "cascadeSummary": "Delay propagated to 1 connected travel segments.",
+    "source": "LIVE_TELEMETRY",
+    "severity": "high",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T18:43:19.468Z",
+    "updatedAt": "2026-09-05T18:43:19.468Z"
+  },
+  "dis_1788633817675_jdrctb": {
+    "id": "dis_1788633817675_jdrctb",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingId": "seg_bk_1788632065427_m92io1_1",
+    "provider": "Air India (Airbus A321neo) • Non-Stop Express",
+    "disruptionType": "delay",
+    "delayMinutes": 90,
+    "rootCause": "Incoming aircraft delay and severe runway congestion",
+    "affectedSegmentIds": [
+      "seg_bk_1788632065427_m92io1_1"
+    ],
+    "cascadeSummary": "Delay propagated to 1 connected travel segments.",
+    "source": "LIVE_TELEMETRY",
+    "severity": "high",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T18:43:37.675Z",
+    "updatedAt": "2026-09-05T18:43:37.675Z"
+  },
+  "dis_1788633915236_vjhrvz": {
+    "id": "dis_1788633915236_vjhrvz",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingId": "bkg_flight_01",
+    "provider": "Uber Mobility • Professional Chauffeur",
+    "disruptionType": "delay",
+    "delayMinutes": 90,
+    "rootCause": "Air traffic control congestion at BOM Runway 27",
+    "affectedSegmentIds": [
+      "bkg_flight_01"
+    ],
+    "cascadeSummary": "Delay propagated to 1 connected travel segments.",
+    "source": "LIVE_TELEMETRY",
+    "severity": "high",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T18:45:15.236Z",
+    "updatedAt": "2026-09-05T18:45:15.236Z"
+  },
+  "dis_1788634145971_p5utab": {
+    "id": "dis_1788634145971_p5utab",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingId": "bkg_flight_01",
+    "provider": "Uber Mobility • Professional Chauffeur",
+    "disruptionType": "delay",
+    "delayMinutes": 90,
+    "rootCause": "Air traffic control congestion at BOM Runway 27",
+    "affectedSegmentIds": [
+      "bkg_flight_01"
+    ],
+    "cascadeSummary": "Delay propagated to 1 connected travel segments.",
+    "source": "LIVE_TELEMETRY",
+    "severity": "high",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T18:49:05.971Z",
+    "updatedAt": "2026-09-05T18:49:05.971Z"
+  },
+  "dis_1788634172639_ivwu7o": {
+    "id": "dis_1788634172639_ivwu7o",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingId": "bkg_flight_01",
+    "provider": "Uber Mobility • Professional Chauffeur",
+    "disruptionType": "delay",
+    "delayMinutes": 90,
+    "rootCause": "Air traffic control congestion at BOM Runway 27",
+    "affectedSegmentIds": [
+      "bkg_flight_01"
+    ],
+    "cascadeSummary": "Delay propagated to 1 connected travel segments.",
+    "source": "LIVE_TELEMETRY",
+    "severity": "high",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T18:49:32.639Z",
+    "updatedAt": "2026-09-05T18:49:32.639Z"
+  },
+  "dis_1788634208874_6uzun7": {
+    "id": "dis_1788634208874_6uzun7",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingId": "bkg_flight_01",
+    "provider": "Uber Mobility • Professional Chauffeur",
+    "disruptionType": "delay",
+    "delayMinutes": 90,
+    "rootCause": "Air traffic control congestion at BOM Runway 27",
+    "affectedSegmentIds": [
+      "bkg_flight_01"
+    ],
+    "cascadeSummary": "Delay propagated to 1 connected travel segments.",
+    "source": "LIVE_TELEMETRY",
+    "severity": "high",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T18:50:08.874Z",
+    "updatedAt": "2026-09-05T18:50:08.874Z"
+  },
+  "dis_1788634661956_9n20ep": {
+    "id": "dis_1788634661956_9n20ep",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingId": "bkg_flight_01",
+    "provider": "Uber Mobility • Professional Chauffeur",
+    "disruptionType": "delay",
+    "delayMinutes": 90,
+    "rootCause": "Air traffic control congestion at BOM Runway 27",
+    "affectedSegmentIds": [
+      "bkg_flight_01"
+    ],
+    "cascadeSummary": "Delay propagated to 1 connected travel segments.",
+    "source": "LIVE_TELEMETRY",
+    "severity": "high",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T18:57:41.956Z",
+    "updatedAt": "2026-09-05T18:57:41.956Z"
+  },
+  "dis_1788634689045_2y6o0s": {
+    "id": "dis_1788634689045_2y6o0s",
+    "userId": "usr_kaivalya_default",
+    "bookingId": "bkg_flight_01",
+    "provider": "makemytrip",
+    "disruptionType": "delay",
+    "delayMinutes": 90,
+    "rootCause": "ATC holding pattern and weather delay",
+    "affectedSegmentIds": [
+      "bkg_flight_01"
+    ],
+    "cascadeSummary": "Delay propagated to 1 connected travel segments.",
+    "source": "LIVE_TELEMETRY",
+    "severity": "high",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T18:58:09.045Z",
+    "updatedAt": "2026-09-05T18:58:09.045Z"
   }
 }

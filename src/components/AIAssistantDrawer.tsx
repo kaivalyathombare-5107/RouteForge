@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bot, Send, Sparkles, ShieldCheck, ArrowRight, CornerDownLeft, RefreshCw, MessageSquare, Crown, Languages, Mic } from 'lucide-react';
+import { Bot, Send, Sparkles, ShieldCheck, ArrowRight, CornerDownLeft, RefreshCw, MessageSquare, Crown, Languages, Mic, X } from 'lucide-react';
 import { Trip, RecoveryOption } from '../types';
 
 interface AIAssistantDrawerProps {
@@ -8,6 +8,8 @@ interface AIAssistantDrawerProps {
   recoveryOptions: RecoveryOption[];
   onSelectOption: (opt: RecoveryOption) => void;
   onNavigateTab: (tab: any) => void;
+  isFloating?: boolean;
+  onCloseFloating?: () => void;
 }
 
 interface ChatMessage {
@@ -26,6 +28,8 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
   recoveryOptions,
   onSelectOption,
   onNavigateTab,
+  isFloating = false,
+  onCloseFloating,
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -46,12 +50,21 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
   const [inputVal, setInputVal] = useState('');
   const [isThinking, setIsThinking] = useState(false);
 
-  const quickQuestions = [
-    'What happens to my Udaipur palace stay if flight is delayed?',
-    'How much refund do I get under DGCA CAR regulations?',
-    'Why is Option A recommended as the best choice for my family?',
-    'Can you arrange a Taj Royal Chauffeur fallback transfer?',
-  ];
+  const [isOpen, setIsOpen] = useState(!isFloating);
+
+  if (isFloating && !isOpen) {
+    return (
+      <button
+        type="button"
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-4 right-4 z-[60] flex h-14 w-14 items-center justify-center rounded-full border border-gold-bright bg-[#0B0D13] text-[#D4AF37] shadow-[0_0_30px_rgba(212,175,55,0.25)] transition-all hover:scale-105 hover:bg-[#D4AF37] hover:text-slate-950"
+        title="Open ReRoute Privé AI Concierge"
+        aria-label="Open ReRoute Privé AI Concierge"
+      >
+        <Bot className="h-6 w-6" />
+      </button>
+    );
+  }
 
   const handleSend = async (questionText?: string, voiceMeta?: { originalSpoken?: string; sourceLang?: string }) => {
     const textToSend = questionText || inputVal.trim();
@@ -115,9 +128,14 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
   };
 
   return (
-    <div id="concierge-terminal-drawer" className="w-full space-y-6">
+    <div
+      id="concierge-terminal-drawer"
+      className={isFloating
+        ? 'fixed bottom-4 right-4 z-[60] flex max-h-[calc(100vh-2rem)] w-[min(440px,calc(100vw-2rem))] flex-col overflow-y-auto rounded-3xl border border-gold-subtle bg-[#08090C]/95 p-3 shadow-[0_0_45px_rgba(0,0,0,0.55)] backdrop-blur-2xl sm:p-4'
+        : 'w-full space-y-6'}
+    >
       {/* Header */}
-      <div className="p-6 rounded-3xl bg-[#0B0D13]/90 border border-gold-subtle backdrop-blur-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
+      <div className={`${isFloating ? 'p-3' : 'p-6'} relative rounded-3xl bg-[#0B0D13]/90 border border-gold-subtle backdrop-blur-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl`}>
         <div className="flex items-center space-x-3.5">
           <div className="w-11 h-11 rounded-2xl bg-slate-950 border border-gold-bright flex items-center justify-center text-[#D4AF37] shadow-md shadow-[#D4AF37]/10">
             <Crown className="w-5 h-5" />
@@ -134,20 +152,20 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
             </p>
           </div>
         </div>
-      </div>
-
-      {/* Quick Questions Pills */}
-      <div className="flex flex-wrap gap-2.5">
-        {quickQuestions.map((q, idx) => (
+        {isFloating && (
           <button
-            key={idx}
-            onClick={() => handleSend(q)}
-            className="px-4 py-2.5 rounded-xl bg-[#0B0D13]/90 hover:bg-slate-900 border border-gold-subtle text-xs font-sans-luxury text-slate-300 hover:text-[#FCE7AC] hover:border-gold-bright transition-all text-left cursor-pointer shadow-sm flex items-center space-x-2"
+            type="button"
+            onClick={() => {
+              setIsOpen(false);
+              onCloseFloating?.();
+            }}
+            className="absolute right-6 top-6 rounded-full border border-slate-700 p-1.5 text-slate-400 transition-colors hover:border-gold-bright hover:text-[#FCE7AC]"
+            title="Minimize AI Concierge"
+            aria-label="Minimize AI Concierge"
           >
-            <Sparkles className="w-3 h-3 text-[#D4AF37] flex-shrink-0" />
-            <span>"{q}"</span>
+            <X className="h-4 w-4" />
           </button>
-        ))}
+        )}
       </div>
 
       {/* Chat Messages Log */}
@@ -223,7 +241,6 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
             title="Open Live Voice & Speech Translator"
           >
             <Languages className="w-3.5 h-3.5 text-[#D4AF37]" />
-            <span className="hidden md:inline text-[11px] font-cinzel">VOICE TRANSLATOR</span>
           </button>
 
           <button

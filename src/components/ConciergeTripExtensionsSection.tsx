@@ -87,45 +87,36 @@ const getInitialUpcomingDate = () => {
   return `${dd} ${mm} ${yyyy}`;
 };
 
-const DEFAULT_UPCOMING_DATE = getInitialUpcomingDate();
-
-const DEFAULT_UDAIPUR_TRIP: CapturedMainTrip = {
-  id: 'trip-bom-udr-default',
-  title: 'Mumbai CSMIA to Udaipur Lake Palace (Air India Business + Chauffeur)',
-  origin: 'Mumbai',
-  originCode: 'BOM',
-  destination: 'Udaipur',
-  destCode: 'UDR',
-  carrier: 'Air India',
-  serviceNumber: 'AI-643',
-  departureTime: `06:15 IST, ${DEFAULT_UPCOMING_DATE}`,
-  arrivalTime: `11:45 IST, ${DEFAULT_UPCOMING_DATE}`,
-  travelDate: DEFAULT_UPCOMING_DATE,
-  pnr: 'MMT-849201',
-  bookingPortal: 'MakeMyTrip',
-  totalPrice: 18450,
-  cabinClass: 'Business / Executive Class',
-  capturedAt: new Date().toISOString(),
-};
-
 export const ConciergeTripExtensionsSection: React.FC<{
   onNavigateSection?: (section: string) => void;
 }> = ({ onNavigateSection }) => {
-  const [tripData, setTripData] = useState<CapturedMainTrip>(() => {
+  const [tripData, setTripData] = useState<CapturedMainTrip | null>(() => {
     try {
       const stored = localStorage.getItem('routeforge_active_concierge_booking');
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored) as CapturedMainTrip;
+        if (parsed.id !== 'trip-bom-udr-default') return parsed;
+        localStorage.removeItem('routeforge_active_concierge_booking');
       }
     } catch {
       // fallback
     }
-    return DEFAULT_UDAIPUR_TRIP;
+    return null;
   });
 
-  const [depTimeInput, setDepTimeInput] = useState(tripData.departureTime);
-  const [arrTimeInput, setArrTimeInput] = useState(tripData.arrivalTime);
-  const [pnrInput, setPnrInput] = useState(tripData.pnr);
+  const [depTimeInput, setDepTimeInput] = useState('');
+  const [arrTimeInput, setArrTimeInput] = useState('');
+  const [pnrInput, setPnrInput] = useState('');
+  const [originInput, setOriginInput] = useState('');
+  const [originCodeInput, setOriginCodeInput] = useState('');
+  const [destinationInput, setDestinationInput] = useState('');
+  const [destinationCodeInput, setDestinationCodeInput] = useState('');
+  const [carrierInput, setCarrierInput] = useState('');
+  const [serviceNumberInput, setServiceNumberInput] = useState('');
+  const [travelDateInput, setTravelDateInput] = useState('');
+  const [bookingPortalInput, setBookingPortalInput] = useState('');
+  const [cabinClassInput, setCabinClassInput] = useState('');
+  const [totalPriceInput, setTotalPriceInput] = useState('');
   const [isSaved, setIsSaved] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'stays' | 'trips'>('all');
   const [savedExtensions, setSavedExtensions] = useState<string[]>([]);
@@ -138,6 +129,16 @@ export const ConciergeTripExtensionsSection: React.FC<{
         setDepTimeInput(e.detail.departureTime);
         setArrTimeInput(e.detail.arrivalTime);
         setPnrInput(e.detail.pnr);
+        setOriginInput(e.detail.origin);
+        setOriginCodeInput(e.detail.originCode);
+        setDestinationInput(e.detail.destination);
+        setDestinationCodeInput(e.detail.destCode);
+        setCarrierInput(e.detail.carrier);
+        setServiceNumberInput(e.detail.serviceNumber);
+        setTravelDateInput(e.detail.travelDate);
+        setBookingPortalInput(e.detail.bookingPortal);
+        setCabinClassInput(e.detail.cabinClass);
+        setTotalPriceInput(String(e.detail.totalPrice));
         setIsSaved(true);
       }
     };
@@ -146,8 +147,26 @@ export const ConciergeTripExtensionsSection: React.FC<{
     return () => window.removeEventListener('routeforge_booking_captured', handleBookingCaptured);
   }, []);
 
+  useEffect(() => {
+    if (!tripData) return;
+    setDepTimeInput(tripData.departureTime);
+    setArrTimeInput(tripData.arrivalTime);
+    setPnrInput(tripData.pnr);
+    setOriginInput(tripData.origin);
+    setOriginCodeInput(tripData.originCode);
+    setDestinationInput(tripData.destination);
+    setDestinationCodeInput(tripData.destCode);
+    setCarrierInput(tripData.carrier);
+    setServiceNumberInput(tripData.serviceNumber);
+    setTravelDateInput(tripData.travelDate);
+    setBookingPortalInput(tripData.bookingPortal);
+    setCabinClassInput(tripData.cabinClass);
+    setTotalPriceInput(String(tripData.totalPrice));
+  }, [tripData]);
+
   const handleSyncTimings = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!tripData) return;
     const updated: CapturedMainTrip = {
       ...tripData,
       departureTime: depTimeInput,
@@ -162,6 +181,80 @@ export const ConciergeTripExtensionsSection: React.FC<{
     }
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 4000);
+  };
+
+  const handleCreateBooking = (e: React.FormEvent) => {
+    e.preventDefault();
+    const created: CapturedMainTrip = {
+      id: `manual-${Date.now()}`,
+      title: `${originInput} to ${destinationInput} (${carrierInput} ${serviceNumberInput})`,
+      origin: originInput,
+      originCode: originCodeInput,
+      destination: destinationInput,
+      destCode: destinationCodeInput,
+      carrier: carrierInput,
+      serviceNumber: serviceNumberInput,
+      departureTime: depTimeInput,
+      arrivalTime: arrTimeInput,
+      travelDate: travelDateInput,
+      pnr: pnrInput,
+      bookingPortal: bookingPortalInput,
+      totalPrice: Number(totalPriceInput) || 0,
+      cabinClass: cabinClassInput,
+      capturedAt: new Date().toISOString(),
+    };
+    setTripData(created);
+
+  if (!tripData) {
+    const inputClass = 'w-full rounded-xl border border-slate-800 bg-slate-950/80 px-3 py-2.5 text-xs text-slate-100 placeholder:text-slate-600 focus:border-gold-bright focus:outline-none';
+    const labelClass = 'mb-1 block text-[10px] font-cinzel tracking-wider text-slate-400 uppercase';
+
+    return (
+      <div id="concierge-main-trip-extensions" className="space-y-6 animate-fadeIn">
+        <div className="rounded-3xl border border-[#D4AF37]/30 bg-[#0B0E14] p-6 shadow-2xl sm:p-8">
+          <div className="mb-6 border-b border-slate-800 pb-5">
+            <div className="flex items-center space-x-2.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-[#D4AF37]" />
+              <span className="text-[11px] font-cinzel font-bold tracking-[0.25em] text-[#D4AF37] uppercase">
+                BOOKING DETAILS CAPTURE
+              </span>
+            </div>
+            <h3 className="mt-2 font-serif-display text-2xl text-white sm:text-3xl">
+              Add your current journey
+            </h3>
+            <p className="mt-2 max-w-3xl text-xs leading-relaxed text-slate-300">
+              Enter a confirmed booking to generate stays and excursions for its actual destination and arrival window.
+            </p>
+          </div>
+
+          <form onSubmit={handleCreateBooking} className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div><label className={labelClass}>Origin</label><input required value={originInput} onChange={(e) => setOriginInput(e.target.value)} placeholder="Mumbai" className={inputClass} /></div>
+            <div><label className={labelClass}>Origin code</label><input required value={originCodeInput} onChange={(e) => setOriginCodeInput(e.target.value.toUpperCase())} placeholder="BOM" className={inputClass} /></div>
+            <div><label className={labelClass}>Destination</label><input required value={destinationInput} onChange={(e) => setDestinationInput(e.target.value)} placeholder="Udaipur" className={inputClass} /></div>
+            <div><label className={labelClass}>Destination code</label><input required value={destinationCodeInput} onChange={(e) => setDestinationCodeInput(e.target.value.toUpperCase())} placeholder="UDR" className={inputClass} /></div>
+            <div><label className={labelClass}>Carrier / provider</label><input required value={carrierInput} onChange={(e) => setCarrierInput(e.target.value)} placeholder="Air India / IRCTC" className={inputClass} /></div>
+            <div><label className={labelClass}>Flight / train number</label><input required value={serviceNumberInput} onChange={(e) => setServiceNumberInput(e.target.value)} placeholder="AI-643 / 12952" className={inputClass} /></div>
+            <div><label className={labelClass}>Travel date</label><input required value={travelDateInput} onChange={(e) => setTravelDateInput(e.target.value)} placeholder="15 Oct 2026" className={inputClass} /></div>
+            <div><label className={labelClass}>Booking portal</label><input required value={bookingPortalInput} onChange={(e) => setBookingPortalInput(e.target.value)} placeholder="IRCTC / MakeMyTrip" className={inputClass} /></div>
+            <div><label className={labelClass}>Departure time</label><input required value={depTimeInput} onChange={(e) => setDepTimeInput(e.target.value)} placeholder="06:15 IST" className={inputClass} /></div>
+            <div><label className={labelClass}>Arrival time</label><input required value={arrTimeInput} onChange={(e) => setArrTimeInput(e.target.value)} placeholder="11:45 IST" className={inputClass} /></div>
+            <div><label className={labelClass}>PNR / booking reference</label><input required value={pnrInput} onChange={(e) => setPnrInput(e.target.value)} placeholder="Booking reference" className={inputClass} /></div>
+            <div><label className={labelClass}>Total price (INR)</label><input required type="number" min="0" value={totalPriceInput} onChange={(e) => setTotalPriceInput(e.target.value)} placeholder="18450" className={inputClass} /></div>
+            <div className="md:col-span-2 lg:col-span-4"><label className={labelClass}>Class / cabin</label><input required value={cabinClassInput} onChange={(e) => setCabinClassInput(e.target.value)} placeholder="Economy / Executive / First AC" className={inputClass} /></div>
+            <button type="submit" className="gold-gradient-bar flex items-center justify-center space-x-2 rounded-xl px-4 py-3 text-xs font-bold tracking-wider text-slate-950 shadow-lg md:col-span-2 lg:col-span-4">
+              <Check className="h-4 w-4" />
+              <span>CAPTURE BOOKING &amp; SHOW JOURNEY SUGGESTIONS</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+    try {
+      localStorage.setItem('routeforge_active_concierge_booking', JSON.stringify(created));
+    } catch (err) {
+      console.warn('LocalStorage save error:', err);
+    }
   };
 
   const toggleSaveExtension = (id: string) => {

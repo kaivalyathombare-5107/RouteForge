@@ -32,6 +32,7 @@ interface JourneySearchResultsModalProps {
   destinationItem: DestinationItem;
   onSelectRecoverySolution?: (solutionName: string) => void;
   onNavigateToConcierge?: () => void;
+  onPlanConfirmed?: (plan: JourneyPlanOption) => void;
 }
 
 type ModeFilterType = 'all' | 'flight' | 'train' | 'bus' | 'uber' | 'multimodal';
@@ -43,6 +44,7 @@ export const JourneySearchResultsModal: React.FC<JourneySearchResultsModalProps>
   destinationItem,
   onSelectRecoverySolution,
   onNavigateToConcierge,
+  onPlanConfirmed,
 }) => {
   const { user } = useAuth();
   const [plans, setPlans] = useState<JourneyPlanOption[]>([]);
@@ -522,6 +524,7 @@ export const JourneySearchResultsModal: React.FC<JourneySearchResultsModalProps>
         searchParams={params}
         onBookingSuccess={() => {
           setIsBookingOptionsOpen(false);
+          if (activePlan) onPlanConfirmed?.(activePlan);
           onClose();
         }}
         onNavigateToConcierge={() => {

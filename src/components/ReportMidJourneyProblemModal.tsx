@@ -46,16 +46,24 @@ export const ReportMidJourneyProblemModal: React.FC<ReportMidJourneyProblemModal
 
   if (!isOpen) return null;
 
-  const handleTriggerCurated = (scenarioId: string) => {
+  const handleTriggerCurated = (scenarioId: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setIsSubmitting(true);
     setTimeout(() => {
       onTriggerDisruption(scenarioId);
       setIsSubmitting(false);
       onClose();
-    }, 400);
+    }, 300);
   };
 
-  const handleTriggerCustom = () => {
+  const handleTriggerCustom = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setIsSubmitting(true);
     setTimeout(() => {
       onTriggerDisruption('custom', {
@@ -66,7 +74,7 @@ export const ReportMidJourneyProblemModal: React.FC<ReportMidJourneyProblemModal
       });
       setIsSubmitting(false);
       onClose();
-    }, 400);
+    }, 300);
   };
 
   const activeCuratedScenario = DISRUPTION_SCENARIOS.find((s) => s.id === selectedScenarioId) || DISRUPTION_SCENARIOS[0];
@@ -110,6 +118,7 @@ export const ReportMidJourneyProblemModal: React.FC<ReportMidJourneyProblemModal
             </div>
 
             <button
+              type="button"
               onClick={onClose}
               className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors cursor-pointer"
             >
@@ -125,7 +134,12 @@ export const ReportMidJourneyProblemModal: React.FC<ReportMidJourneyProblemModal
           {/* Tab Selector: Curated Fast Presets vs Custom Incident */}
           <div className="flex items-center p-1 rounded-xl bg-slate-900/80 border border-slate-800 text-xs font-cinzel">
             <button
-              onClick={() => setActiveTab('curated')}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setActiveTab('curated');
+              }}
               className={`flex-1 py-2 rounded-lg font-bold transition-all cursor-pointer ${
                 activeTab === 'curated'
                   ? 'bg-rose-950/70 border border-rose-500/40 text-rose-200 shadow-sm'
@@ -135,7 +149,12 @@ export const ReportMidJourneyProblemModal: React.FC<ReportMidJourneyProblemModal
               ⚡ Verified Fast Scenarios ({DISRUPTION_SCENARIOS.length})
             </button>
             <button
-              onClick={() => setActiveTab('custom')}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setActiveTab('custom');
+              }}
               className={`flex-1 py-2 rounded-lg font-bold transition-all cursor-pointer ${
                 activeTab === 'custom'
                   ? 'bg-rose-950/70 border border-rose-500/40 text-rose-200 shadow-sm'
@@ -159,7 +178,12 @@ export const ReportMidJourneyProblemModal: React.FC<ReportMidJourneyProblemModal
                   return (
                     <button
                       key={sc.id}
-                      onClick={() => setSelectedScenarioId(sc.id)}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setSelectedScenarioId(sc.id);
+                      }}
                       className={`text-left p-3 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
                         isSelected
                           ? 'bg-rose-950/50 border-rose-500/80 text-white shadow-md shadow-rose-950/30'
@@ -291,7 +315,12 @@ export const ReportMidJourneyProblemModal: React.FC<ReportMidJourneyProblemModal
           {/* Footer Action Buttons */}
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-end gap-3 border-t border-slate-800">
             <button
-              onClick={onClose}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onClose();
+              }}
               className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-cinzel text-slate-400 hover:text-white transition-colors cursor-pointer"
             >
               CANCEL
@@ -299,7 +328,12 @@ export const ReportMidJourneyProblemModal: React.FC<ReportMidJourneyProblemModal
 
             {activeTab === 'curated' ? (
               <button
-                onClick={() => handleTriggerCurated(selectedScenarioId)}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleTriggerCurated(selectedScenarioId, e);
+                }}
                 disabled={isSubmitting}
                 className="w-full sm:w-auto px-6 py-3 rounded-full font-cinzel text-xs font-bold bg-gradient-to-r from-rose-600 via-rose-500 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-xl shadow-rose-950/60 transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
               >
@@ -309,7 +343,12 @@ export const ReportMidJourneyProblemModal: React.FC<ReportMidJourneyProblemModal
               </button>
             ) : (
               <button
-                onClick={handleTriggerCustom}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleTriggerCustom(e);
+                }}
                 disabled={isSubmitting}
                 className="w-full sm:w-auto px-6 py-3 rounded-full font-cinzel text-xs font-bold bg-gradient-to-r from-rose-600 via-rose-500 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-xl shadow-rose-950/60 transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
               >

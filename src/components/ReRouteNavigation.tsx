@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, User, Compass, Layers, ShieldAlert, Menu, X, Languages } from 'lucide-react';
+import { User, Compass, Layers, ShieldAlert, Menu, X, Languages } from 'lucide-react';
 
 export type ReRouteSection = 'destinations' | 'journeys' | 'emergency' | 'concierge' | 'translator' | 'membership';
 
@@ -7,24 +7,18 @@ interface ReRouteNavigationProps {
   activeSection: ReRouteSection;
   onSelectSection: (section: ReRouteSection) => void;
   onOpenSignIn: () => void;
-  onOpenSearch: () => void;
   onOpenProviders?: () => void;
   onOpenAccount?: () => void;
   user?: any;
-  selectedCurrency: string;
-  onSelectCurrency: (currency: string) => void;
 }
 
 export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
   activeSection,
   onSelectSection,
   onOpenSignIn,
-  onOpenSearch,
   onOpenProviders,
   onOpenAccount,
-  user,
-  selectedCurrency,
-  onSelectCurrency
+  user
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const menuRef = useRef<HTMLElement>(null);
@@ -47,37 +41,17 @@ export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
           <Compass className="w-5 h-5 text-slate-950" />
         </div>
         <div className="flex flex-col">
-          <span className="font-serif-display text-lg tracking-[0.2em] text-white">
+          <span className="font-serif-display text-lg tracking-[0.4em] text-white">
             RouteForge
           </span>
           <span className="text-[9px] font-cinzel tracking-widest text-[#D4AF37] uppercase">
-            Bharat Privé Edition
+            Unleashing your Journey
           </span>
         </div>
       </div>
 
       {/* Actions */}
       <div className="flex items-center space-x-3 sm:space-x-4 ml-auto mr-2.5 sm:mr-3.5">
-        {/* Currency Selector */}
-        <select
-          value={selectedCurrency}
-          onChange={(e) => onSelectCurrency(e.target.value)}
-          className="hidden sm:block bg-transparent text-slate-300 text-xs font-mono font-medium outline-none cursor-pointer border border-transparent hover:border-slate-800 rounded px-2 py-1 transition-all"
-        >
-          <option value="INR">INR ₹ (India)</option>
-          <option value="USD">USD $ (Global)</option>
-          <option value="AED">AED د.إ (UAE)</option>
-          <option value="EUR">EUR € (Europe)</option>
-          <option value="GBP">GBP £ (UK)</option>
-        </select>
-
-        <button
-          onClick={onOpenSearch}
-          className="w-10 h-10 rounded-full border border-slate-800 hover:border-[#D4AF37] flex items-center justify-center text-slate-400 hover:text-[#D4AF37] transition-colors"
-        >
-          <Search className="w-4 h-4" />
-        </button>
-
         {/* Account Tab */}
         {user ? (
           <button
