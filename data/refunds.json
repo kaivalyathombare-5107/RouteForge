@@ -1,0 +1,38 @@
+{
+  "ref_1788573291234_ze1l5s": {
+    "id": "ref_1788573291234_ze1l5s",
+    "userId": "usr_step3_traveler_01",
+    "bookingId": "bk_1788573291154_c7s4is",
+    "segmentId": "seg_bk_1788573291154_c7s4is_1",
+    "provider": "makemytrip",
+    "providerReference": "RF-MAKE-917722",
+    "originalAmount": 5120,
+    "expectedRefund": 5120,
+    "actualRefund": 5120,
+    "status": "PROCESSING",
+    "reason": "Flight cancelled by carrier due to airspace restrictions",
+    "ruleId": "DGCA_CAR_SEC3_RULE_3.2",
+    "policyVersion": "DGCA_CAR_SEC3_SERIES_M_IV_2025",
+    "createdAt": "2026-09-05T01:54:51.234Z",
+    "updatedAt": "2026-09-05T01:54:51.234Z",
+    "lastVerifiedAt": "2026-09-05T01:54:51.234Z"
+  },
+  "ref_1788573291293_rqyudx": {
+    "id": "ref_1788573291293_rqyudx",
+    "userId": "usr_step3_traveler_01",
+    "bookingId": "bk_1788573291154_c7s4is",
+    "provider": "irctc",
+    "providerReference": "12952-PNR-883921",
+    "originalAmount": 1860,
+    "expectedRefund": 1860,
+    "reason": "Missed connecting train due to preceding flight cancellation (Rule 73A)",
+    "ruleId": "IRCTC-RULE-73A-TDR",
+    "policyVersion": "IRCTC Coaching Tariff Rule 73A",
+    "tdrReference": "TDR-73291293",
+    "status": "REQUESTED",
+    "actualRefund": 0,
+    "createdAt": "2026-09-05T01:54:51.293Z",
+    "updatedAt": "2026-09-05T01:54:51.293Z",
+    "lastVerifiedAt": "2026-09-05T01:54:51.293Z"
+  }
+}

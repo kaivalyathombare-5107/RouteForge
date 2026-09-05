@@ -1,0 +1,152 @@
+{
+  "dis_1788572628550_5kaxoo": {
+    "id": "dis_1788572628550_5kaxoo",
+    "userId": "usr_test_step2",
+    "bookingId": "bk_1788572628535_cc18ue",
+    "provider": "makemytrip",
+    "disruptionType": "cancellation",
+    "delayMinutes": 180,
+    "rootCause": "Severe airspace congestion and carrier aircraft withdrawal at BOM",
+    "source": "LIVE_TELEMETRY",
+    "severity": "critical",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T01:43:48.550Z",
+    "updatedAt": "2026-09-05T01:43:48.550Z"
+  },
+  "dis_1788572696058_q4wl8p": {
+    "id": "dis_1788572696058_q4wl8p",
+    "userId": "usr_kaivalya_default",
+    "bookingId": "bkg_flight_01",
+    "provider": "makemytrip",
+    "disruptionType": "cancellation",
+    "delayMinutes": 180,
+    "rootCause": "Operational disruption reported by provider telemetry",
+    "affectedSegmentIds": [
+      "bkg_flight_01"
+    ],
+    "cascadeSummary": "Cancellation propagated to 1 connected travel segments.",
+    "source": "PROVIDER_TELEMETRY",
+    "severity": "critical",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T01:44:56.058Z",
+    "updatedAt": "2026-09-05T01:44:56.058Z"
+  },
+  "dis_1788572705212_ulfee0": {
+    "id": "dis_1788572705212_ulfee0",
+    "userId": "usr_kaivalya_default",
+    "bookingId": "bkg_flight_01",
+    "provider": "makemytrip",
+    "disruptionType": "cancellation",
+    "delayMinutes": 180,
+    "rootCause": "Operational disruption reported by provider telemetry",
+    "affectedSegmentIds": [
+      "bkg_flight_01"
+    ],
+    "cascadeSummary": "Cancellation propagated to 1 connected travel segments.",
+    "source": "PROVIDER_TELEMETRY",
+    "severity": "critical",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T01:45:05.212Z",
+    "updatedAt": "2026-09-05T01:45:05.212Z"
+  },
+  "dis_1788572737483_6eqlc6": {
+    "id": "dis_1788572737483_6eqlc6",
+    "userId": "usr_kaivalya_default",
+    "bookingId": "bkg_flight_01",
+    "provider": "makemytrip",
+    "disruptionType": "cancellation",
+    "delayMinutes": 180,
+    "rootCause": "Operational disruption reported by provider telemetry",
+    "affectedSegmentIds": [
+      "bkg_flight_01"
+    ],
+    "cascadeSummary": "Cancellation propagated to 1 connected travel segments.",
+    "source": "PROVIDER_TELEMETRY",
+    "severity": "critical",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T01:45:37.483Z",
+    "updatedAt": "2026-09-05T01:45:37.483Z"
+  },
+  "dis_1788572746386_1htr2t": {
+    "id": "dis_1788572746386_1htr2t",
+    "userId": "usr_kaivalya_default",
+    "bookingId": "bkg_flight_01",
+    "provider": "makemytrip",
+    "disruptionType": "cancellation",
+    "delayMinutes": 180,
+    "rootCause": "Operational disruption reported by provider telemetry",
+    "affectedSegmentIds": [
+      "bkg_flight_01"
+    ],
+    "cascadeSummary": "Cancellation propagated to 1 connected travel segments.",
+    "source": "PROVIDER_TELEMETRY",
+    "severity": "critical",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T01:45:46.386Z",
+    "updatedAt": "2026-09-05T01:45:46.386Z"
+  },
+  "dis_1788572764002_js7a66": {
+    "id": "dis_1788572764002_js7a66",
+    "userId": "usr_kaivalya_default",
+    "bookingId": "bkg_flight_01",
+    "provider": "makemytrip",
+    "disruptionType": "cancellation",
+    "delayMinutes": 180,
+    "rootCause": "Operational disruption reported by provider telemetry",
+    "affectedSegmentIds": [
+      "bkg_flight_01"
+    ],
+    "cascadeSummary": "Cancellation propagated to 1 connected travel segments.",
+    "source": "PROVIDER_TELEMETRY",
+    "severity": "critical",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T01:46:04.002Z",
+    "updatedAt": "2026-09-05T01:46:04.002Z"
+  },
+  "dis_1788572787242_a8yxky": {
+    "id": "dis_1788572787242_a8yxky",
+    "userId": "usr_kaivalya_default",
+    "bookingId": "bk_flight_1",
+    "provider": "makemytrip",
+    "disruptionType": "cancellation",
+    "delayMinutes": 180,
+    "rootCause": "Airspace restriction and technical rotation at BOM",
+    "source": "PROVIDER_WEBHOOK",
+    "severity": "critical",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T01:46:27.242Z",
+    "updatedAt": "2026-09-05T01:46:27.242Z"
+  },
+  "dis_1788573306760_ejpohj": {
+    "id": "dis_1788573306760_ejpohj",
+    "userId": "usr_test_step2",
+    "bookingId": "bk_1788573306745_29zf3s",
+    "provider": "makemytrip",
+    "disruptionType": "cancellation",
+    "delayMinutes": 180,
+    "rootCause": "Severe airspace congestion and carrier aircraft withdrawal at BOM",
+    "source": "LIVE_TELEMETRY",
+    "severity": "critical",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T01:55:06.760Z",
+    "updatedAt": "2026-09-05T01:55:06.760Z"
+  },
+  "dis_1788574617546_g9em49": {
+    "id": "dis_1788574617546_g9em49",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingId": "bkg_flight_01",
+    "provider": "IndiGo Airlines",
+    "disruptionType": "delay",
+    "delayMinutes": 90,
+    "rootCause": "Incoming flight rotation delay and ATC queue",
+    "affectedSegmentIds": [
+      "bkg_flight_01"
+    ],
+    "cascadeSummary": "Delay propagated to 1 connected travel segments.",
+    "source": "LIVE_TELEMETRY",
+    "severity": "high",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-05T02:16:57.546Z",
+    "updatedAt": "2026-09-05T02:16:57.546Z"
+  }
+}

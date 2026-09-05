@@ -67,9 +67,9 @@ export const HeroJourneySection: React.FC<HeroJourneySectionProps> = ({
           {/* Headline with Staggered Visual Typography */}
           <div className="space-y-1 sm:space-y-2">
             <h1 className="font-serif-display font-light text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight text-white leading-[0.95] drop-shadow-2xl">
-              <span className="block font-normal">TIMELESS</span>
-              <span className="block italic text-[#FCE7AC]">BHARAT</span>
-              <span className="block font-normal">& BEYOND</span>
+              <span className="block font-normal">SEEN</span>
+              <span className="block italic text-[#FCE7AC]">THE</span>
+              <span className="block font-normal">UNSEEN</span>
             </h1>
           </div>
 

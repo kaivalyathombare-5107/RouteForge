@@ -1,5 +1,5 @@
 // src/components/TravellerProfileModal.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Crown, 
@@ -19,7 +19,8 @@ import {
   ArrowRight, 
   ArrowLeft, 
   Check, 
-  AlertCircle 
+  AlertCircle,
+  X
 } from 'lucide-react';
 import { 
   TravellerProfile, 
@@ -34,14 +35,17 @@ import {
   FlexibilityPreference, 
   FoodPreference 
 } from '../types/profile';
-import { saveTravellerProfile } from '../lib/api/profile';
+import { saveTravellerProfile, fetchTravellerProfile } from '../lib/api/profile';
 
 interface TravellerProfileModalProps {
   isOpen: boolean;
   userId: string;
   userEmail: string;
   defaultName?: string;
+  initialProfile?: TravellerProfile | null;
   onComplete: (profile: TravellerProfile) => void;
+  onClose?: () => void;
+  isEditing?: boolean;
 }
 
 export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
@@ -49,7 +53,10 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
   userId,
   userEmail,
   defaultName = '',
+  initialProfile,
   onComplete,
+  onClose,
+  isEditing = false,
 }) => {
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,23 +65,23 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
   // Form State
   const [fullName, setFullName] = useState(defaultName);
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [homeCity, setHomeCity] = useState('Mumbai');
-  const [ageGroup, setAgeGroup] = useState<AgeGroup>('26-35');
-  const [preferredCurrency, setPreferredCurrency] = useState<PreferredCurrency>('INR');
+  const [homeCity, setHomeCity] = useState('');
+  const [ageGroup, setAgeGroup] = useState<string>('');
+  const [preferredCurrency, setPreferredCurrency] = useState<string>('INR');
 
   // Travel Preferences
-  const [travelBudget, setTravelBudget] = useState<TravelBudget>('luxury');
-  const [preferredTransport, setPreferredTransport] = useState<PreferredTransport>('multimodal');
-  const [preferredCabinClass, setPreferredCabinClass] = useState<PreferredCabinClass>('vande_bharat_exec');
-  const [seatPreference, setSeatPreference] = useState<SeatPreference>('window');
-  const [hotelCategory, setHotelCategory] = useState<HotelCategory>('heritage_palace');
-  const [preferredDepartureTime, setPreferredDepartureTime] = useState<PreferredDepartureTime>('morning');
+  const [travelBudget, setTravelBudget] = useState<string>('');
+  const [preferredTransport, setPreferredTransport] = useState<string>('');
+  const [preferredCabinClass, setPreferredCabinClass] = useState<string>('');
+  const [seatPreference, setSeatPreference] = useState<string>('');
+  const [hotelCategory, setHotelCategory] = useState<string>('');
+  const [preferredDepartureTime, setPreferredDepartureTime] = useState<string>('');
   const [maxTravelDurationHours, setMaxTravelDurationHours] = useState(10);
   const [maxConnections, setMaxConnections] = useState(1);
-  const [flexibilityPreference, setFlexibilityPreference] = useState<FlexibilityPreference>('moderate');
+  const [flexibilityPreference, setFlexibilityPreference] = useState<string>('');
 
   // Optional Privé Personalization
-  const [foodPreference, setFoodPreference] = useState<FoodPreference>('pure_veg');
+  const [foodPreference, setFoodPreference] = useState<string>('');
   const [accessibilityRequirements, setAccessibilityRequirements] = useState('');
   const [airIndiaNumber, setAirIndiaNumber] = useState('');
   const [indigoNumber, setIndigoNumber] = useState('');
@@ -83,6 +90,57 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
   const [emergencyName, setEmergencyName] = useState('');
   const [emergencyPhone, setEmergencyPhone] = useState('');
   const [emergencyRelation, setEmergencyRelation] = useState('');
+
+  // Populate from existing profile without resetting
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const populate = (p: any) => {
+      if (!p) return;
+      if (p.fullName) setFullName(p.fullName);
+      else if (defaultName && !fullName) setFullName(defaultName);
+
+      if (p.phoneNumber) setPhoneNumber(p.phoneNumber);
+      if (p.homeCity) setHomeCity(p.homeCity);
+      if (p.ageGroup) setAgeGroup(p.ageGroup);
+      if (p.preferredCurrency) setPreferredCurrency(p.preferredCurrency);
+
+      const prefs = p.preferences || p.travelPreferences || {};
+      if (prefs.travelBudget) setTravelBudget(prefs.travelBudget);
+      if (prefs.preferredTransport) setPreferredTransport(prefs.preferredTransport);
+      if (prefs.preferredCabinClass) setPreferredCabinClass(prefs.preferredCabinClass);
+      if (prefs.seatPreference) setSeatPreference(prefs.seatPreference);
+      if (prefs.hotelCategory) setHotelCategory(prefs.hotelCategory);
+      if (prefs.preferredDepartureTime) setPreferredDepartureTime(prefs.preferredDepartureTime);
+      if (prefs.maxTravelDurationHours !== undefined) setMaxTravelDurationHours(prefs.maxTravelDurationHours);
+      if (prefs.maxConnections !== undefined) setMaxConnections(prefs.maxConnections);
+      if (prefs.flexibilityPreference) setFlexibilityPreference(prefs.flexibilityPreference);
+
+      if (p.foodPreference) setFoodPreference(p.foodPreference);
+      if (p.accessibilityRequirements) setAccessibilityRequirements(p.accessibilityRequirements);
+
+      const identifiers = p.frequentTravellerIdentifiers || {};
+      if (identifiers.airIndia) setAirIndiaNumber(identifiers.airIndia);
+      if (identifiers.indigo) setIndigoNumber(identifiers.indigo);
+      if (identifiers.irctc) setIrctcUserId(identifiers.irctc);
+      if (identifiers.tajInnerCircle) setTajNumber(identifiers.tajInnerCircle);
+
+      const emergency = p.emergencyContact || {};
+      if (emergency.name || p.emergencyContactName) setEmergencyName(emergency.name || p.emergencyContactName);
+      if (emergency.phone || p.emergencyContactPhone) setEmergencyPhone(emergency.phone || p.emergencyContactPhone);
+      if (emergency.relation || p.emergencyContactRelation) setEmergencyRelation(emergency.relation || p.emergencyContactRelation);
+    };
+
+    if (initialProfile) {
+      populate(initialProfile);
+    } else {
+      fetchTravellerProfile(userId, userEmail).then((res) => {
+        if (res.success && res.profile) {
+          populate(res.profile);
+        }
+      }).catch((err) => console.warn('[TravellerProfileModal] Profile load notice:', err));
+    }
+  }, [isOpen, initialProfile, userId, userEmail, defaultName]);
 
   if (!isOpen) return null;
 
@@ -112,24 +170,24 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
     setValidationError(null);
     setIsSubmitting(true);
 
-    const profilePayload: TravellerProfile = {
+    const profilePayload: any = {
       fullName: fullName.trim(),
       phoneNumber: phoneNumber.trim(),
       homeCity: homeCity.trim(),
-      ageGroup,
-      preferredCurrency,
+      ...(ageGroup && ageGroup !== 'SELECT' ? { ageGroup } : {}),
+      ...(preferredCurrency && preferredCurrency !== 'SELECT' ? { preferredCurrency } : { preferredCurrency: 'INR' }),
       preferences: {
-        travelBudget,
-        preferredTransport,
-        preferredCabinClass,
-        seatPreference,
-        hotelCategory,
-        preferredDepartureTime,
+        ...(travelBudget && travelBudget !== 'SELECT' ? { travelBudget } : {}),
+        ...(preferredTransport && preferredTransport !== 'SELECT' ? { preferredTransport } : {}),
+        ...(preferredCabinClass && preferredCabinClass !== 'SELECT' ? { preferredCabinClass } : {}),
+        ...(seatPreference && seatPreference !== 'SELECT' ? { seatPreference } : {}),
+        ...(hotelCategory && hotelCategory !== 'SELECT' ? { hotelCategory } : {}),
+        ...(preferredDepartureTime && preferredDepartureTime !== 'SELECT' ? { preferredDepartureTime } : {}),
         maxTravelDurationHours,
         maxConnections,
-        flexibilityPreference,
+        ...(flexibilityPreference && flexibilityPreference !== 'SELECT' ? { flexibilityPreference } : {}),
       },
-      foodPreference,
+      ...(foodPreference && foodPreference !== 'SELECT' ? { foodPreference } : {}),
       accessibilityRequirements: accessibilityRequirements.trim() || undefined,
       frequentTravellerIdentifiers: {
         airIndia: airIndiaNumber.trim() || undefined,
@@ -168,12 +226,23 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
         <div className="absolute -top-20 -right-20 w-80 h-80 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-[#D4AF37]/5 rounded-full blur-3xl pointer-events-none" />
 
+        {/* Close Button when editing */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-900 border border-gold-subtle hover:border-[#D4AF37] flex items-center justify-center text-slate-400 hover:text-white transition-colors cursor-pointer z-10"
+            title="Close editor"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+
         {/* Top Header Badge & Stepper */}
         <div className="relative space-y-3 mb-8 border-b border-gold-subtle/30 pb-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between pr-10">
             <div className="flex items-center space-x-2 text-[10px] font-cinzel font-semibold tracking-[0.25em] text-[#D4AF37]">
               <Crown className="w-4 h-4 text-[#D4AF37]" />
-              <span>RE ROUTE BHARAT PRIVÉ ONBOARDING</span>
+              <span>{isEditing ? 'ROUTEFORGE PRIVÉ • EDIT PROFILE' : 'RE ROUTE BHARAT PRIVÉ ONBOARDING'}</span>
             </div>
             <div className="text-[11px] font-mono text-[#D4AF37] px-2.5 py-0.5 rounded-full bg-slate-900 border border-gold-subtle">
               STEP {currentStep} OF 3
@@ -181,9 +250,9 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
           </div>
 
           <h2 className="font-serif-display text-2xl sm:text-3xl text-white">
-            {currentStep === 1 && 'Configure Your Traveller Profile'}
-            {currentStep === 2 && 'Calibrate Your Travel Corridors'}
-            {currentStep === 3 && 'Privé Personalization & Loyalty'}
+            {currentStep === 1 && (isEditing ? 'Edit Your Traveller Identity' : 'Configure Your Traveller Profile')}
+            {currentStep === 2 && (isEditing ? 'Edit Your Corridor Tolerances' : 'Calibrate Your Travel Corridors')}
+            {currentStep === 3 && (isEditing ? 'Edit Privé Personalization' : 'Privé Personalization & Loyalty')}
           </h2>
 
           <p className="text-xs font-sans-luxury text-slate-300 font-light">
@@ -259,10 +328,11 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
               <div className="space-y-1.5">
                 <label className="text-[11px] font-cinzel text-slate-300">AGE GROUP *</label>
                 <select
-                  value={ageGroup}
-                  onChange={(e) => setAgeGroup(e.target.value as AgeGroup)}
+                  value={ageGroup || ''}
+                  onChange={(e) => setAgeGroup(e.target.value)}
                   className="w-full bg-[#0E1017] border border-gold-subtle rounded-xl px-4 py-3 text-xs sm:text-sm font-sans-luxury text-white focus:outline-none focus:border-[#D4AF37] cursor-pointer"
                 >
+                  <option value="">SELECT</option>
                   <option value="18-25">18 – 25 (Young Professional)</option>
                   <option value="26-35">26 – 35 (Executive / Explorer)</option>
                   <option value="36-50">36 – 50 (Family / Business Leader)</option>
@@ -274,13 +344,14 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
               <div className="space-y-1.5">
                 <label className="text-[11px] font-cinzel text-slate-300 flex items-center space-x-1.5">
                   <CreditCard className="w-3.5 h-3.5 text-[#D4AF37]" />
-                  <span>PREFERRED CURRENCY *</span>
+                  <span>PREFERRED CURRENCY</span>
                 </label>
                 <select
-                  value={preferredCurrency}
-                  onChange={(e) => setPreferredCurrency(e.target.value as PreferredCurrency)}
+                  value={preferredCurrency || ''}
+                  onChange={(e) => setPreferredCurrency(e.target.value)}
                   className="w-full bg-[#0E1017] border border-gold-subtle rounded-xl px-4 py-3 text-xs sm:text-sm font-sans-luxury text-white focus:outline-none focus:border-[#D4AF37] cursor-pointer"
                 >
+                  <option value="">SELECT</option>
                   <option value="INR">INR ₹ (Indian Rupee)</option>
                   <option value="USD">USD $ (US Dollar)</option>
                   <option value="EUR">EUR € (Euro)</option>
@@ -310,10 +381,11 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
               <div className="space-y-1.5">
                 <label className="text-[11px] font-cinzel text-slate-300">TRAVEL BUDGET TIER</label>
                 <select
-                  value={travelBudget}
-                  onChange={(e) => setTravelBudget(e.target.value as TravelBudget)}
+                  value={travelBudget || ''}
+                  onChange={(e) => setTravelBudget(e.target.value)}
                   className="w-full bg-[#0E1017] border border-gold-subtle rounded-xl px-4 py-3 text-xs sm:text-sm font-sans-luxury text-white focus:outline-none focus:border-[#D4AF37] cursor-pointer"
                 >
+                  <option value="">SELECT</option>
                   <option value="economy">Smart Economy (Value & Reliability)</option>
                   <option value="premium">Premium Leisure (Air India & Vande Bharat)</option>
                   <option value="luxury">Bharat Privé Luxury (5-Star & Heritage Stays)</option>
@@ -324,10 +396,11 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
               <div className="space-y-1.5">
                 <label className="text-[11px] font-cinzel text-slate-300">PREFERRED TRANSPORT MODE</label>
                 <select
-                  value={preferredTransport}
-                  onChange={(e) => setPreferredTransport(e.target.value as PreferredTransport)}
+                  value={preferredTransport || ''}
+                  onChange={(e) => setPreferredTransport(e.target.value)}
                   className="w-full bg-[#0E1017] border border-gold-subtle rounded-xl px-4 py-3 text-xs sm:text-sm font-sans-luxury text-white focus:outline-none focus:border-[#D4AF37] cursor-pointer"
                 >
+                  <option value="">SELECT</option>
                   <option value="multimodal">Seamless Multi-Modal (Flight + High-Speed Rail)</option>
                   <option value="flight">Aviation Priority (Direct Flights First)</option>
                   <option value="train">Royal Indian Railways (Vande Bharat & Tejas)</option>
@@ -340,10 +413,11 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
               <div className="space-y-1.5">
                 <label className="text-[11px] font-cinzel text-slate-300">CABIN / CLASS</label>
                 <select
-                  value={preferredCabinClass}
-                  onChange={(e) => setPreferredCabinClass(e.target.value as PreferredCabinClass)}
+                  value={preferredCabinClass || ''}
+                  onChange={(e) => setPreferredCabinClass(e.target.value)}
                   className="w-full bg-[#0E1017] border border-gold-subtle rounded-xl px-4 py-3 text-xs sm:text-sm font-sans-luxury text-white focus:outline-none focus:border-[#D4AF37] cursor-pointer"
                 >
+                  <option value="">SELECT</option>
                   <option value="vande_bharat_exec">Vande Bharat Executive / Anubhuti</option>
                   <option value="business">Business Class</option>
                   <option value="first">First Class / Maharaja Coupe</option>
@@ -355,10 +429,11 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
               <div className="space-y-1.5">
                 <label className="text-[11px] font-cinzel text-slate-300">SEAT PREFERENCE</label>
                 <select
-                  value={seatPreference}
-                  onChange={(e) => setSeatPreference(e.target.value as SeatPreference)}
+                  value={seatPreference || ''}
+                  onChange={(e) => setSeatPreference(e.target.value)}
                   className="w-full bg-[#0E1017] border border-gold-subtle rounded-xl px-4 py-3 text-xs sm:text-sm font-sans-luxury text-white focus:outline-none focus:border-[#D4AF37] cursor-pointer"
                 >
+                  <option value="">SELECT</option>
                   <option value="window">Window View</option>
                   <option value="aisle">Aisle (Easy Access)</option>
                   <option value="coupe">Private Family Coupe (Rail)</option>
@@ -369,10 +444,11 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
               <div className="space-y-1.5">
                 <label className="text-[11px] font-cinzel text-slate-300">HOTEL CATEGORY</label>
                 <select
-                  value={hotelCategory}
-                  onChange={(e) => setHotelCategory(e.target.value as HotelCategory)}
+                  value={hotelCategory || ''}
+                  onChange={(e) => setHotelCategory(e.target.value)}
                   className="w-full bg-[#0E1017] border border-gold-subtle rounded-xl px-4 py-3 text-xs sm:text-sm font-sans-luxury text-white focus:outline-none focus:border-[#D4AF37] cursor-pointer"
                 >
+                  <option value="">SELECT</option>
                   <option value="heritage_palace">Taj Lake Palace & Heritage Palaces</option>
                   <option value="5_star_luxury">5-Star Luxury (Oberoi & ITC)</option>
                   <option value="boutique_resort">Curated Boutique Villas</option>
@@ -385,10 +461,11 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
               <div className="space-y-1.5">
                 <label className="text-[11px] font-cinzel text-slate-300">DEPARTURE WINDOW</label>
                 <select
-                  value={preferredDepartureTime}
-                  onChange={(e) => setPreferredDepartureTime(e.target.value as PreferredDepartureTime)}
+                  value={preferredDepartureTime || ''}
+                  onChange={(e) => setPreferredDepartureTime(e.target.value)}
                   className="w-full bg-[#0E1017] border border-gold-subtle rounded-xl px-4 py-3 text-xs sm:text-sm font-sans-luxury text-white focus:outline-none focus:border-[#D4AF37] cursor-pointer"
                 >
+                  <option value="">SELECT</option>
                   <option value="morning">Morning (08:00 – 12:00)</option>
                   <option value="early_morning">Early Dawn (04:00 – 08:00)</option>
                   <option value="afternoon">Afternoon (12:00 – 17:00)</option>
@@ -412,10 +489,11 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
               <div className="space-y-1.5">
                 <label className="text-[11px] font-cinzel text-slate-300">FLEXIBILITY</label>
                 <select
-                  value={flexibilityPreference}
-                  onChange={(e) => setFlexibilityPreference(e.target.value as FlexibilityPreference)}
+                  value={flexibilityPreference || ''}
+                  onChange={(e) => setFlexibilityPreference(e.target.value)}
                   className="w-full bg-[#0E1017] border border-gold-subtle rounded-xl px-4 py-3 text-xs sm:text-sm font-sans-luxury text-white focus:outline-none focus:border-[#D4AF37] cursor-pointer"
                 >
+                  <option value="">SELECT</option>
                   <option value="moderate">Moderate (±2 hours buffer)</option>
                   <option value="strict">Strict (Exact schedules only)</option>
                   <option value="high">High (Open to optimal AI reroutes)</option>
@@ -454,10 +532,11 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
                   <span>DIETARY / DINING CARE</span>
                 </label>
                 <select
-                  value={foodPreference}
-                  onChange={(e) => setFoodPreference(e.target.value as FoodPreference)}
+                  value={foodPreference || ''}
+                  onChange={(e) => setFoodPreference(e.target.value)}
                   className="w-full bg-[#0E1017] border border-gold-subtle rounded-xl px-4 py-3 text-xs sm:text-sm font-sans-luxury text-white focus:outline-none focus:border-[#D4AF37] cursor-pointer"
                 >
+                  <option value="">SELECT</option>
                   <option value="pure_veg">Verified Pure Vegetarian (Strict)</option>
                   <option value="jain">Jain Meal (No Root Veg / Onion / Garlic)</option>
                   <option value="non_veg">Standard Non-Vegetarian</option>
@@ -584,7 +663,7 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
                 ) : (
                   <>
                     <Check className="w-4 h-4" />
-                    <span>COMPLETE ONBOARDING & ENTER JOURNEYS</span>
+                    <span>{isEditing ? 'SAVE PREFERENCES & RETURN' : 'COMPLETE ONBOARDING & ENTER JOURNEYS'}</span>
                   </>
                 )}
               </button>

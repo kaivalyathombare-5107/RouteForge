@@ -398,9 +398,15 @@ export function propagateDisruption(
  */
 export function generateRecoveryOptions(
   disruptedBooking: Booking,
-  trip: Pick<Trip, 'bookings' | 'preferences'> | Trip
+  trip?: Partial<Trip>
 ): RecoveryOption[] {
-  const prefs = trip.preferences;
+  const prefs: UserPreferences = trip?.preferences || {
+    priority: 'fastest',
+    maxBudget: 15000,
+    maxAcceptableDelayMinutes: 90,
+    preferredProvider: 'Any High Reliability',
+    requireFullRefundability: false,
+  };
 
   // Recovery Option A: Fastest Recovery (e.g., Express Flight + Direct Fast Transit)
   const optionA: RecoveryOption = {

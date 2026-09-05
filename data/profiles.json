@@ -9,6 +9,57 @@
       "ageGroup": "18-25",
       "preferredCurrency": "INR",
       "preferences": {
+        "travelBudget": "economy",
+        "preferredTransport": "multimodal",
+        "preferredCabinClass": "economy",
+        "seatPreference": "window",
+        "hotelCategory": "business_executive",
+        "maxTravelDurationHours": 10,
+        "maxConnections": 1,
+        "flexibilityPreference": "moderate"
+      },
+      "foodPreference": "none",
+      "frequentTravellerIdentifiers": {},
+      "isComplete": true,
+      "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+      "updatedAt": "2026-09-05T02:14:25.501Z",
+      "createdAt": "2026-09-04T10:39:22.594Z"
+    },
+    "updatedAt": "2026-09-05T02:14:25.501Z"
+  },
+  "usr_step3_traveler_01": {
+    "uid": "usr_step3_traveler_01",
+    "email": "traveler01@routeforge.ai",
+    "profile": {
+      "fullName": "Captain Vikram Singh",
+      "phoneNumber": "",
+      "emergencyContact": {
+        "name": "",
+        "phone": "",
+        "relation": ""
+      },
+      "preferredTravelClass": "economy",
+      "dietaryPreference": "standard",
+      "wheelchairAssistance": false,
+      "frequentFlyerPrograms": [],
+      "loyaltyAccounts": [],
+      "userId": "usr_step3_traveler_01",
+      "isComplete": true,
+      "updatedAt": "2026-09-05T01:54:51.111Z",
+      "createdAt": "2026-09-05T01:54:51.111Z"
+    },
+    "updatedAt": "2026-09-05T01:54:51.111Z"
+  },
+  "v3TNM6uqjsPMajv3vZdLwSdhfEf1": {
+    "uid": "v3TNM6uqjsPMajv3vZdLwSdhfEf1",
+    "email": "kaivalya5107.kt@gmail.com",
+    "profile": {
+      "fullName": "Thombare Kaivalya Janardhan",
+      "phoneNumber": "6475686",
+      "homeCity": "Mumbai",
+      "ageGroup": "18-25",
+      "preferredCurrency": "INR",
+      "preferences": {
         "travelBudget": "luxury",
         "preferredTransport": "multimodal",
         "preferredCabinClass": "vande_bharat_exec",
@@ -22,10 +73,10 @@
       "foodPreference": "pure_veg",
       "frequentTravellerIdentifiers": {},
       "isComplete": true,
-      "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
-      "updatedAt": "2026-09-04T11:45:42.515Z",
-      "createdAt": "2026-09-04T10:39:22.594Z"
+      "userId": "v3TNM6uqjsPMajv3vZdLwSdhfEf1",
+      "updatedAt": "2026-09-05T01:58:03.905Z",
+      "createdAt": "2026-09-05T01:57:34.603Z"
     },
-    "updatedAt": "2026-09-04T11:45:42.515Z"
+    "updatedAt": "2026-09-05T01:58:03.905Z"
   }
 }

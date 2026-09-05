@@ -56,5 +56,18 @@
       "lastSyncAt": "2026-09-04T10:55:26.863Z",
       "accountIdentifier": "goibibo_user_eKCtV6"
     }
+  },
+  "usr_step3_traveler_01": {
+    "makemytrip": {
+      "providerId": "makemytrip",
+      "state": "CONNECTED",
+      "connectedAt": "2026-09-05T01:54:51.123Z",
+      "lastSyncAt": "2026-09-05T01:54:51.123Z",
+      "accountIdentifier": "mmt_corp_singh_889",
+      "encryptedToken": "a7a8867b8f6b376a3e03a7bb:3a83ad1cfdb9aabbb85c8fa8d4eeea6c:7c1cd079aae61260ffe650c25acbbb58b32e543faed6440f7d2a3436215f",
+      "maskedSecret": "mmt_live...4521",
+      "tokenExpiresAt": "2026-12-04T01:54:51.123Z",
+      "tokenRotatedAt": "2026-09-05T01:54:51.123Z"
+    }
   }
 }

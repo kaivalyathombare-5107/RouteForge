@@ -19,6 +19,7 @@ import {
 import { JourneyMode } from './HeroJourneySection';
 import { DestinationItem } from './DestinationTiltCards';
 import { JourneyPlanOption, JourneySearchParams } from '../types/journey';
+export type { JourneySearchParams };
 import { searchJourneys } from '../lib/api/journeys';
 import { useAuth } from '../hooks/useAuth';
 import { BookingOptionsModal } from './BookingOptionsModal';

@@ -29,6 +29,57 @@ interface AccountDetailsModalProps {
   onOpenProviders: () => void;
 }
 
+const FORMAT_LABELS: Record<string, string> = {
+  // Budget
+  economy: 'Smart Economy',
+  premium: 'Premium Leisure',
+  luxury: 'Bharat Privé Luxury',
+  ultra_hni: 'Royal Maharaja Circle',
+  // Transport
+  multimodal: 'Seamless Multi-Modal',
+  flight: 'Aviation Priority',
+  train: 'Royal Indian Railways',
+  private_charter: 'Private Charters',
+  // Cabin
+  vande_bharat_exec: 'Vande Bharat Executive / Anubhuti',
+  business: 'Business Class',
+  first: 'First Class / Maharaja Coupe',
+  premium_economy: 'Premium Economy',
+  // Seat
+  window: 'Window View',
+  aisle: 'Aisle (Easy Access)',
+  coupe: 'Private Family Coupe',
+  extra_legroom: 'Extra Legroom',
+  // Hotel
+  heritage_palace: 'Taj Lake Palace & Heritage',
+  '5_star_luxury': '5-Star Luxury (Oberoi/ITC)',
+  boutique_resort: 'Curated Boutique Villas',
+  business_executive: 'Central Business Hotel',
+  // Departure
+  morning: 'Morning (08:00 – 12:00)',
+  early_morning: 'Early Dawn (04:00 – 08:00)',
+  afternoon: 'Afternoon (12:00 – 17:00)',
+  evening: 'Evening (17:00 – 21:00)',
+  night: 'Overnight (21:00 – 04:00)',
+  // Flexibility
+  moderate: 'Moderate (±2h buffer)',
+  strict: 'Strict (Exact schedules)',
+  high: 'High (Optimal AI)',
+  // Food
+  pure_veg: 'Pure Vegetarian (Strict)',
+  jain: 'Jain Meal (No Root/Onion/Garlic)',
+  non_veg: 'Standard Non-Vegetarian',
+  halal: 'Halal Certified',
+  kosher: 'Kosher',
+  diabetic: 'Diabetic / Low Glycemic',
+  none: 'No Specific Preference',
+};
+
+const formatValue = (val?: string | null): string => {
+  if (!val || val === 'SELECT' || val.trim() === '') return 'SELECT';
+  return FORMAT_LABELS[val] || val;
+};
+
 export const AccountDetailsModal: React.FC<AccountDetailsModalProps> = ({
   isOpen,
   onClose,
@@ -79,6 +130,13 @@ export const AccountDetailsModal: React.FC<AccountDetailsModalProps> = ({
     .join('')
     .toUpperCase()
     .slice(0, 2);
+
+  const prefs = (profile?.preferences || (profile as any)?.travelPreferences || {}) as any;
+  const emergency = profile?.emergencyContact || (profile as any)?.emergencyContactName ? {
+    name: profile?.emergencyContact?.name || (profile as any)?.emergencyContactName,
+    relation: profile?.emergencyContact?.relation || (profile as any)?.emergencyContactRelation || 'Family',
+    phone: profile?.emergencyContact?.phone || (profile as any)?.emergencyContactPhone,
+  } : null;
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-lg flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
@@ -142,7 +200,7 @@ export const AccountDetailsModal: React.FC<AccountDetailsModalProps> = ({
                 MEMBERSHIP: PRIVÉ ELITE #{user.uid.slice(0, 8).toUpperCase()}
               </span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-950/60 border border-amber-800/60 text-amber-300">
-                CURRENCY: {profile?.preferredCurrency || 'INR (₹)'}
+                CURRENCY: {formatValue(profile?.preferredCurrency) === 'SELECT' ? 'INR (₹)' : formatValue(profile?.preferredCurrency)}
               </span>
             </div>
           </div>
@@ -165,7 +223,7 @@ export const AccountDetailsModal: React.FC<AccountDetailsModalProps> = ({
                 <span className="text-[10px] font-mono uppercase text-slate-400 block">Primary Contact Phone</span>
                 <p className="font-medium text-white flex items-center space-x-1.5">
                   <Phone className="w-3.5 h-3.5 text-[#D4AF37]" />
-                  <span>{profile.phoneNumber || 'Not registered'}</span>
+                  <span>{profile.phoneNumber || 'SELECT'}</span>
                 </p>
               </div>
 
@@ -173,7 +231,7 @@ export const AccountDetailsModal: React.FC<AccountDetailsModalProps> = ({
                 <span className="text-[10px] font-mono uppercase text-slate-400 block">Home City &amp; Age</span>
                 <p className="font-medium text-white flex items-center space-x-1.5">
                   <MapPin className="w-3.5 h-3.5 text-[#D4AF37]" />
-                  <span>{profile.homeCity} • {profile.ageGroup}</span>
+                  <span>{profile.homeCity || 'SELECT'} • {formatValue(profile.ageGroup)}</span>
                 </p>
               </div>
             </div>
@@ -185,22 +243,46 @@ export const AccountDetailsModal: React.FC<AccountDetailsModalProps> = ({
                   TRAVEL STYLIST &amp; CABIN PREFERENCES
                 </span>
                 <span className="text-[10px] font-mono text-slate-400">
-                  {profile.travelPreferences?.flexibilityPreference || 'Moderate'} Flexibility
+                  {formatValue(prefs.flexibilityPreference) !== 'SELECT' ? `${formatValue(prefs.flexibilityPreference)} Flexibility` : 'FLEXIBILITY: SELECT'}
                 </span>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px] font-sans-luxury text-slate-300">
-                <div>
+                <div className="p-2 rounded-lg bg-slate-900/60 border border-slate-800/80">
                   <span className="text-slate-500 block text-[10px]">BUDGET TIER</span>
-                  <span className="font-medium text-white">{profile.travelPreferences?.travelBudget || 'Royal Luxury Tier'}</span>
+                  <span className={`font-medium ${formatValue(prefs.travelBudget) === 'SELECT' ? 'text-slate-500' : 'text-white'}`}>
+                    {formatValue(prefs.travelBudget)}
+                  </span>
                 </div>
-                <div>
+                <div className="p-2 rounded-lg bg-slate-900/60 border border-slate-800/80">
                   <span className="text-slate-500 block text-[10px]">PREFERRED CABIN</span>
-                  <span className="font-medium text-white">{profile.travelPreferences?.preferredCabinClass || 'First AC / Business'}</span>
+                  <span className={`font-medium ${formatValue(prefs.preferredCabinClass) === 'SELECT' ? 'text-slate-500' : 'text-white'}`}>
+                    {formatValue(prefs.preferredCabinClass)}
+                  </span>
                 </div>
-                <div>
+                <div className="p-2 rounded-lg bg-slate-900/60 border border-slate-800/80">
                   <span className="text-slate-500 block text-[10px]">SEAT SELECTION</span>
-                  <span className="font-medium text-white">{profile.travelPreferences?.seatPreference || 'Window / Lower Berth'}</span>
+                  <span className={`font-medium ${formatValue(prefs.seatPreference) === 'SELECT' ? 'text-slate-500' : 'text-white'}`}>
+                    {formatValue(prefs.seatPreference)}
+                  </span>
+                </div>
+                <div className="p-2 rounded-lg bg-slate-900/60 border border-slate-800/80">
+                  <span className="text-slate-500 block text-[10px]">TRANSPORT MODE</span>
+                  <span className={`font-medium ${formatValue(prefs.preferredTransport) === 'SELECT' ? 'text-slate-500' : 'text-white'}`}>
+                    {formatValue(prefs.preferredTransport)}
+                  </span>
+                </div>
+                <div className="p-2 rounded-lg bg-slate-900/60 border border-slate-800/80">
+                  <span className="text-slate-500 block text-[10px]">HOTEL CATEGORY</span>
+                  <span className={`font-medium ${formatValue(prefs.hotelCategory) === 'SELECT' ? 'text-slate-500' : 'text-white'}`}>
+                    {formatValue(prefs.hotelCategory)}
+                  </span>
+                </div>
+                <div className="p-2 rounded-lg bg-slate-900/60 border border-slate-800/80">
+                  <span className="text-slate-500 block text-[10px]">DEPARTURE TIME</span>
+                  <span className={`font-medium ${formatValue(prefs.preferredDepartureTime) === 'SELECT' ? 'text-slate-500' : 'text-white'}`}>
+                    {formatValue(prefs.preferredDepartureTime)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -215,17 +297,46 @@ export const AccountDetailsModal: React.FC<AccountDetailsModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-sans-luxury text-slate-300">
                 <div className="p-2 rounded-lg bg-slate-900/60 border border-slate-800">
                   <span className="text-slate-500 block text-[10px]">DIETARY REQUIREMENTS</span>
-                  <span className="font-medium text-white">{profile.foodPreference || 'Pure Vegetarian (Jain Certified)'}</span>
+                  <span className={`font-medium ${formatValue(profile.foodPreference) === 'SELECT' ? 'text-slate-500' : 'text-white'}`}>
+                    {formatValue(profile.foodPreference)}
+                  </span>
                 </div>
                 <div className="p-2 rounded-lg bg-slate-900/60 border border-slate-800">
                   <span className="text-slate-500 block text-[10px]">ACCESSIBILITY</span>
-                  <span className="font-medium text-white">{profile.accessibilityRequirements || 'Standard VIP Escort'}</span>
+                  <span className="font-medium text-white">{profile.accessibilityRequirements || 'None specified'}</span>
                 </div>
               </div>
 
-              {profile.emergencyContactName && (
+              {/* Frequent Traveller Numbers */}
+              {profile.frequentTravellerIdentifiers && Object.values(profile.frequentTravellerIdentifiers).some(Boolean) && (
+                <div className="pt-1 flex flex-wrap gap-2 text-[10px] font-mono text-amber-300/90">
+                  {profile.frequentTravellerIdentifiers.airIndia && (
+                    <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
+                      Air India: {profile.frequentTravellerIdentifiers.airIndia}
+                    </span>
+                  )}
+                  {profile.frequentTravellerIdentifiers.indigo && (
+                    <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
+                      IndiGo 6E: {profile.frequentTravellerIdentifiers.indigo}
+                    </span>
+                  )}
+                  {profile.frequentTravellerIdentifiers.irctc && (
+                    <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
+                      IRCTC: {profile.frequentTravellerIdentifiers.irctc}
+                    </span>
+                  )}
+                  {profile.frequentTravellerIdentifiers.tajInnerCircle && (
+                    <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
+                      Taj TIC: {profile.frequentTravellerIdentifiers.tajInnerCircle}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Emergency Safeguard */}
+              {emergency && emergency.name && (
                 <div className="pt-1 text-[10px] font-mono text-slate-400">
-                  Emergency Contact: {profile.emergencyContactName} ({profile.emergencyContactRelation}) • {profile.emergencyContactPhone}
+                  Emergency Contact: {emergency.name} ({emergency.relation}) • {emergency.phone || 'N/A'}
                 </div>
               )}
             </div>

@@ -32,13 +32,17 @@ import { ImmersiveStayCard } from './components/ImmersiveStayCard';
 import { ValuePropositionBar } from './components/ValuePropositionBar';
 import { Full360PanoramaModal } from './components/Full360PanoramaModal';
 import { ReRouteSignInModal } from './components/ReRouteSignInModal';
-import { JourneySearchResultsModal, JourneySearchParams } from './components/JourneySearchResultsModal';
+import { JourneySearchResultsModal } from './components/JourneySearchResultsModal';
+import { JourneySearchParams } from './types/journey';
 import { useAuth } from './hooks/useAuth';
 import { TravellerProfileModal } from './components/TravellerProfileModal';
 import { ProviderConnectionModal } from './components/ProviderConnectionModal';
 import { AccountDetailsModal } from './components/AccountDetailsModal';
 import { fetchTravellerProfile } from './lib/api/profile';
 import { TravellerProfile } from './types/profile';
+import { fetchUserBookings } from './lib/api/bookings';
+import { createDisruption, executeRecovery } from './lib/api/disruptions';
+import { cancelBooking } from './lib/api/refunds';
 
 // Disruption & 3D Spatial Systems
 import { ThreeTripGraph } from './components/ThreeTripGraph';
@@ -98,6 +102,7 @@ export default function App() {
   const { user, loading } = useAuth();
   const [travellerProfile, setTravellerProfile] = useState<TravellerProfile | null>(null);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
+  const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
   const [isProviderConnectionOpen, setIsProviderConnectionOpen] = useState<boolean>(false);
   const [isAccountDetailsOpen, setIsAccountDetailsOpen] = useState<boolean>(false);
 
@@ -130,12 +135,25 @@ export default function App() {
     };
   }, [user]);
 
+  // Spec requirement: First-time user: Google login → Traveller Profile → Provider Connections → Plan Your Journey
   const handleProfileComplete = (profile: TravellerProfile) => {
     playSound('success', soundEnabled);
     setTravellerProfile(profile);
     setIsOnboardingOpen(false);
-    // Spec requirement: First-time user: Google login → Traveller Profile → Provider Connections → Plan Your Journey
-    setIsProviderConnectionOpen(true);
+    if (isEditingProfile) {
+      setIsEditingProfile(false);
+      setIsAccountDetailsOpen(true);
+    } else {
+      setIsProviderConnectionOpen(true);
+    }
+  };
+
+  const handleCloseProfileModal = () => {
+    setIsOnboardingOpen(false);
+    if (isEditingProfile) {
+      setIsEditingProfile(false);
+      setIsAccountDetailsOpen(true);
+    }
   };
 
   const handleProviderConnectionComplete = () => {
@@ -143,6 +161,104 @@ export default function App() {
     setIsProviderConnectionOpen(false);
     setActiveSection('journeys');
   };
+
+  // Sync Booking Vault with Trip Graph for authenticated user (Sections 10, 18, 21)
+  useEffect(() => {
+    if (!user) return;
+
+    let isMounted = true;
+    const syncVault = async () => {
+      try {
+        const idToken = await user.getIdToken();
+        const res = await fetchUserBookings(idToken, user.uid);
+        if (isMounted && res.success && res.bookings && res.bookings.length > 0) {
+          const vaultBookings = res.bookings;
+          const graphBookings: Booking[] = [];
+          const graphEdges: TripEdge[] = [];
+
+          vaultBookings.forEach((vb: any, bIdx: number) => {
+            const segments = vb.segments || [];
+            segments.forEach((seg: any, sIdx: number) => {
+              const nodeX = -6 + (bIdx * 3 + sIdx) * 3;
+              graphBookings.push({
+                id: seg.id || `vb_${vb.id}_${sIdx}`,
+                type: (seg.transportType || 'flight') as any,
+                provider: seg.operator || vb.provider || 'MakeMyTrip Bharat',
+                providerCode: seg.serviceNumber || 'MMT-RES',
+                title: `${seg.operator || vb.title} (${seg.origin} → ${seg.destination})`,
+                referenceCode: seg.pnr || vb.bookingReference,
+                seatOrRoom: seg.seatClass || 'Confirmed Class',
+                origin: seg.origin || 'BOM',
+                destination: seg.destination || 'DEL',
+                departureTime: seg.depTime || '10:15 IST',
+                arrivalTime: seg.arrTime || '12:20 IST',
+                departureTimestamp: Date.now() + 3600000 * (sIdx + 1),
+                arrivalTimestamp: Date.now() + 3600000 * (sIdx + 3),
+                price: Math.round(vb.totalPrice / (segments.length || 1)),
+                currency: vb.currency || 'INR',
+                status: (vb.status === 'DISRUPTED' ? 'delayed' : vb.status === 'CANCELLED' ? 'cancelled' : vb.status === 'RECOVERED' ? 'recovered' : 'normal') as any,
+                location: {
+                  city: seg.origin,
+                  venue: `${seg.origin} Terminal`,
+                  code: seg.origin.slice(0, 3).toUpperCase(),
+                  x: nodeX,
+                  y: 0,
+                  z: 0,
+                },
+                riskLevel: (vb.status === 'DISRUPTED' || vb.status === 'CANCELLED' ? 'critical' : 'none') as any,
+                delayMinutes: vb.disruption?.delayMinutes || 0,
+                downstreamImpactIds: [],
+                lastVerifiedAt: new Date().toLocaleTimeString('en-IN') + ' IST',
+                isImportedStatus: false,
+                policy: {
+                  ruleId: 'DGCA_CAR_SEC3',
+                  policyVersion: 'DGCA_2025_REV',
+                  cancellationCutoffHours: 24,
+                  baseDeduction: 0,
+                  percentageDeduction: 0,
+                  tdrEligible: false,
+                  tdrWindowHours: 0,
+                  termsSummary: vb.disruptionShield || '100% full statutory refund on carrier schedule disruption under DGCA CAR.',
+                },
+              });
+            });
+          });
+
+          // Connect sequential segments with edges
+          for (let i = 0; i < graphBookings.length - 1; i++) {
+            graphEdges.push({
+              id: `edge_vault_${i}`,
+              fromBookingId: graphBookings[i].id,
+              toBookingId: graphBookings[i + 1].id,
+              minimumBufferMinutes: 45,
+              actualBufferMinutes: 75,
+              transferTimeMinutes: 30,
+              dependencyType: 'connecting_service',
+              status: 'safe',
+              bufferWarningThresholdMinutes: 30,
+            });
+          }
+
+          if (graphBookings.length > 0) {
+            setTrip((prev) => ({
+              ...prev,
+              name: `${vaultBookings[0].title} Live Mission Graph`,
+              bookings: graphBookings,
+              edges: graphEdges,
+            }));
+          }
+        }
+      } catch (err) {
+        console.warn('[App] Could not sync vault to trip graph:', err);
+      }
+    };
+
+    syncVault();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
 
   // Autoplay Carousel Effect
   useEffect(() => {
@@ -175,19 +291,59 @@ export default function App() {
     setIsSearchResultsOpen(true);
   };
 
-  // Disruption Simulation Handler
-  const handleSimulateDisruption = (scenario: 'flight_cancel' | 'flight_delay_90' = 'flight_cancel') => {
+  // Disruption Ingestion & Propagation Handler (Sections 14, 20)
+  const handleSimulateDisruption = async (scenario: 'flight_cancel' | 'flight_delay_90' | 'train_divert' | 'infeasible_curfew' = 'flight_cancel') => {
     playSound('disruption', soundEnabled);
     setIsDisrupted(true);
-    const rootBookingId = 'bk_flight_1';
+    const rootBooking = trip.bookings[0];
+    const rootBookingId = rootBooking?.id || 'bkg_flight_01';
     const rootType = scenario === 'flight_cancel' ? 'cancellation' : 'delay';
     const delayMinutes = scenario === 'flight_delay_90' ? 90 : 180;
 
+    try {
+      const idToken = user ? await user.getIdToken() : undefined;
+      const res = await createDisruption(
+        {
+          bookingId: rootBookingId,
+          provider: rootBooking?.provider || 'makemytrip',
+          disruptionType: rootType,
+          delayMinutes,
+          rootCause: scenario === 'flight_cancel'
+            ? 'Airspace congestion and carrier operational cancellation'
+            : 'Incoming flight rotation delay and ATC queue',
+          source: 'LIVE_TELEMETRY',
+        },
+        idToken,
+        user?.uid
+      );
+
+      if (res.success && res.disruption) {
+        // Also propagate in-memory graph
+        const propagationResult = propagateDisruption(trip.bookings, trip.edges, rootBookingId, rootType, delayMinutes);
+        const updatedBookings = trip.bookings.map((b) => propagationResult.updatedBookings.find((ib) => ib.id === b.id) || b);
+        const generatedOptions = res.recoveryOptions || generateRecoveryOptions(rootBooking || updatedBookings[0], {
+          ...trip,
+          bookings: updatedBookings,
+          edges: propagationResult.updatedEdges,
+        });
+
+        setTrip((prev) => ({
+          ...prev,
+          status: 'disrupted',
+          bookings: updatedBookings,
+          edges: propagationResult.updatedEdges,
+        }));
+        setRecoveryOptions(generatedOptions);
+        return;
+      }
+    } catch (err) {
+      console.warn('[Disruption] Backend disruption call notice, executing client deterministic engine:', err);
+    }
+
+    // Client fallback
     const propagationResult = propagateDisruption(trip.bookings, trip.edges, rootBookingId, rootType, delayMinutes);
     const updatedBookings = trip.bookings.map((b) => propagationResult.updatedBookings.find((ib) => ib.id === b.id) || b);
-
-    const rootBooking = updatedBookings.find((b) => b.id === rootBookingId) || updatedBookings[0];
-    const generatedOptions = generateRecoveryOptions(rootBooking, {
+    const generatedOptions = generateRecoveryOptions(rootBooking || updatedBookings[0], {
       ...trip,
       bookings: updatedBookings,
       edges: propagationResult.updatedEdges,
@@ -218,9 +374,31 @@ export default function App() {
     });
   };
 
-  const handleConfirmRecoveryExecution = (executedOption: RecoveryOption) => {
+  // Recovery Execution Handler (Sections 15, 20)
+  const handleConfirmRecoveryExecution = async (executedOption: RecoveryOption) => {
     playSound('success', soundEnabled);
     setActiveRecoveryPlan(executedOption);
+
+    const rootBooking = trip.bookings.find((b) => b.status === 'cancelled' || b.status === 'delayed') || trip.bookings[0];
+
+    try {
+      const idToken = user ? await user.getIdToken() : undefined;
+      await executeRecovery(
+        {
+          bookingId: rootBooking?.id || 'bkg_flight_01',
+          selectedOptionId: executedOption.id,
+          optionTitle: executedOption.title,
+          strategy: executedOption.strategy,
+          netFinancialImpact: executedOption.netFinancialImpact,
+          additionalCost: executedOption.additionalCost,
+          refundRecoveryAmount: executedOption.refundRecoveryAmount,
+        },
+        idToken,
+        user?.uid
+      );
+    } catch (err) {
+      console.warn('[Recovery] Backend recovery execute sync notice:', err);
+    }
 
     const recoveredBookings = trip.bookings.map((b) => ({
       ...b,
@@ -235,6 +413,55 @@ export default function App() {
     }));
 
     setModalOptionToExecute(null);
+  };
+
+  const handleCancelBooking = async (bookingId: string) => {
+    playSound('click', soundEnabled);
+    try {
+      const idToken = user ? await user.getIdToken() : undefined;
+      const res = await cancelBooking(
+        { bookingId, reason: 'Passenger voluntary cancellation' },
+        idToken,
+        user?.uid || 'usr_kaivalya_default'
+      );
+
+      setTrip((prev) => {
+        const targetBooking = prev.bookings.find((b) => b.id === bookingId);
+        const newRefundCases = res.refundCase
+          ? [
+              {
+                id: res.refundCase.id,
+                bookingId: res.refundCase.bookingId,
+                bookingTitle: targetBooking?.title || 'Cancelled Segment',
+                provider: res.refundCase.provider,
+                ticketAmount: res.refundCase.originalAmount,
+                estimatedRefund: res.refundCase.expectedRefund,
+                deductionAmount: Math.max(0, res.refundCase.originalAmount - res.refundCase.expectedRefund),
+                tdrRequired: res.refundCase.provider === 'irctc',
+                tdrReasonCode: res.refundCase.tdrReference || 'VOLUNTARY_CANCEL',
+                tdrWindowDescription: 'Direct settlement to original payment source',
+                ruleId: res.refundCase.ruleId,
+                policyVersion: res.refundCase.policyVersion,
+                deterministicReason: res.refundCase.reason,
+                aiExplanation: 'Statutory cancellation registered directly with partner carrier.',
+                status: res.refundCase.status as any,
+                timestamp: new Date().toLocaleTimeString('en-IN') + ' IST',
+              },
+              ...prev.refundCases,
+            ]
+          : prev.refundCases;
+
+        return {
+          ...prev,
+          bookings: prev.bookings.map((b) => (b.id === bookingId ? { ...b, status: 'cancelled' as any } : b)),
+          refundCases: newRefundCases,
+        };
+      });
+
+      playSound('success', soundEnabled);
+    } catch (err: any) {
+      console.error('[API] Failed to cancel booking:', err);
+    }
   };
 
   const selectedBooking = trip.bookings.find((b) => b.id === selectedBookingId) || null;
@@ -457,6 +684,7 @@ export default function App() {
                           onClose={() => setSelectedBookingId(null)}
                           onNavigateToRefunds={() => setActiveSection('concierge')}
                           onSimulateNodeDisruption={() => handleSimulateDisruption('flight_delay_90')}
+                          onCancelBooking={handleCancelBooking}
                         />
                       </motion.div>
                     )}
@@ -774,6 +1002,9 @@ export default function App() {
           userId={user.uid}
           userEmail={user.email || ''}
           defaultName={user.displayName || ''}
+          initialProfile={travellerProfile}
+          isEditing={isEditingProfile}
+          onClose={handleCloseProfileModal}
           onComplete={handleProfileComplete}
         />
       )}
@@ -794,7 +1025,11 @@ export default function App() {
         <AccountDetailsModal
           isOpen={isAccountDetailsOpen}
           onClose={() => setIsAccountDetailsOpen(false)}
-          onOpenEditProfile={() => setIsOnboardingOpen(true)}
+          onOpenEditProfile={() => {
+            setIsAccountDetailsOpen(false);
+            setIsEditingProfile(true);
+            setIsOnboardingOpen(true);
+          }}
           onOpenProviders={() => setIsProviderConnectionOpen(true)}
         />
       )}

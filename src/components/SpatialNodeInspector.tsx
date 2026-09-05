@@ -8,6 +8,7 @@ interface SpatialNodeInspectorProps {
   onClose: () => void;
   onNavigateToRefunds: () => void;
   onSimulateNodeDisruption: (bookingId: string) => void;
+  onCancelBooking?: (bookingId: string) => void;
 }
 
 export const SpatialNodeInspector: React.FC<SpatialNodeInspectorProps> = ({
@@ -16,6 +17,7 @@ export const SpatialNodeInspector: React.FC<SpatialNodeInspectorProps> = ({
   onClose,
   onNavigateToRefunds,
   onSimulateNodeDisruption,
+  onCancelBooking,
 }) => {
   if (!booking) return null;
 
@@ -130,6 +132,15 @@ export const SpatialNodeInspector: React.FC<SpatialNodeInspectorProps> = ({
           >
             <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
             <span>TRIGGER DELAY ON THIS NODE</span>
+          </button>
+        )}
+
+        {booking.status !== 'cancelled' && onCancelBooking && (
+          <button
+            onClick={() => onCancelBooking(booking.id)}
+            className="w-full py-2 rounded-xl bg-slate-950 hover:bg-slate-900 border border-gold-subtle text-xs font-cinzel text-slate-300 hover:text-white flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
+          >
+            <span>CANCEL BOOKING (OFFICIAL PARTNER)</span>
           </button>
         )}
       </div>

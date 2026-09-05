@@ -200,5 +200,186 @@
     "createdAt": "2026-09-04T11:39:52.444Z",
     "updatedAt": "2026-09-04T11:39:52.444Z",
     "lastVerifiedAt": "2026-09-04T11:39:52.444Z"
+  },
+  "bk_1788572628535_cc18ue": {
+    "id": "bk_1788572628535_cc18ue",
+    "userId": "usr_test_step2",
+    "bookingReference": "RF-MAKE-136536",
+    "provider": "makemytrip",
+    "title": "Air India Non-Stop Express (BOM → DEL)",
+    "status": "RECOVERED",
+    "totalPrice": 4850,
+    "currency": "INR",
+    "passengers": [
+      {
+        "name": "Kaivalya Thom"
+      }
+    ],
+    "segments": [
+      {
+        "id": "seg_bk_1788572628535_cc18ue_1",
+        "bookingId": "bk_1788572628535_cc18ue",
+        "segmentOrder": 1,
+        "transportType": "flight",
+        "operator": "Air India (Airbus A321neo)",
+        "serviceNumber": "AI-864",
+        "origin": "BOM",
+        "destination": "DEL",
+        "depTime": "10:15 IST",
+        "arrTime": "12:20 IST",
+        "seatClass": "Economy",
+        "status": "CONFIRMED",
+        "sourceType": "PARTNER_API",
+        "pnr": "MAKE-136536",
+        "createdAt": "2026-09-05T01:43:48.535Z"
+      }
+    ],
+    "cancellationPolicy": {
+      "refundable": true,
+      "terms": "Standard cancellation terms per carrier policy."
+    },
+    "modificationPolicy": {
+      "allowed": true,
+      "terms": "Modification supported before scheduled departure."
+    },
+    "disruptionShield": "DGCA CAR Section 3 statutory 100% refund guarantee.",
+    "provenance": {
+      "source": "PARTNER_API",
+      "verifiedAt": "7:13:48 am IST"
+    },
+    "createdAt": "2026-09-05T01:43:48.535Z",
+    "updatedAt": "2026-09-05T01:43:48.557Z",
+    "lastVerifiedAt": "2026-09-05T01:43:48.535Z",
+    "disruption": {
+      "recoveryExecutionId": "rec_1788572628556_oljkq6",
+      "recoveredAt": "2026-09-05T01:43:48.556Z",
+      "strategy": "Fastest Recovery",
+      "optionTitle": "Option A: Direct Fast-Track Re-Route",
+      "netFinancialImpact": -400
+    }
+  },
+  "bk_1788573291154_c7s4is": {
+    "id": "bk_1788573291154_c7s4is",
+    "userId": "usr_step3_traveler_01",
+    "bookingReference": "RF-MAKE-917722",
+    "provider": "makemytrip",
+    "title": "IndiGo 6E-204 Flight & Express Multimodal",
+    "status": "CANCELLED",
+    "totalPrice": 5120,
+    "currency": "INR",
+    "passengers": [
+      {
+        "name": "Primary Traveler"
+      }
+    ],
+    "segments": [
+      {
+        "id": "seg_bk_1788573291154_c7s4is_1",
+        "bookingId": "bk_1788573291154_c7s4is",
+        "segmentOrder": 1,
+        "transportType": "flight",
+        "operator": "IndiGo",
+        "serviceNumber": "6E-204",
+        "origin": "BOM",
+        "destination": "DEL",
+        "depTime": "09:30 IST",
+        "arrTime": "11:40 IST",
+        "seatClass": "Corporate Flexi Tier 1",
+        "status": "CONFIRMED",
+        "sourceType": "PARTNER_API",
+        "pnr": "MAKE-917722",
+        "createdAt": "2026-09-05T01:54:51.154Z",
+        "travelDate": "2026-10-18"
+      }
+    ],
+    "cancellationPolicy": {
+      "refundable": true,
+      "terms": "DGCA CAR Section 3 statutory refund rules apply."
+    },
+    "modificationPolicy": {
+      "allowed": true,
+      "terms": "Complimentary date change allowed up to 2 hours prior."
+    },
+    "disruptionShield": "Automated disruption monitoring & refund protection active.",
+    "provenance": {
+      "source": "PARTNER_API",
+      "verifiedAt": "7:24:51 am IST"
+    },
+    "createdAt": "2026-09-05T01:54:51.154Z",
+    "updatedAt": "2026-09-05T01:54:51.233Z",
+    "lastVerifiedAt": "2026-09-05T01:54:51.154Z",
+    "modificationHistory": [
+      {
+        "modifiedAt": "2026-09-05T01:54:51.217Z",
+        "changes": {
+          "newDate": "2026-10-18",
+          "newCabinClass": "Corporate Flexi Tier 1",
+          "notes": "Rescheduled conference attendance"
+        }
+      }
+    ],
+    "disruption": {
+      "cancelledAt": "2026-09-05T01:54:51.232Z",
+      "reason": "Flight cancelled by carrier due to airspace restrictions",
+      "refundEligible": true,
+      "expectedRefund": 5120
+    }
+  },
+  "bk_1788573306745_29zf3s": {
+    "id": "bk_1788573306745_29zf3s",
+    "userId": "usr_test_step2",
+    "bookingReference": "RF-MAKE-756499",
+    "provider": "makemytrip",
+    "title": "Air India Non-Stop Express (BOM → DEL)",
+    "status": "RECOVERED",
+    "totalPrice": 4850,
+    "currency": "INR",
+    "passengers": [
+      {
+        "name": "Kaivalya Thom"
+      }
+    ],
+    "segments": [
+      {
+        "id": "seg_bk_1788573306745_29zf3s_1",
+        "bookingId": "bk_1788573306745_29zf3s",
+        "segmentOrder": 1,
+        "transportType": "flight",
+        "operator": "Air India (Airbus A321neo)",
+        "serviceNumber": "AI-864",
+        "origin": "BOM",
+        "destination": "DEL",
+        "depTime": "10:15 IST",
+        "arrTime": "12:20 IST",
+        "seatClass": "Economy",
+        "status": "CONFIRMED",
+        "sourceType": "PARTNER_API",
+        "pnr": "MAKE-756499",
+        "createdAt": "2026-09-05T01:55:06.745Z"
+      }
+    ],
+    "cancellationPolicy": {
+      "refundable": true,
+      "terms": "Standard cancellation terms per carrier policy."
+    },
+    "modificationPolicy": {
+      "allowed": true,
+      "terms": "Modification supported before scheduled departure."
+    },
+    "disruptionShield": "DGCA CAR Section 3 statutory 100% refund guarantee.",
+    "provenance": {
+      "source": "PARTNER_API",
+      "verifiedAt": "7:25:06 am IST"
+    },
+    "createdAt": "2026-09-05T01:55:06.745Z",
+    "updatedAt": "2026-09-05T01:55:06.769Z",
+    "lastVerifiedAt": "2026-09-05T01:55:06.745Z",
+    "disruption": {
+      "recoveryExecutionId": "rec_1788573306767_ookuy8",
+      "recoveredAt": "2026-09-05T01:55:06.767Z",
+      "strategy": "Fastest Recovery",
+      "optionTitle": "Option A: Direct Fast-Track Re-Route",
+      "netFinancialImpact": -400
+    }
   }
 }

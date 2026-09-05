@@ -1,0 +1,46 @@
+{
+  "rec_1788572628556_oljkq6": {
+    "id": "rec_1788572628556_oljkq6",
+    "userId": "usr_test_step2",
+    "disruptionId": "dis_1788572628550_5kaxoo",
+    "bookingId": "bk_1788572628535_cc18ue",
+    "selectedOptionId": "rec_opt_fastest",
+    "optionTitle": "Option A: Direct Fast-Track Re-Route",
+    "strategy": "Fastest Recovery",
+    "netFinancialImpact": -400,
+    "additionalCost": 4800,
+    "refundRecoveryAmount": 5200,
+    "providerReference": "RF-MAKE-136536",
+    "status": "EXECUTED",
+    "createdAt": "2026-09-05T01:43:48.556Z"
+  },
+  "rec_1788572779781_z10a2a": {
+    "id": "rec_1788572779781_z10a2a",
+    "userId": "usr_test_step2",
+    "disruptionId": "dis_1788572764002_js7a66",
+    "bookingId": "bkg_flight_01",
+    "selectedOptionId": "rec_opt_fastest",
+    "optionTitle": "Option A: Direct Fast-Track Re-Route",
+    "strategy": "Fastest Recovery",
+    "netFinancialImpact": -400,
+    "additionalCost": 4800,
+    "refundRecoveryAmount": 5200,
+    "status": "EXECUTED",
+    "createdAt": "2026-09-05T01:46:19.781Z"
+  },
+  "rec_1788573306767_ookuy8": {
+    "id": "rec_1788573306767_ookuy8",
+    "userId": "usr_test_step2",
+    "disruptionId": "dis_1788573306760_ejpohj",
+    "bookingId": "bk_1788573306745_29zf3s",
+    "selectedOptionId": "rec_opt_fastest",
+    "optionTitle": "Option A: Direct Fast-Track Re-Route",
+    "strategy": "Fastest Recovery",
+    "netFinancialImpact": -400,
+    "additionalCost": 4800,
+    "refundRecoveryAmount": 5200,
+    "providerReference": "RF-MAKE-756499",
+    "status": "EXECUTED",
+    "createdAt": "2026-09-05T01:55:06.767Z"
+  }
+}

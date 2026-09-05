@@ -2,6 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 import { TravellerProfile } from '../types/profile';
+import { encryptToken, decryptToken, maskSecret, createSecureTokenMetadata } from './security.js';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const PROFILES_FILE = path.join(DATA_DIR, 'profiles.json');
@@ -45,21 +46,36 @@ export const ProfileStore = {
     return record ? record.profile : null;
   },
 
-  upsertProfile(uid: string, email: string, profile: TravellerProfile): TravellerProfile {
+  upsertProfile(uid: string, email: string, profile: Partial<TravellerProfile>): TravellerProfile {
     const profiles = loadProfiles();
+    const existing = profiles[uid]?.profile;
     const now = new Date().toISOString();
 
     const updatedProfile: TravellerProfile = {
+      fullName: profile.fullName || existing?.fullName || '',
+      phoneNumber: profile.phoneNumber || existing?.phoneNumber || '',
+      homeCity: profile.homeCity || existing?.homeCity || '',
+      ...(existing || {}),
       ...profile,
       userId: uid,
+      userEmail: email || profile.userEmail || existing?.userEmail || '',
+      preferences: {
+        ...(existing?.preferences || {}),
+        ...(profile.preferences || {}),
+      } as any,
+      frequentTravellerIdentifiers: {
+        ...(existing?.frequentTravellerIdentifiers || {}),
+        ...(profile.frequentTravellerIdentifiers || {}),
+      },
+      emergencyContact: profile.emergencyContact !== undefined ? profile.emergencyContact : existing?.emergencyContact,
       isComplete: true,
       updatedAt: now,
-      createdAt: profiles[uid]?.profile.createdAt || now,
+      createdAt: existing?.createdAt || now,
     };
 
     profiles[uid] = {
       uid,
-      email,
+      email: email || profiles[uid]?.email || '',
       profile: updatedProfile,
       updatedAt: now,
     };
@@ -97,18 +113,25 @@ export const ProviderConnectionStore = {
     return all[uid] || {};
   },
 
-  connect(uid: string, providerId: string, accountIdentifier?: string): any {
+  connect(uid: string, providerId: string, accountIdentifier?: string, tokenOrSecret?: string): any {
     const all = loadConnections();
     if (!all[uid]) {
       all[uid] = {};
     }
     const now = new Date().toISOString();
+    const secureMeta = tokenOrSecret ? createSecureTokenMetadata(tokenOrSecret, providerId) : undefined;
     const connection = {
       providerId,
       state: 'CONNECTED',
       connectedAt: now,
       lastSyncAt: now,
       accountIdentifier: accountIdentifier || `${providerId}_user_${uid.slice(0, 6)}`,
+      ...(secureMeta ? {
+        encryptedToken: secureMeta.encryptedToken,
+        maskedSecret: secureMeta.maskedToken,
+        tokenExpiresAt: secureMeta.expiresAt,
+        tokenRotatedAt: secureMeta.lastRotatedAt,
+      } : {}),
     };
     all[uid][providerId] = connection;
     saveConnections(all);
@@ -124,6 +147,15 @@ export const ProviderConnectionStore = {
       };
       saveConnections(all);
     }
+  },
+
+  getDecryptedToken(uid: string, providerId: string): string | null {
+    const all = loadConnections();
+    const conn = all[uid]?.[providerId];
+    if (conn?.encryptedToken) {
+      return decryptToken(conn.encryptedToken);
+    }
+    return null;
   }
 };
 
@@ -327,6 +359,263 @@ export const BookingVaultStore = {
       return bookings[id];
     }
     return null;
+  },
+
+  modifyBooking(id: string, updates: { newDate?: string; newCabinClass?: string; segments?: any[]; notes?: string }): any | null {
+    const bookings = loadBookings();
+    if (bookings[id]) {
+      bookings[id].status = 'MODIFIED';
+      bookings[id].updatedAt = new Date().toISOString();
+      bookings[id].modificationHistory = bookings[id].modificationHistory || [];
+      bookings[id].modificationHistory.push({
+        modifiedAt: new Date().toISOString(),
+        changes: updates,
+      });
+      if (updates.newDate && bookings[id].segments?.[0]) {
+        bookings[id].segments[0].travelDate = updates.newDate;
+      }
+      if (updates.newCabinClass && bookings[id].segments?.[0]) {
+        bookings[id].segments[0].seatClass = updates.newCabinClass;
+      }
+      if (updates.segments) {
+        bookings[id].segments = updates.segments;
+      }
+      saveBookings(bookings);
+      return bookings[id];
+    }
+    return null;
   }
+};
+
+const DISRUPTIONS_FILE = path.join(DATA_DIR, 'disruptions.json');
+const RECOVERIES_FILE = path.join(DATA_DIR, 'recoveries.json');
+
+function loadDisruptions(): Record<string, any> {
+  try {
+    if (fs.existsSync(DISRUPTIONS_FILE)) {
+      return JSON.parse(fs.readFileSync(DISRUPTIONS_FILE, 'utf-8'));
+    }
+  } catch (err) {
+    console.warn('[DB] Failed reading disruptions file:', err);
+  }
+  return {};
+}
+
+function saveDisruptions(data: Record<string, any>) {
+  try {
+    fs.writeFileSync(DISRUPTIONS_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('[DB] Failed writing disruptions file:', err);
+  }
+}
+
+export const DisruptionStore = {
+  createDisruption(input: {
+    userId: string;
+    bookingId: string;
+    segmentId?: string;
+    provider: string;
+    disruptionType: 'cancellation' | 'delay' | 'reschedule';
+    severity?: 'low' | 'medium' | 'high' | 'critical';
+    delayMinutes?: number;
+    rootCause: string;
+    affectedSegmentIds?: string[];
+    cascadeSummary?: string;
+    source?: string;
+  }): any {
+    const disruptions = loadDisruptions();
+    const id = `dis_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+    const now = new Date().toISOString();
+
+    const record = {
+      id,
+      ...input,
+      severity: input.severity || (input.disruptionType === 'cancellation' ? 'critical' : (input.delayMinutes || 0) > 60 ? 'high' : 'medium'),
+      status: 'ACTIVE',
+      source: input.source || 'PROVIDER_EVENT',
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    disruptions[id] = record;
+    saveDisruptions(disruptions);
+
+    // Update booking in Vault to reflect disruption
+    BookingVaultStore.updateBookingStatus(
+      input.bookingId,
+      input.disruptionType === 'cancellation' ? 'CANCELLED' : 'DISRUPTED',
+      {
+        disruptionId: id,
+        type: input.disruptionType,
+        delayMinutes: input.delayMinutes || 0,
+        reason: input.rootCause,
+      }
+    );
+
+    return record;
+  },
+
+  getDisruptionsByUid(uid: string): any[] {
+    const disruptions = loadDisruptions();
+    return Object.values(disruptions).filter((d: any) => d.userId === uid);
+  },
+
+  getDisruptionById(id: string): any | null {
+    const disruptions = loadDisruptions();
+    return disruptions[id] || null;
+  },
+};
+
+function loadRecoveries(): Record<string, any> {
+  try {
+    if (fs.existsSync(RECOVERIES_FILE)) {
+      return JSON.parse(fs.readFileSync(RECOVERIES_FILE, 'utf-8'));
+    }
+  } catch (err) {
+    console.warn('[DB] Failed reading recoveries file:', err);
+  }
+  return {};
+}
+
+function saveRecoveries(data: Record<string, any>) {
+  try {
+    fs.writeFileSync(RECOVERIES_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('[DB] Failed writing recoveries file:', err);
+  }
+}
+
+export const RecoveryStore = {
+  createRecoveryExecution(input: {
+    userId: string;
+    disruptionId?: string;
+    bookingId: string;
+    selectedOptionId: string;
+    optionTitle: string;
+    strategy: string;
+    netFinancialImpact: number;
+    additionalCost: number;
+    refundRecoveryAmount: number;
+    newSegments?: any[];
+    providerReference?: string;
+  }): any {
+    const recoveries = loadRecoveries();
+    const id = `rec_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+    const now = new Date().toISOString();
+
+    const record = {
+      id,
+      ...input,
+      status: 'EXECUTED',
+      createdAt: now,
+    };
+
+    recoveries[id] = record;
+    saveRecoveries(recoveries);
+
+    // Update the booking status in Vault to RECOVERED
+    BookingVaultStore.updateBookingStatus(input.bookingId, 'RECOVERED', {
+      recoveryExecutionId: id,
+      recoveredAt: now,
+      strategy: input.strategy,
+      optionTitle: input.optionTitle,
+      netFinancialImpact: input.netFinancialImpact,
+    });
+
+    return record;
+  },
+
+  getRecoveriesByUid(uid: string): any[] {
+    const recoveries = loadRecoveries();
+    return Object.values(recoveries).filter((r: any) => r.userId === uid);
+  },
+};
+
+const REFUNDS_FILE = path.join(DATA_DIR, 'refunds.json');
+
+function loadRefunds(): Record<string, any> {
+  try {
+    if (fs.existsSync(REFUNDS_FILE)) {
+      return JSON.parse(fs.readFileSync(REFUNDS_FILE, 'utf-8'));
+    }
+  } catch (err) {
+    console.warn('[DB] Failed reading refunds file:', err);
+  }
+  return {};
+}
+
+function saveRefunds(data: Record<string, any>) {
+  try {
+    fs.writeFileSync(REFUNDS_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('[DB] Failed writing refunds file:', err);
+  }
+}
+
+export const RefundStore = {
+  createRefundCase(input: {
+    userId: string;
+    bookingId: string;
+    segmentId?: string;
+    provider: string;
+    providerReference: string;
+    originalAmount: number;
+    expectedRefund: number;
+    actualRefund?: number;
+    status?: 'EXPECTED' | 'REQUESTED' | 'PROCESSING' | 'APPROVED' | 'REFUNDED' | 'REJECTED';
+    reason: string;
+    ruleId: string;
+    policyVersion: string;
+    tdrReference?: string;
+  }): any {
+    const refunds = loadRefunds();
+    const id = `ref_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+    const now = new Date().toISOString();
+
+    const record = {
+      id,
+      ...input,
+      status: input.status || 'REQUESTED',
+      actualRefund: input.actualRefund || 0,
+      createdAt: now,
+      updatedAt: now,
+      lastVerifiedAt: now,
+    };
+
+    refunds[id] = record;
+    saveRefunds(refunds);
+    return record;
+  },
+
+  getRefundsByUid(uid: string): any[] {
+    const refunds = loadRefunds();
+    return Object.values(refunds).filter((r: any) => r.userId === uid);
+  },
+
+  getRefundById(id: string, uid?: string): any | null {
+    const refunds = loadRefunds();
+    const r = refunds[id];
+    if (!r) return null;
+    if (uid && r.userId !== uid) return null;
+    return r;
+  },
+
+  updateRefundStatus(id: string, status: string, actualRefund?: number, providerTxId?: string): any | null {
+    const refunds = loadRefunds();
+    if (refunds[id]) {
+      refunds[id].status = status;
+      if (actualRefund !== undefined) {
+        refunds[id].actualRefund = actualRefund;
+      }
+      if (providerTxId) {
+        refunds[id].providerTxId = providerTxId;
+      }
+      refunds[id].updatedAt = new Date().toISOString();
+      refunds[id].lastVerifiedAt = new Date().toISOString();
+      saveRefunds(refunds);
+      return refunds[id];
+    }
+    return null;
+  },
 };
 
