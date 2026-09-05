@@ -1,0 +1,204 @@
+{
+  "bk_1788521758405_51btt1": {
+    "id": "bk_1788521758405_51btt1",
+    "userId": "user_vip_test_7788",
+    "bookingReference": "RF-IRCT-481292",
+    "provider": "irctc",
+    "title": "Vande Bharat 2.0 Executive Express",
+    "status": "CONFIRMED",
+    "totalPrice": 6592,
+    "currency": "INR",
+    "passengers": [
+      {
+        "name": "Kaivalya T.",
+        "mealPreference": "Pure Veg / Jain"
+      }
+    ],
+    "segments": [
+      {
+        "id": "seg_bk_1788521758405_51btt1_1",
+        "bookingId": "bk_1788521758405_51btt1",
+        "segmentOrder": 1,
+        "transportType": "train",
+        "operator": "Vande Bharat Executive (20901)",
+        "serviceNumber": "20901",
+        "origin": "Mumbai Central",
+        "destination": "Gandhinagar Capital",
+        "depTime": "06:10 IST",
+        "arrTime": "10:55 IST",
+        "seatClass": "Confirmed",
+        "status": "CONFIRMED",
+        "sourceType": "PARTNER_API",
+        "pnr": "IRCT-481292",
+        "createdAt": "2026-09-04T11:35:58.405Z"
+      },
+      {
+        "id": "seg_bk_1788521758405_51btt1_2",
+        "bookingId": "bk_1788521758405_51btt1",
+        "segmentOrder": 2,
+        "transportType": "transfer",
+        "operator": "Uber Premier (Innova Hycross)",
+        "serviceNumber": "UBER-PREMIER",
+        "origin": "Gandhinagar Station",
+        "destination": "Taj Gandhinagar Resort",
+        "depTime": "10:55 IST",
+        "arrTime": "11:30 IST",
+        "seatClass": "Confirmed",
+        "status": "CONFIRMED",
+        "sourceType": "PARTNER_API",
+        "pnr": "IRCT-481292",
+        "createdAt": "2026-09-04T11:35:58.405Z"
+      }
+    ],
+    "cancellationPolicy": {
+      "refundable": true,
+      "terms": "Standard cancellation terms per carrier policy."
+    },
+    "modificationPolicy": {
+      "allowed": true,
+      "terms": "Modification supported before scheduled departure."
+    },
+    "disruptionShield": "Railway Rule 73A: 100% full refund guarantee with automated TDR filing on train delay > 3 hours.",
+    "provenance": {
+      "source": "PARTNER_API",
+      "verifiedAt": "5:05:58 pm IST"
+    },
+    "createdAt": "2026-09-04T11:35:58.405Z",
+    "updatedAt": "2026-09-04T11:35:58.405Z",
+    "lastVerifiedAt": "2026-09-04T11:35:58.405Z"
+  },
+  "bk_1788521905220_vgmnm6": {
+    "id": "bk_1788521905220_vgmnm6",
+    "userId": "test_http_user_9911",
+    "bookingReference": "RF-MAKE-959404",
+    "provider": "makemytrip",
+    "title": "Air India Business Class + Taj Royal Transfer",
+    "status": "CONFIRMED",
+    "totalPrice": 19770,
+    "currency": "INR",
+    "passengers": [
+      {
+        "name": "Primary Traveler"
+      }
+    ],
+    "segments": [
+      {
+        "id": "seg_bk_1788521905220_vgmnm6_1",
+        "bookingId": "bk_1788521905220_vgmnm6",
+        "segmentOrder": 1,
+        "transportType": "flight",
+        "operator": "Air India A350",
+        "serviceNumber": "MAKE-100",
+        "origin": "Origin",
+        "destination": "Destination",
+        "depTime": "10:15 IST",
+        "arrTime": "12:20 IST",
+        "seatClass": "Confirmed",
+        "status": "CONFIRMED",
+        "sourceType": "PARTNER_API",
+        "pnr": "MAKE-959404",
+        "createdAt": "2026-09-04T11:38:25.220Z"
+      },
+      {
+        "id": "seg_bk_1788521905220_vgmnm6_2",
+        "bookingId": "bk_1788521905220_vgmnm6",
+        "segmentOrder": 2,
+        "transportType": "transfer",
+        "operator": "Uber Black BMW 7-Series",
+        "serviceNumber": "MAKE-101",
+        "origin": "Origin",
+        "destination": "Destination",
+        "depTime": "12:30 IST",
+        "arrTime": "13:15 IST",
+        "seatClass": "Confirmed",
+        "status": "CONFIRMED",
+        "sourceType": "PARTNER_API",
+        "pnr": "MAKE-959404",
+        "createdAt": "2026-09-04T11:38:25.220Z"
+      }
+    ],
+    "cancellationPolicy": {
+      "refundable": true,
+      "terms": "Standard cancellation terms per carrier policy."
+    },
+    "modificationPolicy": {
+      "allowed": true,
+      "terms": "Modification supported before scheduled departure."
+    },
+    "disruptionShield": "DGCA CAR Section 3: Statutory 100% full refund on delay > 2h.",
+    "provenance": {
+      "source": "PARTNER_API",
+      "verifiedAt": "5:08:25 pm IST"
+    },
+    "createdAt": "2026-09-04T11:38:25.220Z",
+    "updatedAt": "2026-09-04T11:38:25.220Z",
+    "lastVerifiedAt": "2026-09-04T11:38:25.220Z"
+  },
+  "bk_1788521992444_7gekai": {
+    "id": "bk_1788521992444_7gekai",
+    "userId": "test_http_user_9911",
+    "bookingReference": "RF-MAKE-710478",
+    "provider": "makemytrip",
+    "title": "Air India Business Class + Taj Royal Transfer",
+    "status": "CONFIRMED",
+    "totalPrice": 19770,
+    "currency": "INR",
+    "passengers": [
+      {
+        "name": "Primary Traveler"
+      }
+    ],
+    "segments": [
+      {
+        "id": "seg_bk_1788521992444_7gekai_1",
+        "bookingId": "bk_1788521992444_7gekai",
+        "segmentOrder": 1,
+        "transportType": "flight",
+        "operator": "Air India A350",
+        "serviceNumber": "MAKE-100",
+        "origin": "Origin",
+        "destination": "Destination",
+        "depTime": "10:15 IST",
+        "arrTime": "12:20 IST",
+        "seatClass": "Confirmed",
+        "status": "CONFIRMED",
+        "sourceType": "PARTNER_API",
+        "pnr": "MAKE-710478",
+        "createdAt": "2026-09-04T11:39:52.444Z"
+      },
+      {
+        "id": "seg_bk_1788521992444_7gekai_2",
+        "bookingId": "bk_1788521992444_7gekai",
+        "segmentOrder": 2,
+        "transportType": "transfer",
+        "operator": "Uber Black BMW 7-Series",
+        "serviceNumber": "MAKE-101",
+        "origin": "Origin",
+        "destination": "Destination",
+        "depTime": "12:30 IST",
+        "arrTime": "13:15 IST",
+        "seatClass": "Confirmed",
+        "status": "CONFIRMED",
+        "sourceType": "PARTNER_API",
+        "pnr": "MAKE-710478",
+        "createdAt": "2026-09-04T11:39:52.444Z"
+      }
+    ],
+    "cancellationPolicy": {
+      "refundable": true,
+      "terms": "Standard cancellation terms per carrier policy."
+    },
+    "modificationPolicy": {
+      "allowed": true,
+      "terms": "Modification supported before scheduled departure."
+    },
+    "disruptionShield": "DGCA CAR Section 3: Statutory 100% full refund on delay > 2h.",
+    "provenance": {
+      "source": "PARTNER_API",
+      "verifiedAt": "5:09:52 pm IST"
+    },
+    "createdAt": "2026-09-04T11:39:52.444Z",
+    "updatedAt": "2026-09-04T11:39:52.444Z",
+    "lastVerifiedAt": "2026-09-04T11:39:52.444Z"
+  }
+}

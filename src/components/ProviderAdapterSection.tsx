@@ -1,24 +1,47 @@
+// src/components/ProviderAdapterSection.tsx
 import React, { useState } from 'react';
-import { Layers, Activity, Database, CheckCircle2, RefreshCw, Terminal, Globe, Lock, ShieldCheck } from 'lucide-react';
-import { providerAdapters } from '../lib/providers/provider-adapters';
+import { Layers, Activity, Database, CheckCircle2, RefreshCw, Terminal, Globe, Lock, ShieldCheck, ExternalLink } from 'lucide-react';
+import { providerAdaptersMap, ProviderId } from '../lib/providers';
 
 export const ProviderAdapterSection: React.FC = () => {
-  const [selectedAdapter, setSelectedAdapter] = useState<'train' | 'air' | 'hotel'>('air');
+  const [selectedAdapterId, setSelectedAdapterId] = useState<ProviderId>('irctc');
   const [liveResponse, setLiveResponse] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const testAdapter = async (type: 'train' | 'air' | 'hotel') => {
+  const testAdapter = async (id: ProviderId) => {
     setIsLoading(true);
-    setSelectedAdapter(type);
+    setSelectedAdapterId(id);
+    const adapter = providerAdaptersMap[id];
+    if (!adapter) {
+      setLiveResponse({ error: `Adapter ${id} not found.` });
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      if (type === 'train') {
-        const res = await providerAdapters.irctcTrain.getStatus('bkg_train_02');
+      if (id === 'irctc') {
+        const res = await adapter.search({ origin: 'NDLS', destination: 'MMCT', departDate: '2026-10-15' });
         setLiveResponse(res);
-      } else if (type === 'air') {
-        const res = await providerAdapters.irctcAir.getStatus('bkg_flight_01');
+      } else if (id === 'makemytrip') {
+        const res = await adapter.search({ origin: 'BOM', destination: 'DEL', departDate: '2026-10-15' });
         setLiveResponse(res);
-      } else {
-        const res = await providerAdapters.hotel.getStatus('bkg_hotel_03');
+      } else if (id === 'uber') {
+        const res = await adapter.search({ origin: 'BOM Airport T2', destination: 'The Taj Mahal Palace, Colaba', departDate: '2026-10-15' });
+        setLiveResponse(res);
+      } else if (id === 'redbus') {
+        const res = await adapter.search({ origin: 'Delhi', destination: 'Jaipur', departDate: '2026-10-15' });
+        setLiveResponse(res);
+      } else if (id === 'ixigo') {
+        const res = await adapter.search({ origin: 'BOM', destination: 'JAI', departDate: '2026-10-15' });
+        setLiveResponse(res);
+      } else if (id === 'ola') {
+        const res = await adapter.search({ origin: 'Mumbai', destination: 'Pune', departDate: '2026-10-15' });
+        setLiveResponse(res);
+      } else if (id === 'rapido') {
+        const res = await adapter.search({ origin: 'New Delhi Railway Station', destination: 'Connaught Place', departDate: '2026-10-15' });
+        setLiveResponse(res);
+      } else if (id === 'goibibo') {
+        const res = await adapter.search({ origin: 'Udaipur', destination: 'Udaipur', departDate: '2026-10-15' });
         setLiveResponse(res);
       }
     } catch (e: any) {
@@ -28,6 +51,8 @@ export const ProviderAdapterSection: React.FC = () => {
     }
   };
 
+  const currentAdapter = providerAdaptersMap[selectedAdapterId] || providerAdaptersMap['irctc'];
+
   return (
     <div className="w-full max-w-7xl mx-auto space-y-8">
       {/* Header */}
@@ -36,13 +61,13 @@ export const ProviderAdapterSection: React.FC = () => {
           <span className="text-xs font-mono px-2 py-0.5 rounded bg-cyan-950/80 text-cyan-400 border border-cyan-800/60 font-semibold">
             SYSTEM ARCHITECTURE
           </span>
-          <span className="text-xs font-mono text-slate-400">UNIFIED ADAPTER PATTERN</span>
+          <span className="text-xs font-mono text-slate-400">UNIFIED ADAPTER PATTERN (8 INTEGRATED PROVIDERS)</span>
         </div>
         <h2 className="text-2xl font-bold font-display text-slate-100">
-          Provider Abstraction & Deterministic Pipeline
+          Provider Abstraction &amp; Deterministic Pipeline
         </h2>
         <p className="text-xs text-slate-400 font-light mt-1 max-w-3xl">
-          JOURNEY//X abstracts heterogeneous legacy provider data into a canonical trip graph. Business rules remain strictly deterministic; AI is safely layered on top purely for contextual explanation.
+          RouteForge abstracts heterogeneous legacy provider data into a canonical trip graph. Business rules remain strictly deterministic; AI is safely layered on top purely for contextual explanation.
         </p>
       </div>
 
@@ -52,14 +77,14 @@ export const ProviderAdapterSection: React.FC = () => {
           {
             layer: 'LAYER 1',
             title: 'Raw Provider APIs',
-            desc: 'IRCTC PRS, IndiGo GDS, Hotel CRS, Venue Curfew',
+            desc: 'IRCTC PRS, IndiGo GDS, Hotel CRS, Uber Mobility API',
             icon: Globe,
             color: 'border-slate-700 bg-slate-950/60 text-slate-300',
           },
           {
             layer: 'LAYER 2',
             title: 'Provider Adapters',
-            desc: 'Uniform typed interface, normalization, error isolation',
+            desc: '8 Uniform typed adapters with strict provenance tagging',
             icon: Layers,
             color: 'border-cyan-500/50 bg-cyan-950/30 text-cyan-300',
           },
@@ -107,52 +132,58 @@ export const ProviderAdapterSection: React.FC = () => {
               Live Provider Adapter Diagnostic Harness
             </h3>
           </div>
+
+          <div className="flex flex-wrap items-center gap-1.5">
+            {Object.keys(providerAdaptersMap).map((id) => (
+              <button
+                key={id}
+                onClick={() => testAdapter(id)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-mono uppercase border transition-all cursor-pointer ${
+                  selectedAdapterId === id 
+                    ? 'bg-cyan-950 border-cyan-500 text-cyan-300 font-bold' 
+                    : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {id}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Adapter Details Header */}
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-slate-950/60 border border-slate-800/60 text-xs font-mono">
           <div className="flex items-center space-x-2">
-            <button
-              onClick={() => testAdapter('air')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono border transition-all ${
-                selectedAdapter === 'air' ? 'bg-cyan-950 border-cyan-500 text-cyan-300' : 'bg-slate-950 border-slate-800 text-slate-400'
-              }`}
-            >
-              IRCTC Air Adapter
-            </button>
-            <button
-              onClick={() => testAdapter('train')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono border transition-all ${
-                selectedAdapter === 'train' ? 'bg-cyan-950 border-cyan-500 text-cyan-300' : 'bg-slate-950 border-slate-800 text-slate-400'
-              }`}
-            >
-              IRCTC Train Adapter
-            </button>
-            <button
-              onClick={() => testAdapter('hotel')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono border transition-all ${
-                selectedAdapter === 'hotel' ? 'bg-cyan-950 border-cyan-500 text-cyan-300' : 'bg-slate-950 border-slate-800 text-slate-400'
-              }`}
-            >
-              Hotel Adapter
-            </button>
+            <span className="text-slate-400">PROVIDER:</span>
+            <span className="text-white font-bold">{currentAdapter.name}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <span className="text-slate-400">CATEGORY:</span>
+            <span className="text-cyan-400 uppercase">{currentAdapter.category}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <span className="text-slate-400">PROVENANCE:</span>
+            <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-[#D4AF37] font-semibold">
+              {currentAdapter.sourceType}
+            </span>
           </div>
         </div>
 
         {/* Console Payload Inspection */}
         <div className="p-4 rounded-xl bg-slate-950 border border-slate-800/90 font-mono text-xs space-y-2">
-          <div className="flex items-center justify-between text-[11px] text-slate-500 border-b border-slate-850 pb-2">
-            <span>TARGET: {selectedAdapter === 'air' ? 'IRCTCAirAdapter (v3.1-GDS-NDC)' : selectedAdapter === 'train' ? 'IRCTCTrainAdapter (v2.4-PRS)' : 'HotelAdapter (v4.0)'}</span>
-            <span>STATUS: {isLoading ? 'QUERYING...' : '200 OK'}</span>
+          <div className="flex items-center justify-between text-[11px] text-slate-500 border-b border-slate-800 pb-2">
+            <span>TARGET: {currentAdapter.name} ({currentAdapter.sourceType})</span>
+            <span>STATUS: {isLoading ? 'QUERYING TELEMETRY...' : '200 OK'}</span>
           </div>
 
-          <pre className="text-cyan-300 text-[11px] overflow-x-auto p-2 bg-slate-950/60 rounded-lg max-h-60">
+          <pre className="text-cyan-300 text-[11px] overflow-x-auto p-2 bg-slate-950/60 rounded-lg max-h-72 custom-scrollbar">
             {JSON.stringify(liveResponse || {
               success: true,
-              timestamp: '2026-09-01T13:42:00.000Z',
-              source: 'LIVE_ADAPTER_BRIDGE',
-              latencyMs: 142,
-              data: {
-                status: selectedAdapter === 'air' ? 'DISRUPTED_CANCELLED' : 'CONFIRMED',
-                provider: selectedAdapter === 'air' ? 'IRCTC Air (IndiGo 6E-204)' : selectedAdapter === 'train' ? 'IRCTC Northern Railway' : 'ITC Rajputana',
-                telemetry: 'Connected to source GDS/CRS endpoint with zero leakage of credentials.',
-              }
+              providerId: currentAdapter.id,
+              sourceType: currentAdapter.sourceType,
+              timestamp: new Date().toISOString(),
+              latencyMs: 110,
+              capabilities: currentAdapter.capabilities,
+              note: 'Click any provider button above to trigger live adapter execution with authentic provenance envelope.',
             }, null, 2)}
           </pre>
         </div>

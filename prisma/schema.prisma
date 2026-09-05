@@ -65,3 +65,99 @@ model TravelPreference {
 
   @@map("travel_preferences")
 }
+
+model ProviderConnection {
+  id                String    @id @default(uuid())
+  userId            String    @map("user_id")
+  providerId        String    @map("provider_id")
+  connectionState   String    @default("NOT_CONNECTED") @map("connection_state")
+  accountIdentifier String?   @map("account_identifier")
+  connectedAt       DateTime? @map("connected_at")
+  expiresAt         DateTime? @map("expires_at")
+  lastSyncAt        DateTime? @map("last_sync_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  tokens ProviderToken[]
+
+  @@unique([userId, providerId])
+  @@map("provider_connections")
+}
+
+model ProviderToken {
+  id                   String    @id @default(uuid())
+  providerConnectionId String    @map("provider_connection_id")
+  tokenType            String    @map("token_type") // e.g., 'access_token', 'refresh_token'
+  encryptedToken       String    @map("encrypted_token")
+  expiresAt            DateTime? @map("expires_at")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  connection ProviderConnection @relation(fields: [providerConnectionId], references: [id], onDelete: Cascade)
+
+  @@map("provider_tokens")
+}
+
+model BookingIntent {
+  id                  String   @id @default(uuid())
+  userId              String   @map("user_id")
+  journeyId           String?  @map("journey_id")
+  provider            String   @map("provider")
+  selectedOption      Json     @map("selected_option")
+  providerReference   String?  @map("provider_reference")
+  bookingMethod       String   @map("booking_method") // OFFICIAL_PARTNER, DIRECT_API, DEEP_LINK
+  deepLinkUrl         String?  @map("deep_link_url")
+  status              String   @default("INITIATED") @map("status") // INITIATED, REDIRECTED, CONFIRMED, ABANDONED
+  requestedParameters Json?    @map("requested_parameters")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  @@map("booking_intents")
+}
+
+model Booking {
+  id                 String           @id @default(uuid())
+  userId             String           @map("user_id")
+  bookingReference   String           @unique @map("booking_reference") // PNR / Ticket Ref
+  provider           String           @map("provider")
+  title              String           @map("title")
+  status             String           @default("CONFIRMED") @map("status") // CONFIRMED, TICKETED, ACTIVE, COMPLETED, DISRUPTED, CANCELLED
+  totalPrice         Float            @map("total_price")
+  currency           String           @default("INR") @map("currency")
+  passengers         Json             @map("passengers")
+  cancellationPolicy Json?            @map("cancellation_policy")
+  modificationPolicy Json?            @map("modification_policy")
+  disruptionShield   String?          @map("disruption_shield")
+  provenance         Json?            @map("provenance")
+  createdAt          DateTime         @default(now()) @map("created_at")
+  updatedAt          DateTime         @updatedAt @map("updated_at")
+  lastVerifiedAt     DateTime?        @map("last_verified_at")
+
+  segments           BookingSegment[]
+
+  @@map("bookings")
+}
+
+model BookingSegment {
+  id            String   @id @default(uuid())
+  bookingId     String   @map("booking_id")
+  segmentOrder  Int      @default(0) @map("segment_order")
+  transportType String   @map("transport_type") // flight, train, bus, transfer, stay
+  operator      String   @map("operator")
+  serviceNumber String   @map("service_number")
+  origin        String   @map("origin")
+  destination   String   @map("destination")
+  depTime       String   @map("dep_time")
+  arrTime       String   @map("arr_time")
+  seatClass     String?  @map("seat_class")
+  status        String   @default("CONFIRMED") @map("status")
+  pnr           String?  @map("pnr")
+  sourceType    String   @default("PARTNER_API") @map("source_type")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  booking       Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("booking_segments")
+}
+
+

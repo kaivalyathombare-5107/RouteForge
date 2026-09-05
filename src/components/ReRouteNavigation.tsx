@@ -1,5 +1,4 @@
-import React from 'react';
-import { Search, User, Compass } from 'lucide-react';
+import { Search, User, Compass, Layers } from 'lucide-react';
 
 export type ReRouteSection = 'destinations' | 'journeys' | 'experiences' | 'concierge' | 'membership';
 
@@ -8,6 +7,9 @@ interface ReRouteNavigationProps {
   onSelectSection: (section: ReRouteSection) => void;
   onOpenSignIn: () => void;
   onOpenSearch: () => void;
+  onOpenProviders?: () => void;
+  onOpenAccount?: () => void;
+  user?: any;
   selectedCurrency: string;
   onSelectCurrency: (currency: string) => void;
 }
@@ -17,6 +19,9 @@ export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
   onSelectSection,
   onOpenSignIn,
   onOpenSearch,
+  onOpenProviders,
+  onOpenAccount,
+  user,
   selectedCurrency,
   onSelectCurrency
 }) => {
@@ -103,13 +108,34 @@ export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
           <Search className="w-4 h-4" />
         </button>
 
-        <button
-          onClick={onOpenSignIn}
-          className="hidden sm:flex items-center space-x-2 px-5 py-2.5 rounded-full gold-gradient-bar hover:opacity-95 text-slate-950 font-cinzel text-[11px] font-bold tracking-[0.2em] transition-all shadow-lg shadow-[#D4AF37]/20"
-        >
-          <User className="w-3.5 h-3.5" />
-          <span>SIGN IN</span>
-        </button>
+        {user && onOpenProviders && (
+          <button
+            onClick={onOpenProviders}
+            title="Provider Connection Center"
+            className="hidden sm:flex items-center space-x-1.5 px-3.5 py-2 rounded-full border border-gold-subtle hover:border-[#D4AF37] text-slate-300 hover:text-[#D4AF37] text-xs font-cinzel tracking-wider transition-all cursor-pointer bg-slate-950/60"
+          >
+            <Layers className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <span>PROVIDERS</span>
+          </button>
+        )}
+
+        {user ? (
+          <div
+            onClick={onOpenAccount || onOpenSignIn}
+            className="hidden sm:flex items-center space-x-2 px-4 py-2 rounded-full border border-gold-subtle bg-[#0B0D13] text-[#D4AF37] font-cinzel text-[11px] font-bold tracking-[0.15em] transition-all cursor-pointer hover:border-gold-bright hover:shadow-lg hover:shadow-[#D4AF37]/10"
+          >
+            <User className="w-3.5 h-3.5" />
+            <span className="max-w-[140px] truncate">{user.displayName || user.email?.split('@')[0] || 'PRIVÉ'}</span>
+          </div>
+        ) : (
+          <button
+            onClick={onOpenSignIn}
+            className="hidden sm:flex items-center space-x-2 px-5 py-2.5 rounded-full gold-gradient-bar hover:opacity-95 text-slate-950 font-cinzel text-[11px] font-bold tracking-[0.2em] transition-all shadow-lg shadow-[#D4AF37]/20 cursor-pointer"
+          >
+            <User className="w-3.5 h-3.5" />
+            <span>SIGN IN</span>
+          </button>
+        )}
       </div>
     </header>
   );

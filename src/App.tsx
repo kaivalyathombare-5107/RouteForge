@@ -35,6 +35,8 @@ import { ReRouteSignInModal } from './components/ReRouteSignInModal';
 import { JourneySearchResultsModal, JourneySearchParams } from './components/JourneySearchResultsModal';
 import { useAuth } from './hooks/useAuth';
 import { TravellerProfileModal } from './components/TravellerProfileModal';
+import { ProviderConnectionModal } from './components/ProviderConnectionModal';
+import { AccountDetailsModal } from './components/AccountDetailsModal';
 import { fetchTravellerProfile } from './lib/api/profile';
 import { TravellerProfile } from './types/profile';
 
@@ -96,12 +98,15 @@ export default function App() {
   const { user, loading } = useAuth();
   const [travellerProfile, setTravellerProfile] = useState<TravellerProfile | null>(null);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
+  const [isProviderConnectionOpen, setIsProviderConnectionOpen] = useState<boolean>(false);
+  const [isAccountDetailsOpen, setIsAccountDetailsOpen] = useState<boolean>(false);
 
   // Check profile upon authentication (Spec Section 1 & 2: First-time user onboarding)
   useEffect(() => {
     if (!user) {
       setTravellerProfile(null);
       setIsOnboardingOpen(false);
+      setIsProviderConnectionOpen(false);
       return;
     }
 
@@ -112,7 +117,7 @@ export default function App() {
         setTravellerProfile(res.profile);
         setIsOnboardingOpen(false);
       } else {
-        // First-time user onboarding
+        // First-time user onboarding: Profile -> Provider Connections -> Plan Your Journey
         setIsOnboardingOpen(true);
       }
     }).catch((err) => {
@@ -130,6 +135,12 @@ export default function App() {
     setTravellerProfile(profile);
     setIsOnboardingOpen(false);
     // Spec requirement: First-time user: Google login → Traveller Profile → Provider Connections → Plan Your Journey
+    setIsProviderConnectionOpen(true);
+  };
+
+  const handleProviderConnectionComplete = () => {
+    playSound('success', soundEnabled);
+    setIsProviderConnectionOpen(false);
     setActiveSection('journeys');
   };
 
@@ -248,6 +259,9 @@ export default function App() {
           setActiveSection(sec);
         }}
         onOpenSignIn={() => setIsSignInOpen(true)}
+        onOpenProviders={() => setIsProviderConnectionOpen(true)}
+        onOpenAccount={() => setIsAccountDetailsOpen(true)}
+        user={user}
         onOpenSearch={() => {
           setSearchParams({
             origin: 'JFK New York',
@@ -761,6 +775,27 @@ export default function App() {
           userEmail={user.email || ''}
           defaultName={user.displayName || ''}
           onComplete={handleProfileComplete}
+        />
+      )}
+
+      {/* Provider Connection Center Modal */}
+      {user && (
+        <ProviderConnectionModal
+          isOpen={isProviderConnectionOpen}
+          userId={user.uid}
+          onClose={() => setIsProviderConnectionOpen(false)}
+          onContinueToJourneys={handleProviderConnectionComplete}
+          isInitialOnboarding={isOnboardingOpen === false}
+        />
+      )}
+
+      {/* Account Details & Profile Dossier Modal */}
+      {user && (
+        <AccountDetailsModal
+          isOpen={isAccountDetailsOpen}
+          onClose={() => setIsAccountDetailsOpen(false)}
+          onOpenEditProfile={() => setIsOnboardingOpen(true)}
+          onOpenProviders={() => setIsProviderConnectionOpen(true)}
         />
       )}
 

@@ -4,28 +4,28 @@
     "email": "kaivalyathombare5@gmail.com",
     "profile": {
       "fullName": "Kaivalya Thombare",
-      "phoneNumber": "+91 7498969407",
+      "phoneNumber": "7498969407",
       "homeCity": "Mumbai",
       "ageGroup": "18-25",
       "preferredCurrency": "INR",
       "preferences": {
-        "travelBudget": "economy",
+        "travelBudget": "luxury",
         "preferredTransport": "multimodal",
-        "preferredCabinClass": "economy",
+        "preferredCabinClass": "vande_bharat_exec",
         "seatPreference": "window",
-        "hotelCategory": "business_executive",
+        "hotelCategory": "heritage_palace",
         "preferredDepartureTime": "morning",
-        "maxTravelDurationHours": 24,
+        "maxTravelDurationHours": 10,
         "maxConnections": 1,
-        "flexibilityPreference": "high"
+        "flexibilityPreference": "moderate"
       },
-      "foodPreference": "none",
+      "foodPreference": "pure_veg",
       "frequentTravellerIdentifiers": {},
       "isComplete": true,
       "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
-      "updatedAt": "2026-09-04T10:39:22.594Z",
+      "updatedAt": "2026-09-04T11:45:42.515Z",
       "createdAt": "2026-09-04T10:39:22.594Z"
     },
-    "updatedAt": "2026-09-04T10:39:22.594Z"
+    "updatedAt": "2026-09-04T11:45:42.515Z"
   }
 }

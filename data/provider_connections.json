@@ -1,0 +1,60 @@
+{
+  "eKCtV6q61wgi7edQaQ3tC8W7D9t1": {
+    "irctc": {
+      "providerId": "irctc",
+      "state": "CONNECTED",
+      "connectedAt": "2026-09-04T10:55:16.113Z",
+      "lastSyncAt": "2026-09-04T10:55:16.113Z",
+      "accountIdentifier": "irctc_user_eKCtV6"
+    },
+    "makemytrip": {
+      "providerId": "makemytrip",
+      "state": "CONNECTED",
+      "connectedAt": "2026-09-04T10:54:40.705Z",
+      "lastSyncAt": "2026-09-04T10:54:40.705Z",
+      "accountIdentifier": "makemytrip_user_eKCtV6"
+    },
+    "ixigo": {
+      "providerId": "ixigo",
+      "state": "CONNECTED",
+      "connectedAt": "2026-09-04T10:55:17.547Z",
+      "lastSyncAt": "2026-09-04T10:55:17.547Z",
+      "accountIdentifier": "ixigo_user_eKCtV6"
+    },
+    "uber": {
+      "providerId": "uber",
+      "state": "CONNECTED",
+      "connectedAt": "2026-09-04T10:55:19.920Z",
+      "lastSyncAt": "2026-09-04T10:55:19.920Z",
+      "accountIdentifier": "uber_user_eKCtV6"
+    },
+    "redbus": {
+      "providerId": "redbus",
+      "state": "CONNECTED",
+      "connectedAt": "2026-09-04T10:55:21.327Z",
+      "lastSyncAt": "2026-09-04T10:55:21.327Z",
+      "accountIdentifier": "redbus_user_eKCtV6"
+    },
+    "ola": {
+      "providerId": "ola",
+      "state": "CONNECTED",
+      "connectedAt": "2026-09-04T10:55:23.274Z",
+      "lastSyncAt": "2026-09-04T10:55:23.274Z",
+      "accountIdentifier": "ola_user_eKCtV6"
+    },
+    "rapido": {
+      "providerId": "rapido",
+      "state": "CONNECTED",
+      "connectedAt": "2026-09-04T10:55:24.518Z",
+      "lastSyncAt": "2026-09-04T10:55:24.518Z",
+      "accountIdentifier": "rapido_user_eKCtV6"
+    },
+    "goibibo": {
+      "providerId": "goibibo",
+      "state": "CONNECTED",
+      "connectedAt": "2026-09-04T10:55:26.863Z",
+      "lastSyncAt": "2026-09-04T10:55:26.863Z",
+      "accountIdentifier": "goibibo_user_eKCtV6"
+    }
+  }
+}

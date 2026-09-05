@@ -1,0 +1,55 @@
+{
+  "intent_1788521758403_ptp6b0": {
+    "id": "intent_1788521758403_ptp6b0",
+    "userId": "user_vip_test_7788",
+    "journeyId": "plan_fastest",
+    "provider": "irctc",
+    "selectedOption": {
+      "title": "Vande Bharat 2.0 Executive",
+      "price": 5850
+    },
+    "providerReference": "22436",
+    "bookingMethod": "OFFICIAL_PARTNER",
+    "requestedParameters": {
+      "trainNumber": "22436",
+      "class": "EC"
+    },
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-04T11:35:58.403Z",
+    "updatedAt": "2026-09-04T11:35:58.427Z"
+  },
+  "intent_1788521905212_7x9v5e": {
+    "id": "intent_1788521905212_7x9v5e",
+    "userId": "test_http_user_9911",
+    "provider": "makemytrip",
+    "selectedOption": {
+      "title": "Air India Business Class",
+      "price": 18400
+    },
+    "bookingMethod": "OFFICIAL_PARTNER",
+    "deepLinkUrl": "https://www.makemytrip.com/flight/search?itinerary=undefined-undefined-undefined&tripType=O",
+    "requestedParameters": {
+      "flightNumber": "AI-864"
+    },
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-04T11:38:25.212Z",
+    "updatedAt": "2026-09-04T11:38:25.237Z"
+  },
+  "intent_1788521992437_8hx76t": {
+    "id": "intent_1788521992437_8hx76t",
+    "userId": "test_http_user_9911",
+    "provider": "makemytrip",
+    "selectedOption": {
+      "title": "Air India Business Class",
+      "price": 18400
+    },
+    "bookingMethod": "OFFICIAL_PARTNER",
+    "deepLinkUrl": "https://www.makemytrip.com/flight/search?itinerary=undefined-undefined-undefined&tripType=O",
+    "requestedParameters": {
+      "flightNumber": "AI-864"
+    },
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-04T11:39:52.437Z",
+    "updatedAt": "2026-09-04T11:39:52.462Z"
+  }
+}

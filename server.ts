@@ -5,7 +5,10 @@ import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
 import { propagateDisruption, generateRecoveryOptions, calculateIRCTCRefund, calculateFlightRefund } from './src/lib/deterministic-engines.js';
 
-import { ProfileStore } from './src/lib/db.js';
+import { ProfileStore, ProviderConnectionStore, BookingIntentStore, BookingVaultStore } from './src/lib/db.js';
+import { CORE_PROVIDERS } from './src/lib/providers/registry.js';
+import { providerAdaptersMap } from './src/lib/providers/index.js';
+import { planJourneys } from './src/lib/journey/planner.js';
 
 dotenv.config();
 
@@ -76,6 +79,241 @@ app.put('/api/profile', (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+// Provider Connection Center API Endpoints
+app.get('/api/providers', (req, res) => {
+  try {
+    const userAuth = getRequestUid(req);
+    const userConnections = userAuth?.uid ? ProviderConnectionStore.getConnectionsByUid(userAuth.uid) : {};
+
+    const providers = CORE_PROVIDERS.map((provider) => {
+      const conn = userConnections[provider.id];
+      return {
+        ...provider,
+        connectionState: conn?.state || 'NOT_CONNECTED',
+        accountIdentifier: conn?.accountIdentifier || null,
+        lastSyncAt: conn?.lastSyncAt || null,
+      };
+    });
+
+    res.json({ success: true, providers });
+  } catch (error: any) {
+    console.error('[API] Error fetching providers:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/providers/:provider/connect', (req, res) => {
+  try {
+    const userAuth = getRequestUid(req);
+    const uid = userAuth?.uid || req.body?.userId;
+    if (!uid) {
+      return res.status(401).json({ success: false, error: 'Authentication required to connect provider.' });
+    }
+
+    const providerId = req.params.provider.toLowerCase();
+    const providerMeta = CORE_PROVIDERS.find(p => p.id === providerId);
+    if (!providerMeta) {
+      return res.status(404).json({ success: false, error: `Provider '${providerId}' not found.` });
+    }
+
+    const accountIdentifier = req.body?.accountIdentifier;
+    const connection = ProviderConnectionStore.connect(uid, providerId, accountIdentifier);
+
+    res.json({
+      success: true,
+      providerId,
+      state: 'CONNECTED',
+      connection,
+      message: `Successfully connected ${providerMeta.name}`,
+    });
+  } catch (error: any) {
+    console.error('[API] Error connecting provider:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.delete('/api/providers/:provider/disconnect', (req, res) => {
+  try {
+    const userAuth = getRequestUid(req);
+    const uid = userAuth?.uid || (req.query.uid as string) || req.body?.userId;
+    if (!uid) {
+      return res.status(401).json({ success: false, error: 'Authentication required to disconnect provider.' });
+    }
+
+    const providerId = req.params.provider.toLowerCase();
+    ProviderConnectionStore.disconnect(uid, providerId);
+
+    res.json({
+      success: true,
+      providerId,
+      state: 'NOT_CONNECTED',
+      message: `Disconnected ${providerId}`,
+    });
+  } catch (error: any) {
+    console.error('[API] Error disconnecting provider:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Multi-Modal Journey Search & Normalization Endpoint (Sections 5, 6, 7)
+app.post('/api/journeys/search', async (req, res) => {
+  try {
+    const userAuth = getRequestUid(req);
+    const userProfile = userAuth?.uid ? ProfileStore.getProfileByUid(userAuth.uid) : null;
+    const searchParams = req.body || {};
+
+    const searchResponse = await planJourneys(searchParams, userProfile);
+    res.json(searchResponse);
+  } catch (error: any) {
+    console.error('[API] Error searching journeys:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Booking Intent & Booking Vault API Endpoints (Sections 8, 9, 10, 13)
+app.post('/api/bookings/intent', (req, res) => {
+  try {
+    const userAuth = getRequestUid(req);
+    const uid = userAuth?.uid || req.body?.userId;
+    if (!uid) {
+      return res.status(401).json({ success: false, error: 'Authentication required to initiate booking.' });
+    }
+
+    const { journeyId, provider, selectedOption, providerReference, bookingMethod, requestedParameters } = req.body;
+    if (!provider || !selectedOption) {
+      return res.status(400).json({ success: false, error: 'Missing provider or selectedOption payload.' });
+    }
+
+    // Resolve adapter deep-link if official deep-link is supported
+    let deepLinkUrl: string | undefined = undefined;
+    const adapter = providerAdaptersMap[provider.toLowerCase()];
+    if (adapter?.generateDeepLink) {
+      deepLinkUrl = adapter.generateDeepLink(requestedParameters || {});
+    }
+
+    const intent = BookingIntentStore.createIntent({
+      userId: uid,
+      journeyId,
+      provider: provider.toLowerCase(),
+      selectedOption,
+      providerReference: providerReference || selectedOption.id || selectedOption.serviceNumber,
+      bookingMethod: bookingMethod || 'OFFICIAL_PARTNER',
+      deepLinkUrl,
+      requestedParameters,
+    });
+
+    res.json({
+      success: true,
+      intentId: intent.id,
+      provider: intent.provider,
+      bookingMethod: intent.bookingMethod,
+      deepLinkUrl: intent.deepLinkUrl,
+      status: intent.status,
+      createdAt: intent.createdAt,
+    });
+  } catch (error: any) {
+    console.error('[API] Error creating booking intent:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/bookings', (req, res) => {
+  try {
+    const userAuth = getRequestUid(req);
+    const uid = userAuth?.uid || req.body?.userId;
+    if (!uid) {
+      return res.status(401).json({ success: false, error: 'Authentication required to create booking.' });
+    }
+
+    const {
+      provider,
+      title,
+      totalPrice,
+      currency,
+      passengers,
+      legs,
+      segments,
+      cancellationPolicy,
+      modificationPolicy,
+      disruptionShield,
+      provenance,
+      intentId,
+    } = req.body;
+
+    if (!provider || !title || !totalPrice) {
+      return res.status(400).json({ success: false, error: 'Missing required booking fields (provider, title, totalPrice).' });
+    }
+
+    const booking = BookingVaultStore.createBooking({
+      userId: uid,
+      provider: provider.toLowerCase(),
+      title,
+      totalPrice,
+      currency: currency || 'INR',
+      passengers: passengers || [{ name: userAuth?.email || 'Primary Traveler' }],
+      legs,
+      segments,
+      cancellationPolicy,
+      modificationPolicy,
+      disruptionShield,
+      provenance,
+      intentId,
+    });
+
+    res.json({
+      success: true,
+      booking,
+      message: `Booking successfully confirmed in Vault with PNR ${booking.bookingReference}`,
+    });
+  } catch (error: any) {
+    console.error('[API] Error creating booking:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/bookings', (req, res) => {
+  try {
+    const userAuth = getRequestUid(req);
+    const uid = userAuth?.uid;
+    if (!uid) {
+      return res.status(401).json({ success: false, error: 'Authentication required to fetch bookings.' });
+    }
+
+    const bookings = BookingVaultStore.getBookingsByUid(uid);
+    res.json({ success: true, bookings, count: bookings.length });
+  } catch (error: any) {
+    console.error('[API] Error fetching bookings:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/bookings/:id', (req, res) => {
+  try {
+    const userAuth = getRequestUid(req);
+    const uid = userAuth?.uid;
+    if (!uid) {
+      return res.status(401).json({ success: false, error: 'Authentication required to fetch booking details.' });
+    }
+
+    const bookingId = req.params.id;
+    const booking = BookingVaultStore.getBookingById(bookingId);
+    if (!booking) {
+      return res.status(404).json({ success: false, error: `Booking ${bookingId} not found.` });
+    }
+
+    // Tenant Isolation Check (Section 13 & 24: verify one user cannot access another user's bookings)
+    if (booking.userId !== uid) {
+      return res.status(403).json({ success: false, error: 'Forbidden: You do not have permission to view this booking.' });
+    }
+
+    res.json({ success: true, booking });
+  } catch (error: any) {
+    console.error('[API] Error fetching booking by ID:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 
 // Initialize Google GenAI client lazily & securely
 let aiClient: GoogleGenAI | null = null;
