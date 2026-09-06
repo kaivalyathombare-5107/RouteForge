@@ -94,6 +94,8 @@ export const SignInSection: React.FC<SignInSectionProps> = ({
         setError('Sign-in cancelled. Please click below to try again.');
       } else if (code === 'auth/unauthorized-domain') {
         setError(`This app domain (${domain}) is not authorized in Firebase. Add "${domain}" to Firebase Console → Authentication → Settings → Authorized domains, then reload this page.`);
+      } else if (code === 'auth/invalid-credential') {
+        setError('Google OAuth handshake failed (auth/invalid-credential). In Firebase Console → Authentication → Sign-in method → Google, verify that Web Client ID and Web Client Secret match your Google Cloud OAuth 2.0 Client, or disable and re-enable Google provider to refresh.');
       } else {
         setError(e?.message || 'Google sign-in window could not be opened. Please try again.');
       }

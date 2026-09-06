@@ -37,6 +37,8 @@ export const ReRouteSignInModal: React.FC<ReRouteSignInModalProps> = ({ isOpen, 
         setError('Sign-in cancelled (Google sign-in popup was closed before completing).');
       } else if (code === 'auth/unauthorized-domain') {
         setError(`This domain (${domain}) is not authorized in Firebase Console → Authentication → Settings → Authorized domains. Click "Instant Privé VIP Access" below to proceed immediately.`);
+      } else if (code === 'auth/invalid-credential') {
+        setError('Google OAuth handshake failed (auth/invalid-credential). In Firebase Console → Authentication → Sign-in method → Google, verify that Web Client ID and Web Client Secret match your Google Cloud OAuth 2.0 Client credentials.');
       } else if (code === 'auth/invalid-api-key') {
         setError('Firebase API key is unconfigured or invalid in .env. Click "Instant Privé VIP Access" below to continue.');
       } else {

@@ -1035,5 +1035,88 @@
     "status": "CONFIRMED",
     "createdAt": "2026-09-06T14:48:48.949Z",
     "updatedAt": "2026-09-06T14:48:48.974Z"
+  },
+  "intent_1788711408958_n4v187": {
+    "id": "intent_1788711408958_n4v187",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "journeyId": "plan_flight_fastest",
+    "provider": "makemytrip",
+    "selectedOption": {
+      "id": "plan_flight_fastest",
+      "category": "FASTEST",
+      "title": "Air India (Airbus A321neo) Non-Stop Flight",
+      "providerSummary": "MakeMyTrip Bharat Aviation GDS",
+      "totalDuration": "2h 5m Direct Flight",
+      "durationMinutes": 125,
+      "depTime": "10:15 IST",
+      "arrTime": "12:20 IST",
+      "totalPrice": 4850,
+      "currency": "INR",
+      "priceFormatted": "₹4,850 / person",
+      "co2": "84 kg CO₂e",
+      "disruptionShield": "DGCA CAR Section 3 statutory 100% refund guarantee on flight cancellation or schedule shift > 2h.",
+      "badge": "FLIGHT • MINIMAL TRANSIT TIME",
+      "legs": [
+        {
+          "id": "leg_air_AI-864_Vande Bharat Executive / Anubhuti",
+          "type": "flight",
+          "label": "JAI Airport (JAI) → NMI Airport (NMI)",
+          "carrier": "Air India (Airbus A321neo) • Non-Stop Express",
+          "time": "2h 5m",
+          "depTime": "10:15 IST",
+          "arrTime": "12:20 IST",
+          "provider": "makemytrip",
+          "sourceType": "PARTNER_API",
+          "seatClass": "Vande Bharat Executive / Anubhuti",
+          "bookingReference": "AI-864",
+          "provenance": {
+            "source": "MakeMyTrip Bharat Aviation GDS Feed",
+            "verifiedAt": "9:46:35 pm IST"
+          }
+        }
+      ],
+      "provenance": {
+        "source": "PARTNER_API",
+        "verifiedAt": "9:46:35 pm IST",
+        "expiresAt": "2026-09-06T16:31:35.023Z",
+        "confidenceScore": 0.99
+      },
+      "explanation": "Direct commercial flight via MakeMyTrip with shortest air transit. Verified on-time schedule with 7 kg Hand Luggage & 25 kg Checked Baggage included.",
+      "bookingMethods": [
+        "OFFICIAL_PARTNER",
+        "DIRECT_API",
+        "DEEP_LINK"
+      ]
+    },
+    "providerReference": "AI-864",
+    "bookingMethod": "OFFICIAL_PARTNER",
+    "deepLinkUrl": "https://www.makemytrip.com/flight/search?itinerary=BOM-DEL-2026-10-15&tripType=O",
+    "requestedParameters": {
+      "title": "Air India (Airbus A321neo) Non-Stop Flight",
+      "legs": [
+        {
+          "id": "leg_air_AI-864_Vande Bharat Executive / Anubhuti",
+          "type": "flight",
+          "label": "JAI Airport (JAI) → NMI Airport (NMI)",
+          "carrier": "Air India (Airbus A321neo) • Non-Stop Express",
+          "time": "2h 5m",
+          "depTime": "10:15 IST",
+          "arrTime": "12:20 IST",
+          "provider": "makemytrip",
+          "sourceType": "PARTNER_API",
+          "seatClass": "Vande Bharat Executive / Anubhuti",
+          "bookingReference": "AI-864",
+          "provenance": {
+            "source": "MakeMyTrip Bharat Aviation GDS Feed",
+            "verifiedAt": "9:46:35 pm IST"
+          }
+        }
+      ],
+      "totalPrice": 5543,
+      "website": "https://www.makemytrip.com/flight/search?itinerary=JAI-BOM-15/10/2026&tripType=O&paxType=A-1_C-0_I-0&intl=false&cabinClass=E"
+    },
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-06T16:16:48.958Z",
+    "updatedAt": "2026-09-06T16:16:48.966Z"
   }
 }

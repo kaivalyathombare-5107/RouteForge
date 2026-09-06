@@ -68,5 +68,18 @@
     "refundRecoveryAmount": 5200,
     "status": "EXECUTED",
     "createdAt": "2026-09-06T14:49:38.862Z"
+  },
+  "rec_1788710639349_dgbiav": {
+    "id": "rec_1788710639349_dgbiav",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingId": "seg_bk_1788623754622_j985f2_1",
+    "selectedOptionId": "rec_opt_fewest_changes",
+    "optionTitle": "Option C: Single-Point Carrier Re-Protection",
+    "strategy": "Fewest Changes",
+    "netFinancialImpact": 0,
+    "additionalCost": 0,
+    "refundRecoveryAmount": 0,
+    "status": "EXECUTED",
+    "createdAt": "2026-09-06T16:03:59.349Z"
   }
 }

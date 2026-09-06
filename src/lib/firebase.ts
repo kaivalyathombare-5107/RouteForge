@@ -37,6 +37,9 @@ if (isFirebaseConfigured) {
     appInstance = getApps().length ? getApp() : initializeApp(firebaseConfig);
     authInstance = getAuth(appInstance);
     googleProviderInstance = new GoogleAuthProvider();
+    googleProviderInstance.addScope('email');
+    googleProviderInstance.addScope('profile');
+    googleProviderInstance.addScope('openid');
     googleProviderInstance.setCustomParameters({ prompt: "select_account" });
   } catch (error) {
     console.warn("[Firebase] Initialization skipped or failed due to invalid configuration:", error);

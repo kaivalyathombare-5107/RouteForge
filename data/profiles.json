@@ -105,5 +105,27 @@
       "createdAt": "2026-09-06T15:19:41.609Z"
     },
     "updatedAt": "2026-09-06T15:19:41.609Z"
+  },
+  "HccjX4bCnqWS4LcLLHonO8YlrX83": {
+    "uid": "HccjX4bCnqWS4LcLLHonO8YlrX83",
+    "email": "routeforge.kaivalya@gmail.com",
+    "profile": {
+      "fullName": "Kaivalya",
+      "phoneNumber": "76347647",
+      "homeCity": "Mumbai",
+      "ageGroup": "18-25",
+      "preferredCurrency": "INR",
+      "preferences": {
+        "maxTravelDurationHours": 10,
+        "maxConnections": 1
+      },
+      "frequentTravellerIdentifiers": {},
+      "isComplete": true,
+      "userId": "HccjX4bCnqWS4LcLLHonO8YlrX83",
+      "userEmail": "routeforge.kaivalya@gmail.com",
+      "updatedAt": "2026-09-06T16:14:05.831Z",
+      "createdAt": "2026-09-06T16:14:05.831Z"
+    },
+    "updatedAt": "2026-09-06T16:14:05.831Z"
   }
 }
