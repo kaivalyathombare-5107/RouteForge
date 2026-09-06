@@ -91,6 +91,8 @@ export const SignInSection: React.FC<SignInSectionProps> = ({
         setError('Browser popup was blocked. Please enable popups or use Instant Privé VIP Access below.');
       } else if (code === 'auth/popup-closed-by-user') {
         setError('Sign-in cancelled. Please click below to try again.');
+      } else if (code === 'auth/unauthorized-domain') {
+        setError('This app URL is not authorized in Firebase. Add localhost to Firebase Console → Authentication → Settings → Authorized domains, then reload this page.');
       } else {
         setError(e?.message || 'Google sign-in window could not be opened. You can use Instant Privé VIP Access below.');
       }

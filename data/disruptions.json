@@ -346,5 +346,23 @@
     "status": "ACTIVE",
     "createdAt": "2026-09-06T14:49:13.840Z",
     "updatedAt": "2026-09-06T14:49:13.840Z"
+  },
+  "dis_1788708023573_knj8sn": {
+    "id": "dis_1788708023573_knj8sn",
+    "userId": "iNptnS0ziwbM4h4iig3CBWY0XFP2",
+    "bookingId": "bkg_flight_01",
+    "provider": "IndiGo Airlines",
+    "disruptionType": "cancellation",
+    "delayMinutes": 180,
+    "rootCause": "Aircraft technical unserviceability at BOM T2",
+    "affectedSegmentIds": [
+      "bkg_flight_01"
+    ],
+    "cascadeSummary": "Cancellation propagated to 1 connected travel segments.",
+    "source": "LIVE_TELEMETRY",
+    "severity": "critical",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-06T15:20:23.573Z",
+    "updatedAt": "2026-09-06T15:20:23.573Z"
   }
 }

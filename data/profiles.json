@@ -78,5 +78,32 @@
       "createdAt": "2026-09-05T01:57:34.603Z"
     },
     "updatedAt": "2026-09-05T01:58:03.905Z"
+  },
+  "iNptnS0ziwbM4h4iig3CBWY0XFP2": {
+    "uid": "iNptnS0ziwbM4h4iig3CBWY0XFP2",
+    "email": "itskv5107.kt@gmail.com",
+    "profile": {
+      "fullName": "Kaivalya Thombare",
+      "phoneNumber": "7498969407",
+      "homeCity": "Mumbai",
+      "ageGroup": "18-25",
+      "preferredCurrency": "INR",
+      "preferences": {
+        "travelBudget": "economy",
+        "preferredTransport": "multimodal",
+        "seatPreference": "window",
+        "hotelCategory": "business_executive",
+        "maxTravelDurationHours": 10,
+        "maxConnections": 1
+      },
+      "foodPreference": "none",
+      "frequentTravellerIdentifiers": {},
+      "isComplete": true,
+      "userId": "iNptnS0ziwbM4h4iig3CBWY0XFP2",
+      "userEmail": "itskv5107.kt@gmail.com",
+      "updatedAt": "2026-09-06T15:19:41.609Z",
+      "createdAt": "2026-09-06T15:19:41.609Z"
+    },
+    "updatedAt": "2026-09-06T15:19:41.609Z"
   }
 }
