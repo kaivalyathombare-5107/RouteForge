@@ -4,9 +4,11 @@ import {
   Calendar,
   ArrowRight,
   Sparkles,
+  Users,
 } from 'lucide-react';
 import { LocationAutocomplete } from './LocationAutocomplete';
 import { JourneyMode } from './HeroJourneySection';
+import { TravelCalendarPicker } from './TravelCalendarPicker';
 
 interface PlanJourneyWidgetProps {
   onSearchSubmit: (params: {
@@ -32,9 +34,9 @@ export const PlanJourneyWidget: React.FC<PlanJourneyWidgetProps> = ({
   const [mode, setMode] = useState<JourneyMode>('flight');
   const [origin, setOrigin] = useState(initialOrigin);
   const [destinationCity, setDestinationCity] = useState(initialDestination);
-  const [departDate, setDepartDate] = useState('15 Oct, 2026');
-  const [returnDate, setReturnDate] = useState('22 Oct, 2026');
-  const [travelers] = useState('2 Adults, 2 Children (Family Holiday)');
+  const [departDate, setDepartDate] = useState('2026-10-15');
+  const [returnDate, setReturnDate] = useState('2026-10-22');
+  const [memberCount, setMemberCount] = useState(2);
   const [cabinClass] = useState('Vande Bharat Executive / Anubhuti');
 
   const lastNotifiedRef = useRef<{ origin: string; destination: string; mode: string }>({
@@ -80,7 +82,7 @@ export const PlanJourneyWidget: React.FC<PlanJourneyWidgetProps> = ({
       destination: destinationCity,
       departDate,
       returnDate,
-      travelers,
+      travelers: `${memberCount} ${memberCount === 1 ? 'Member' : 'Members'}`,
       cabinClass,
       mode,
     });
@@ -182,33 +184,40 @@ export const PlanJourneyWidget: React.FC<PlanJourneyWidgetProps> = ({
         )}
       </div>
 
-      {/* Dates: DEPART and RETURN */}
-      <div className="grid grid-cols-2 gap-2.5">
-        <div className="rounded-xl bg-slate-950/60 border border-slate-800 focus-within:border-[#D4AF37] px-3 py-2 transition-colors">
-          <div className="flex items-center justify-between text-[9px] font-cinzel font-semibold tracking-widest text-[#D4AF37]">
-            <span>DEPART</span>
-            <Calendar className="w-2.5 h-2.5" />
-          </div>
-          <input
-            type="text"
-            value={departDate}
-            onChange={(e) => setDepartDate(e.target.value)}
-            className="w-full bg-transparent text-xs font-sans-luxury text-slate-200 outline-none mt-0.5"
-          />
-        </div>
+      {/* Dates: DEPART and RETURN (Matching Image 2 and Image 1 Calendar) & TRAVELERS */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+        <TravelCalendarPicker
+          departDate={departDate}
+          returnDate={returnDate}
+          onChangeDepartDate={(newDepart) => {
+            setDepartDate(newDepart);
+            if (returnDate && newDepart > returnDate) {
+              setReturnDate(newDepart);
+            }
+          }}
+          onChangeReturnDate={(newReturn) => {
+            setReturnDate(newReturn);
+          }}
+        />
 
-        <div className="rounded-xl bg-slate-950/60 border border-slate-800 focus-within:border-[#D4AF37] px-3 py-2 transition-colors">
+        <label className="rounded-xl bg-slate-950/70 border border-slate-800 focus-within:border-[#D4AF37] px-3.5 py-2.5 transition-colors cursor-pointer col-span-1">
           <div className="flex items-center justify-between text-[9px] font-cinzel font-semibold tracking-widest text-[#D4AF37]">
-            <span>RETURN</span>
-            <Calendar className="w-2.5 h-2.5" />
+            <span>TRAVELERS</span>
+            <Users className="w-3 h-3 text-[#D4AF37]" />
           </div>
-          <input
-            type="text"
-            value={returnDate}
-            onChange={(e) => setReturnDate(e.target.value)}
-            className="w-full bg-transparent text-xs font-sans-luxury text-slate-200 outline-none mt-0.5"
-          />
-        </div>
+          <select
+            aria-label="Number of members"
+            value={memberCount}
+            onChange={(e) => setMemberCount(Number(e.target.value))}
+            className="w-full bg-transparent text-xs sm:text-sm font-semibold font-sans-luxury text-slate-100 outline-none mt-1 cursor-pointer"
+          >
+            {Array.from({ length: 12 }, (_, index) => index + 1).map((count) => (
+              <option key={count} value={count} className="bg-slate-950 text-slate-200">
+                {count} {count === 1 ? 'Member' : 'Members'}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
 
       {/* SEARCH JOURNEYS Submit Button */}

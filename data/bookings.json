@@ -1070,5 +1070,58 @@
     "createdAt": "2026-09-06T16:16:48.963Z",
     "updatedAt": "2026-09-06T16:16:48.963Z",
     "lastVerifiedAt": "2026-09-06T16:16:48.963Z"
+  },
+  "bk_1788712239970_72182e": {
+    "id": "bk_1788712239970_72182e",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingReference": "RF-REDB-164672",
+    "provider": "redbus",
+    "title": "Air India (Airbus A321neo) Non-Stop Flight",
+    "status": "CONFIRMED",
+    "totalPrice": 5273,
+    "currency": "INR",
+    "passengers": [
+      {
+        "name": "Kaivalya Thombare",
+        "mealPreference": "Pure Veg / Jain (Profile Synced)"
+      }
+    ],
+    "segments": [
+      {
+        "id": "seg_bk_1788712239970_72182e_1",
+        "bookingId": "bk_1788712239970_72182e",
+        "segmentOrder": 1,
+        "transportType": "flight",
+        "operator": "Air India (Airbus A321neo) • Non-Stop Express",
+        "serviceNumber": "AI-864",
+        "origin": "JAI Airport (JAI)",
+        "destination": "NMI Airport (NMI)",
+        "depTime": "10:15 IST",
+        "arrTime": "12:20 IST",
+        "seatClass": "Vande Bharat Executive / Anubhuti",
+        "status": "CONFIRMED",
+        "sourceType": "PARTNER_API",
+        "pnr": "REDB-164672",
+        "createdAt": "2026-09-06T16:30:39.970Z"
+      }
+    ],
+    "cancellationPolicy": {
+      "refundable": true,
+      "terms": "DGCA CAR Section 3 statutory 100% refund guarantee on flight cancellation or schedule shift > 2h."
+    },
+    "modificationPolicy": {
+      "allowed": true,
+      "terms": "Modification supported before scheduled departure."
+    },
+    "disruptionShield": "DGCA CAR Section 3 statutory 100% refund guarantee on flight cancellation or schedule shift > 2h.",
+    "provenance": {
+      "source": "PARTNER_API",
+      "verifiedAt": "10:00:32 pm IST",
+      "expiresAt": "2026-09-06T16:45:32.671Z",
+      "confidenceScore": 0.99
+    },
+    "createdAt": "2026-09-06T16:30:39.970Z",
+    "updatedAt": "2026-09-06T16:30:39.970Z",
+    "lastVerifiedAt": "2026-09-06T16:30:39.970Z"
   }
 }
