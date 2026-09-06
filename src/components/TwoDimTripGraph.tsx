@@ -43,6 +43,42 @@ interface TwoDimTripGraphProps {
   onClearRoute?: () => void;
 }
 
+interface RadarRouteSegment {
+  from: GeoPoint;
+  to: GeoPoint;
+  mode: JourneyMode;
+  label: string;
+  color: string;
+}
+
+const resolveRecoveryPoint = (value: string | undefined, fallback: string): GeoPoint | null => {
+  if (!value) return null;
+  const normalisedValue = value.replace(/\bJPR\b/gi, 'Jaipur');
+  return resolveLocationToGeoPoint(normalisedValue, fallback);
+};
+
+const getRecoveryRouteSegments = (plan: RecoveryOption | null | undefined): RadarRouteSegment[] => {
+  if (!plan) return [];
+
+  return plan.replacementBookings.flatMap((booking, index) => {
+    const routeMatch = booking.title?.match(/([A-Z]{3})\s*(?:→|->)\s*([A-Z]{3})/i);
+    const fromValue = booking.origin || routeMatch?.[1];
+    const toValue = booking.destination || routeMatch?.[2];
+    const from = resolveRecoveryPoint(fromValue, 'Recovery origin');
+    const to = resolveRecoveryPoint(toValue, 'Recovery destination');
+    if (!from || !to || (from.lat === to.lat && from.lon === to.lon)) return [];
+
+    const mode: JourneyMode = /rail|train|vande|intercity/i.test(booking.title || '') ? 'train' : 'flight';
+    return [{
+      from,
+      to,
+      mode,
+      label: booking.title || `Recovery leg ${index + 1}`,
+      color: plan.color,
+    }];
+  });
+};
+
 // Major international and domestic hubs with coordinates [lon, lat]
 const WORLD_HUBS: { name: string; code: string; lon: number; lat: number; type: 'flight' | 'train' | 'hub' }[] = [
   { name: 'Mumbai', code: 'BOM', lon: 72.8656, lat: 19.0896, type: 'hub' },
@@ -144,6 +180,7 @@ export const TwoDimTripGraph: React.FC<TwoDimTripGraphProps> = ({
   searchOrigin,
   searchDestination,
   searchMode = 'flight',
+  activeRecoveryPlan,
   hasUserEntered = false,
   onSelectRoute,
   onClearRoute,
@@ -169,15 +206,21 @@ export const TwoDimTripGraph: React.FC<TwoDimTripGraphProps> = ({
     return resolveLocationToGeoPoint(searchDestination, 'Destination');
   }, [searchDestination]);
 
+  const recoveryRouteSegments = useMemo(
+    () => getRecoveryRouteSegments(activeRecoveryPlan),
+    [activeRecoveryPlan]
+  );
+
   // Route visibility condition: ONLY when user entered something in Plan Your Journey!
   const isRouteVisible = useMemo(() => {
+    if (recoveryRouteSegments.length > 0) return true;
     if (!hasUserEntered) return false;
     if (!originGeo || !destGeo) return false;
     if (!searchOrigin?.trim() || !searchDestination?.trim()) return false;
     // Don't show if origin and destination are the same
     if (originGeo.lat === destGeo.lat && originGeo.lon === destGeo.lon) return false;
     return true;
-  }, [hasUserEntered, originGeo, destGeo, searchOrigin, searchDestination]);
+  }, [hasUserEntered, originGeo, destGeo, searchOrigin, searchDestination, recoveryRouteSegments]);
 
   // Real Calculated Distance and Flight/Train Duration
   const routeMetrics = useMemo(() => {
@@ -246,14 +289,24 @@ export const TwoDimTripGraph: React.FC<TwoDimTripGraphProps> = ({
 
   // Auto-focus and fit bounds to route when a new route is activated
   useEffect(() => {
-    if (isRouteVisible && originGeo && destGeo && containerRef.current) {
+    const focusPoints = recoveryRouteSegments.length > 0
+      ? recoveryRouteSegments.flatMap((segment) => [segment.from, segment.to])
+      : originGeo && destGeo
+        ? [originGeo, destGeo]
+        : [];
+
+    if (isRouteVisible && focusPoints.length > 0 && containerRef.current) {
       const { clientWidth: w, clientHeight: h } = containerRef.current;
       if (w > 0 && h > 0) {
-        const midLon = (originGeo.lon + destGeo.lon) / 2;
-        const midLat = (originGeo.lat + destGeo.lat) / 2;
-        const distDeg = Math.sqrt(
-          Math.pow(originGeo.lon - destGeo.lon, 2) + Math.pow(originGeo.lat - destGeo.lat, 2)
-        );
+        const longitudes = focusPoints.map((point) => point.lon);
+        const latitudes = focusPoints.map((point) => point.lat);
+        const minLon = Math.min(...longitudes);
+        const maxLon = Math.max(...longitudes);
+        const minLat = Math.min(...latitudes);
+        const maxLat = Math.max(...latitudes);
+        const midLon = (minLon + maxLon) / 2;
+        const midLat = (minLat + maxLat) / 2;
+        const distDeg = Math.max(maxLon - minLon, maxLat - minLat);
 
         // Calculate appropriate zoom to fit route nicely
         let targetZoom = Math.min(4.5, Math.max(1.3, (w / (distDeg * (w / 360))) * 0.45));
@@ -267,7 +320,7 @@ export const TwoDimTripGraph: React.FC<TwoDimTripGraphProps> = ({
         setPan({ x: targetPanX, y: targetPanY });
       }
     }
-  }, [isRouteVisible, originGeo?.lat, originGeo?.lon, destGeo?.lat, destGeo?.lon]);
+  }, [isRouteVisible, originGeo?.lat, originGeo?.lon, destGeo?.lat, destGeo?.lon, recoveryRouteSegments]);
 
   // Main 2D Canvas Render Loop
   useEffect(() => {
@@ -380,9 +433,74 @@ export const TwoDimTripGraph: React.FC<TwoDimTripGraphProps> = ({
         }
       });
 
-      // 4. CONDITIONAL ROUTE RENDERING
-      // ONLY RENDER ROUTE IF USER ENTERED SOMETHING IN "PLAN YOUR JOURNEY"!
-      if (isRouteVisible && originGeo && destGeo) {
+      // 4. SELECTED RECOVERY PLAN CORRIDORS
+      if (recoveryRouteSegments.length > 0) {
+        const now = Date.now();
+        recoveryRouteSegments.forEach((segment, segmentIndex) => {
+          const p1 = geoToScreen(segment.from.lon, segment.from.lat, width, height);
+          const p2 = geoToScreen(segment.to.lon, segment.to.lat, width, height);
+          const dx = p2.x - p1.x;
+          const dy = p2.y - p1.y;
+          const screenDist = Math.sqrt(dx * dx + dy * dy);
+          const curveOffset = Math.min(110, Math.max(24, screenDist * 0.18));
+          const midX = (p1.x + p2.x) / 2;
+          const midY = (p1.y + p2.y) / 2 - curveOffset;
+
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.quadraticCurveTo(midX, midY, p2.x, p2.y);
+          ctx.strokeStyle = `${segment.color}55`;
+          ctx.lineWidth = 9;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.quadraticCurveTo(midX, midY, p2.x, p2.y);
+          ctx.strokeStyle = segment.color;
+          ctx.lineWidth = 2.8;
+          ctx.setLineDash([8, 5]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          const pulseT = ((now / 3500) + segmentIndex * 0.22) % 1;
+          const invT = 1 - pulseT;
+          const photonX = invT * invT * p1.x + 2 * invT * pulseT * midX + pulseT * pulseT * p2.x;
+          const photonY = invT * invT * p1.y + 2 * invT * pulseT * midY + pulseT * pulseT * p2.y;
+          ctx.beginPath();
+          ctx.arc(photonX, photonY, 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#FFFFFF';
+          ctx.shadowColor = segment.color;
+          ctx.shadowBlur = 12;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+
+          [
+            { point: p1, color: '#10B981', label: segment.from.code || segment.from.city },
+            { point: p2, color: '#FCE7AC', label: segment.to.code || segment.to.city },
+          ].forEach(({ point, color, label }) => {
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 5.5 + (Math.sin(now / 220) + 1) * 2.5, 0, Math.PI * 2);
+            ctx.strokeStyle = `${color}99`;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.fillStyle = color;
+            ctx.font = 'bold 10px "JetBrains Mono", monospace';
+            ctx.fillText(label, point.x + 8, point.y + 4);
+          });
+
+          ctx.fillStyle = 'rgba(243, 239, 230, 0.8)';
+          ctx.font = '9px "JetBrains Mono", monospace';
+          ctx.fillText(`LEG ${segmentIndex + 1}`, midX + 5, midY - 5);
+        });
+      }
+
+      // 5. CONDITIONAL JOURNEY ROUTE RENDERING
+      // ONLY RENDER THE FORM ROUTE IF NO RECOVERY PLAN IS ACTIVE.
+      if (recoveryRouteSegments.length === 0 && isRouteVisible && originGeo && destGeo) {
         const p1 = geoToScreen(originGeo.lon, originGeo.lat, width, height);
         const p2 = geoToScreen(destGeo.lon, destGeo.lat, width, height);
 
@@ -536,7 +654,7 @@ export const TwoDimTripGraph: React.FC<TwoDimTripGraphProps> = ({
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [geoToScreen, isRouteVisible, originGeo, destGeo, searchMode, zoom]);
+  }, [geoToScreen, isRouteVisible, originGeo, destGeo, searchMode, zoom, recoveryRouteSegments]);
 
   // Mouse Handlers for Pan and Zoom
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -653,8 +771,26 @@ export const TwoDimTripGraph: React.FC<TwoDimTripGraphProps> = ({
         </div>
 
         {/* BOTTOM LEFT OVERLAYS: */}
-        {/* CASE A: USER HAS ENTERED A JOURNEY (ROUTE ACTIVE HUD) */}
-        {isRouteVisible && routeMetrics && originGeo && destGeo ? (
+        {/* CASE A: SELECTED RECOVERY PLAN HUD */}
+        {activeRecoveryPlan ? (
+          <div className="absolute bottom-5 left-5 max-w-md bg-slate-950/90 backdrop-blur-xl rounded-2xl border border-emerald-500/50 p-4 shadow-2xl space-y-3 pointer-events-none z-20 animate-fadeIn">
+            <div className="flex items-center justify-between border-b border-emerald-500/30 pb-2">
+              <div className="flex items-center space-x-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[10px] font-cinzel font-bold text-emerald-300 tracking-wider">
+                  ACTIVE RECOVERY CORRIDOR RADAR
+                </span>
+              </div>
+              <span className="text-[10px] font-mono text-slate-400">
+                {recoveryRouteSegments.length} LEG{recoveryRouteSegments.length === 1 ? '' : 'S'}
+              </span>
+            </div>
+            <p className="text-xs font-serif-display text-white">{activeRecoveryPlan.title}</p>
+            <p className="text-[10px] font-mono text-slate-400">
+              {recoveryRouteSegments.map((segment) => `${segment.from.code || segment.from.city} → ${segment.to.code || segment.to.city}`).join('  |  ')}
+            </p>
+          </div>
+        ) : isRouteVisible && routeMetrics && originGeo && destGeo ? (
           <div className="absolute bottom-5 left-5 max-w-md bg-slate-950/90 backdrop-blur-xl rounded-2xl border border-gold-subtle p-4 shadow-2xl space-y-3 pointer-events-auto z-20 animate-fadeIn">
             <div className="flex items-center justify-between pb-2 border-b border-gold-subtle/40">
               <div className="flex items-center space-x-2">
@@ -705,7 +841,7 @@ export const TwoDimTripGraph: React.FC<TwoDimTripGraphProps> = ({
             </div>
           </div>
         ) : (
-          /* CASE B: USER HAS NOT ENTERED SOMETHING YET (IDLE RADAR PROMPT) */
+          /* CASE C: USER HAS NOT ENTERED SOMETHING YET (IDLE RADAR PROMPT) */
           <div className="absolute bottom-5 left-5 max-w-sm bg-slate-950/85 backdrop-blur-xl rounded-2xl border border-gold-subtle/50 p-4 shadow-2xl space-y-3 pointer-events-auto z-20">
             <div className="flex items-center space-x-2">
               <Compass className="w-4 h-4 text-[#D4AF37]" />

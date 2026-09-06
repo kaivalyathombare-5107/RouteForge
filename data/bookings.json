@@ -964,5 +964,58 @@
     "createdAt": "2026-09-05T18:22:58.504Z",
     "updatedAt": "2026-09-05T18:22:58.504Z",
     "lastVerifiedAt": "2026-09-05T18:22:58.504Z"
+  },
+  "bk_1788706128972_s299hw": {
+    "id": "bk_1788706128972_s299hw",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingReference": "RF-IRCT-392196",
+    "provider": "irctc indian railways",
+    "title": "New Delhi - Mumbai Central Tejas Rajdhani Express",
+    "status": "CONFIRMED",
+    "totalPrice": 5343,
+    "currency": "INR",
+    "passengers": [
+      {
+        "name": "Kaivalya Thombare",
+        "mealPreference": "Pure Veg / Jain (Profile Synced)"
+      }
+    ],
+    "segments": [
+      {
+        "id": "seg_bk_1788706128972_s299hw_1",
+        "bookingId": "bk_1788706128972_s299hw",
+        "segmentOrder": 1,
+        "transportType": "train",
+        "operator": "Indian Railways IRCTC • First AC (1A)",
+        "serviceNumber": "12952",
+        "origin": "New Delhi - Mumbai Central Tejas Rajdhani (12952)",
+        "destination": "Destination",
+        "depTime": "16:55 IST",
+        "arrTime": "08:35 IST",
+        "seatClass": "First AC (1A)",
+        "status": "CONFIRMED",
+        "sourceType": "PARTNER_API",
+        "pnr": "IRCT-392196",
+        "createdAt": "2026-09-06T14:48:48.972Z"
+      }
+    ],
+    "cancellationPolicy": {
+      "refundable": true,
+      "terms": "Railway Rule 73A: 100% full statutory refund with auto-TDR filing if delayed > 3h."
+    },
+    "modificationPolicy": {
+      "allowed": true,
+      "terms": "Modification supported before scheduled departure."
+    },
+    "disruptionShield": "Railway Rule 73A: 100% full statutory refund with auto-TDR filing if delayed > 3h.",
+    "provenance": {
+      "source": "PARTNER_API",
+      "verifiedAt": "08:18 pm IST",
+      "expiresAt": "2026-09-06T15:03:40.270Z",
+      "confidenceScore": 0.98
+    },
+    "createdAt": "2026-09-06T14:48:48.972Z",
+    "updatedAt": "2026-09-06T14:48:48.972Z",
+    "lastVerifiedAt": "2026-09-06T14:48:48.972Z"
   }
 }

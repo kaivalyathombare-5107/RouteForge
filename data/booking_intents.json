@@ -953,5 +953,87 @@
     "status": "CONFIRMED",
     "createdAt": "2026-09-05T18:22:58.433Z",
     "updatedAt": "2026-09-05T18:22:58.507Z"
+  },
+  "intent_1788706128949_hejbcw": {
+    "id": "intent_1788706128949_hejbcw",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "journeyId": "plan_train_express",
+    "provider": "irctc indian railways",
+    "selectedOption": {
+      "id": "plan_train_express",
+      "category": "PREMIUM_RAIL",
+      "title": "New Delhi - Mumbai Central Tejas Rajdhani Express",
+      "providerSummary": "IRCTC NextGen PRS",
+      "totalDuration": "15h 36m Scenic Railway",
+      "durationMinutes": 936,
+      "depTime": "16:55 IST",
+      "arrTime": "08:35 IST",
+      "totalPrice": 4850,
+      "currency": "INR",
+      "priceFormatted": "₹4,850 / berth",
+      "co2": "28 kg CO₂e (Eco-Friendly)",
+      "disruptionShield": "Railway Rule 73A: 100% full statutory refund with auto-TDR filing if delayed > 3h.",
+      "badge": "TRAIN • HIGH-SPEED SCENIC RAIL",
+      "legs": [
+        {
+          "id": "leg_rail_12952_1A",
+          "type": "train",
+          "label": "New Delhi - Mumbai Central Tejas Rajdhani (12952)",
+          "carrier": "Indian Railways IRCTC • First AC (1A)",
+          "time": "15h 36m",
+          "depTime": "16:55 IST",
+          "arrTime": "08:35 IST",
+          "provider": "irctc",
+          "sourceType": "PARTNER_API",
+          "seatClass": "First AC (1A)",
+          "bookingReference": "12952",
+          "provenance": {
+            "source": "IRCTC NextGen PRS Gateway",
+            "verifiedAt": "08:18 pm IST"
+          }
+        }
+      ],
+      "provenance": {
+        "source": "PARTNER_API",
+        "verifiedAt": "08:18 pm IST",
+        "expiresAt": "2026-09-06T15:03:40.270Z",
+        "confidenceScore": 0.98
+      },
+      "explanation": "Verified IRCTC PRS confirmed berths with panoramic window view, complimentary onboard meals, and generous 40 kg luggage allowance.",
+      "bookingMethods": [
+        "OFFICIAL_PARTNER",
+        "DIRECT_API",
+        "DEEP_LINK"
+      ]
+    },
+    "providerReference": "12952",
+    "bookingMethod": "OFFICIAL_PARTNER",
+    "requestedParameters": {
+      "title": "New Delhi - Mumbai Central Tejas Rajdhani Express",
+      "legs": [
+        {
+          "id": "leg_rail_12952_1A",
+          "type": "train",
+          "label": "New Delhi - Mumbai Central Tejas Rajdhani (12952)",
+          "carrier": "Indian Railways IRCTC • First AC (1A)",
+          "time": "15h 36m",
+          "depTime": "16:55 IST",
+          "arrTime": "08:35 IST",
+          "provider": "irctc",
+          "sourceType": "PARTNER_API",
+          "seatClass": "First AC (1A)",
+          "bookingReference": "12952",
+          "provenance": {
+            "source": "IRCTC NextGen PRS Gateway",
+            "verifiedAt": "08:18 pm IST"
+          }
+        }
+      ],
+      "totalPrice": 5343,
+      "website": "https://www.irctc.co.in/nget/train-search"
+    },
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-06T14:48:48.949Z",
+    "updatedAt": "2026-09-06T14:48:48.974Z"
   }
 }

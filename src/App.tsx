@@ -1057,22 +1057,6 @@ export default function App() {
                 </p>
               </div>
 
-              {/* Status & Quick Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  onClick={() => setIsReportProblemOpen(true)}
-                  className="px-4 py-2.5 rounded-full bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/80 text-xs font-cinzel font-semibold text-rose-200 hover:text-white transition-all cursor-pointer flex items-center space-x-2 shadow-lg shadow-rose-950/40"
-                >
-                  <span className="w-3.5 h-3.5 rounded-full border border-rose-400 flex items-center justify-center text-[10px] font-bold font-mono">!</span>
-                  <span>REPORT DISRUPTION</span>
-                </button>
-                <button
-                  onClick={() => setActiveSection('concierge')}
-                  className="px-4 py-2.5 rounded-full bg-slate-950/90 hover:bg-[#D4AF37]/10 border border-gold-subtle hover:border-gold-bright text-xs font-cinzel font-semibold text-slate-200 hover:text-[#FCE7AC] transition-all cursor-pointer"
-                >
-                  VIEW DISRUPTION SHIELD
-                </button>
-              </div>
             </div>
 
             {/* Autonomous Recovery Planner Section with exact matching selector ID */}
@@ -1106,6 +1090,30 @@ export default function App() {
                 selectedOptionId={activeRecoveryPlan?.id}
                 isInfeasibleState={isInfeasibleState}
               />
+
+              {activeRecoveryPlan && (
+                <div className="space-y-3 animate-fadeIn">
+                  <div className="flex items-center justify-between border-b border-gold-subtle/40 pb-3">
+                    <div>
+                      <span className="text-[10px] font-cinzel font-semibold tracking-[0.25em] text-[#D4AF37]">
+                        SELECTED PLAN ROUTE TOPOLOGY
+                      </span>
+                      <h3 className="text-xl sm:text-2xl font-bold font-serif-display text-white mt-1">
+                        {activeRecoveryPlan.title}
+                      </h3>
+                    </div>
+                    <span className="text-[10px] font-mono text-emerald-300 border border-emerald-500/40 rounded-full px-3 py-1">
+                      {activeRecoveryPlan.replacementBookings.length} CONNECTING ROUTE{activeRecoveryPlan.replacementBookings.length === 1 ? '' : 'S'}
+                    </span>
+                  </div>
+                  <div className="relative w-full h-[480px] sm:h-[560px] rounded-3xl overflow-hidden shadow-2xl border border-gold-subtle bg-slate-950">
+                    <TwoDimTripGraph
+                      activeRecoveryPlan={activeRecoveryPlan}
+                      reducedMotion={reducedMotion}
+                    />
+                  </div>
+                </div>
+              )}
             </section>
           </div>
         )}

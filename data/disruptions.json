@@ -328,5 +328,23 @@
     "status": "ACTIVE",
     "createdAt": "2026-09-05T18:58:09.045Z",
     "updatedAt": "2026-09-05T18:58:09.045Z"
+  },
+  "dis_1788706153840_mv52g7": {
+    "id": "dis_1788706153840_mv52g7",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingId": "bkg_flight_01",
+    "provider": "Uber Mobility • Professional Chauffeur",
+    "disruptionType": "delay",
+    "delayMinutes": 90,
+    "rootCause": "Air traffic control congestion at BOM Runway 27",
+    "affectedSegmentIds": [
+      "bkg_flight_01"
+    ],
+    "cascadeSummary": "Delay propagated to 1 connected travel segments.",
+    "source": "LIVE_TELEMETRY",
+    "severity": "high",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-06T14:49:13.840Z",
+    "updatedAt": "2026-09-06T14:49:13.840Z"
   }
 }

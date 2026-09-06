@@ -42,5 +42,31 @@
     "providerReference": "RF-MAKE-756499",
     "status": "EXECUTED",
     "createdAt": "2026-09-05T01:55:06.767Z"
+  },
+  "rec_1788706078894_d2k9q3": {
+    "id": "rec_1788706078894_d2k9q3",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingId": "seg_bk_1788623754622_j985f2_1",
+    "selectedOptionId": "rec_opt_fastest",
+    "optionTitle": "Option A: Direct Fast-Track Re-Route",
+    "strategy": "Fastest Recovery",
+    "netFinancialImpact": -400,
+    "additionalCost": 4800,
+    "refundRecoveryAmount": 5200,
+    "status": "EXECUTED",
+    "createdAt": "2026-09-06T14:47:58.894Z"
+  },
+  "rec_1788706178862_zi4bh3": {
+    "id": "rec_1788706178862_zi4bh3",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingId": "seg_bk_1788623754622_j985f2_1",
+    "selectedOptionId": "rec_opt_cheapest",
+    "optionTitle": "Option B: Budget Superfast Ground Link",
+    "strategy": "Lowest Cost",
+    "netFinancialImpact": -1300,
+    "additionalCost": 3900,
+    "refundRecoveryAmount": 5200,
+    "status": "EXECUTED",
+    "createdAt": "2026-09-06T14:49:38.862Z"
   }
 }
