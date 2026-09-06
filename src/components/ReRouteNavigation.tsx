@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { User, Compass, Layers, ShieldAlert, Menu, X, Languages } from 'lucide-react';
+import { User, Compass, Layers, ShieldAlert, Menu, X, Languages, Sparkles } from 'lucide-react';
 
-export type ReRouteSection = 'destinations' | 'journeys' | 'emergency' | 'concierge' | 'translator' | 'membership';
+export type ReRouteSection = 'destinations' | 'journeys' | 'emergency' | 'concierge' | 'translator' | 'membership' | 'recovery';
 
 interface ReRouteNavigationProps {
   activeSection: ReRouteSection;
@@ -142,6 +142,7 @@ export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
                 <span>Emergency</span>
               </button>
               <button
+                id="nav-concierge-shield-button"
                 onClick={() => {
                   onSelectSection('concierge');
                   setIsMobileMenuOpen(false);
@@ -153,6 +154,21 @@ export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
                 }`}
               >
                 Disruption Shield
+              </button>
+              <button
+                id="nav-recovery-plans-button"
+                onClick={() => {
+                  onSelectSection('recovery');
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-cinzel font-semibold tracking-wider transition-all flex items-center space-x-2 cursor-pointer ${
+                  activeSection === 'recovery'
+                    ? 'bg-[#D4AF37]/20 text-[#FCE7AC] border border-[#D4AF37]/40 font-bold'
+                    : 'text-slate-300 hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
+                <span>Recovery Plans</span>
               </button>
               <button
                 id="nav-translator-button"

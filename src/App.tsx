@@ -103,7 +103,7 @@ export default function App() {
   const [isDisrupted, setIsDisrupted] = useState<boolean>(() => readStored('routeforge_is_disrupted', false));
   const [recoveryOptions, setRecoveryOptions] = useState<RecoveryOption[]>(() => readStored('routeforge_recovery_options', []));
   const [hoveredRecoveryOption, setHoveredRecoveryOption] = useState<RecoveryOption | null>(null);
-  const [activeRecoveryPlan, setActiveRecoveryPlan] = useState<RecoveryOption | null>(null);
+  const [activeRecoveryPlan, setActiveRecoveryPlan] = useState<RecoveryOption | null>(() => readStored('routeforge_active_recovery_plan', null));
   const [modalOptionToExecute, setModalOptionToExecute] = useState<RecoveryOption | null>(null);
   const [isInfeasibleState, setIsInfeasibleState] = useState<boolean>(false);
   const [activeScenarioId, setActiveScenarioId] = useState<string>(() => readStored('routeforge_active_scenario', 'flight_delay_90'));
@@ -132,7 +132,8 @@ export default function App() {
     localStorage.setItem('routeforge_search_params', JSON.stringify(searchParams));
     localStorage.setItem('routeforge_timeline_reset', JSON.stringify(isTimelineReset));
     localStorage.setItem('routeforge_confirmed_timeline_bookings', JSON.stringify(confirmedTimelineBookings));
-  }, [activeSection, isDisrupted, activeScenarioId, recoveryOptions, showRecoveryPlans, hasUserEnteredJourney, searchParams, isTimelineReset, confirmedTimelineBookings]);
+    localStorage.setItem('routeforge_active_recovery_plan', JSON.stringify(activeRecoveryPlan));
+  }, [activeSection, isDisrupted, activeScenarioId, recoveryOptions, showRecoveryPlans, hasUserEnteredJourney, searchParams, isTimelineReset, confirmedTimelineBookings, activeRecoveryPlan]);
 
   // Check profile upon authentication (Spec Section 1 & 2: First-time user onboarding)
   useEffect(() => {
@@ -415,7 +416,7 @@ export default function App() {
       const generated = generateRecoveryOptions(targetBooking, trip);
       setRecoveryOptions(generated);
     }
-    setShowRecoveryPlans(true);
+    setActiveSection('recovery');
     setTimeout(() => {
       document.getElementById('concierge-recovery-planner')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 150);
@@ -952,63 +953,18 @@ export default function App() {
                 onSimulateScenario={(scId) => handleSimulateDisruption(scId)}
                 onReset={handleResetTrip}
                 onOpenRecovery={handleGenerateRecoveryOptions}
-                isRecoveryOpen={showRecoveryPlans}
+                isRecoveryOpen={false}
                 onSelectBooking={(id) => setSelectedBookingId(id)}
                 activeScenarioId={activeScenarioId}
               />
             </section>
 
-            {/* PART 2: AUTONOMOUS MULTI-MODAL RECOVERY PLANS (SHOWN ONLY ON "GENERATE RECOVERY OPTIONS") */}
-            {showRecoveryPlans && (
-              <section id="concierge-recovery-planner" className="scroll-mt-28 space-y-4 animate-fadeIn">
-                <div className="flex items-center justify-between border-b border-gold-subtle/50 pb-3">
-                  <div className="flex items-center space-x-3">
-                    <span className="w-7 h-7 rounded-full bg-[#D4AF37] text-slate-950 font-cinzel font-bold text-xs flex items-center justify-center shadow-md">
-                      02
-                    </span>
-                    <div>
-                      <h3 className="text-xl sm:text-2xl font-bold font-serif-display text-white">
-                        Autonomous Multi-Modal Recovery Plans ({recoveryOptions.length > 0 ? recoveryOptions.length : 3})
-                      </h3>
-                      <p className="text-xs text-slate-400 font-sans-luxury">
-                        Compare feasible rebooking corridors with net financial impact, timing buffers, and royal comfort scores.
-                      </p>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowRecoveryPlans(false)}
-                    className="px-3 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] font-cinzel text-slate-400 hover:text-slate-200 transition-all cursor-pointer"
-                  >
-                    Hide Plans ✕
-                  </button>
-                </div>
-
-                <RecoveryPlannerSection
-                  recoveryOptions={recoveryOptions.length > 0 ? recoveryOptions : generateRecoveryOptions(trip.bookings[0], trip)}
-                  userPreferences={trip.preferences}
-                  onChangePriority={(newP) => {
-                    const up = { ...trip.preferences, priority: newP };
-                    setTrip((prev) => ({ ...prev, preferences: up }));
-                    if (isDisrupted) {
-                      setRecoveryOptions(generateRecoveryOptions(trip.bookings[0], { ...trip, preferences: up }));
-                    }
-                  }}
-                  onHoverRecoveryOption={setHoveredRecoveryOption}
-                  onSelectRecoveryOption={(opt) => setModalOptionToExecute(opt)}
-                  selectedOptionId={activeRecoveryPlan?.id}
-                  isInfeasibleState={isInfeasibleState}
-                />
-              </section>
-            )}
-
-            {/* PART 3: DETERMINISTIC REFUND & STATUTORY TDR ENGINE (WIDE & SPACIOUS) */}
+            {/* PART 2: DETERMINISTIC REFUND & STATUTORY TDR ENGINE (WIDE & SPACIOUS) */}
             <section id="concierge-refund-engine" className="scroll-mt-28 space-y-4">
               <div className="flex items-center justify-between border-b border-gold-subtle/50 pb-3">
                 <div className="flex items-center space-x-3">
                   <span className="w-7 h-7 rounded-full bg-[#D4AF37] text-slate-950 font-cinzel font-bold text-xs flex items-center justify-center shadow-md">
-                    03
+                    02
                   </span>
                   <div>
                     <h3 className="text-xl sm:text-2xl font-bold font-serif-display text-white">
@@ -1031,6 +987,77 @@ export default function App() {
           <LiveTranslatorSection
             onNavigateSection={(sec) => setActiveSection(sec as ReRouteSection)}
           />
+        )}
+
+        {/* SECTION: AUTONOMOUS RECOVERY PLANS (DEDICATED MENU DIVISION) */}
+        {activeSection === 'recovery' && (
+          <div className="space-y-8 animate-fadeIn max-w-7xl mx-auto py-2 sm:py-4">
+            {/* Dedicated Top Banner */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-[#0B0D13]/90 border border-gold-subtle backdrop-blur-xl shadow-2xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2 text-xs font-cinzel text-[#D4AF37] font-semibold tracking-wider">
+                  <Sparkles className="w-4 h-4" />
+                  <span>RE ROUTE PRIVÉ CORRIDOR RESCUE ENGINE</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-serif-display text-white">
+                  Autonomous Multi-Modal Recovery Plans
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-300 font-sans-luxury max-w-2xl font-light leading-relaxed">
+                  Real-time algorithmic rebooking corridors across domestic aviation, express rail, and palace concierge holds with 100% deterministic DGCA CAR & IRCTC statutory refund reconciliation.
+                </p>
+              </div>
+
+              {/* Status & Quick Action Buttons */}
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() => setIsReportProblemOpen(true)}
+                  className="px-4 py-2.5 rounded-full bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/80 text-xs font-cinzel font-semibold text-rose-200 hover:text-white transition-all cursor-pointer flex items-center space-x-2 shadow-lg shadow-rose-950/40"
+                >
+                  <span className="w-3.5 h-3.5 rounded-full border border-rose-400 flex items-center justify-center text-[10px] font-bold font-mono">!</span>
+                  <span>REPORT DISRUPTION</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('concierge')}
+                  className="px-4 py-2.5 rounded-full bg-slate-950/90 hover:bg-[#D4AF37]/10 border border-gold-subtle hover:border-gold-bright text-xs font-cinzel font-semibold text-slate-200 hover:text-[#FCE7AC] transition-all cursor-pointer"
+                >
+                  VIEW DISRUPTION SHIELD
+                </button>
+              </div>
+            </div>
+
+            {/* Autonomous Recovery Planner Section with exact matching selector ID */}
+            <section id="concierge-recovery-planner" className="scroll-mt-28 space-y-6">
+              <RecoveryPlannerSection
+                recoveryOptions={recoveryOptions.length > 0 ? recoveryOptions : generateRecoveryOptions(trip.bookings[0], trip)}
+                userPreferences={trip.preferences}
+                onChangePriority={(newP) => {
+                  const up = { ...trip.preferences, priority: newP };
+                  setTrip((prev) => ({ ...prev, preferences: up }));
+                  if (isDisrupted) {
+                    setRecoveryOptions(generateRecoveryOptions(trip.bookings[0], { ...trip, preferences: up }));
+                  }
+                }}
+                onHoverRecoveryOption={setHoveredRecoveryOption}
+                onSelectRecoveryOption={(opt) => setModalOptionToExecute(opt)}
+                onConfirmPlanDirectly={handleConfirmRecoveryExecution}
+                confirmedPlan={activeRecoveryPlan}
+                onResetConfirmedPlan={() => {
+                  setActiveRecoveryPlan(null);
+                  try {
+                    localStorage.removeItem('routeforge_active_recovery_plan');
+                  } catch {}
+                }}
+                onNavigateToTimeline={() => {
+                  setActiveSection('journeys');
+                  setTimeout(() => {
+                    document.getElementById('chronological-spatial-timeline')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }, 100);
+                }}
+                selectedOptionId={activeRecoveryPlan?.id}
+                isInfeasibleState={isInfeasibleState}
+              />
+            </section>
+          </div>
         )}
 
         {/* SECTION 5: MEMBERSHIP */}
@@ -1141,8 +1168,8 @@ export default function App() {
             if (tab === 'command_center') setActiveSection('journeys');
             if (tab === 'translator') setActiveSection('translator');
             if (tab === 'recovery_planner') {
-              setActiveSection('concierge');
-              handleGenerateRecoveryOptions();
+              setActiveSection('recovery');
+              setShowRecoveryPlans(true);
             }
             if (tab === 'refund_intelligence') {
               setActiveSection('concierge');

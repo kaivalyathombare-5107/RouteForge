@@ -200,10 +200,11 @@ export const ActionConfirmationModal: React.FC<ActionConfirmationModalProps> = (
                 onConfirmSuccess(option);
                 onClose();
               }}
-              className="w-full py-3.5 rounded-full font-cinzel bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-bold text-xs flex items-center justify-center space-x-2 shadow-xl cursor-pointer"
+              className="w-full py-3.5 rounded-full font-cinzel bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 shadow-xl shadow-emerald-950/50 cursor-pointer transition-all transform active:scale-98"
             >
-              <span>RETURN TO 3D LIVING GRAPH (RECOVERED)</span>
-              <ArrowRight className="w-4 h-4" />
+              <CheckCircle2 className="w-4 h-4 text-slate-950" />
+              <span>VIEW CONFIRMED RECOVERY PLAN (DETAILED)</span>
+              <ArrowRight className="w-4 h-4 text-slate-950" />
             </button>
           )}
         </div>
