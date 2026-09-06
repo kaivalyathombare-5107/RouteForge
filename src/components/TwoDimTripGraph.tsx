@@ -336,6 +336,11 @@ export const TwoDimTripGraph: React.FC<TwoDimTripGraphProps> = ({
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
 
+      if (width <= 0 || height <= 0) {
+        animationFrameId = requestAnimationFrame(render);
+        return;
+      }
+
       if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
         canvas.width = width * dpr;
         canvas.height = height * dpr;

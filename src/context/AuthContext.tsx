@@ -47,12 +47,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Remove the old persistent demo session so it cannot leak between users.
-    localStorage.removeItem(LEGACY_SESSION_STORAGE_KEY);
-
-    // 1. Check for a session-scoped demo session.
+    // 1. Check for a stored demo session (sessionStorage or localStorage)
     try {
-      const stored = sessionStorage.getItem(SESSION_STORAGE_KEY);
+      const stored = sessionStorage.getItem(SESSION_STORAGE_KEY) || localStorage.getItem(SESSION_STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed && parsed.uid) {
@@ -78,6 +75,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .then((cred) => {
         if (cred?.user) {
           localStorage.removeItem(SESSION_STORAGE_KEY);
+          sessionStorage.removeItem(SESSION_STORAGE_KEY);
           setUser(cred.user);
         }
       })
@@ -95,6 +93,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         clearTimeout(timeout);
         if (firebaseUser) {
           localStorage.removeItem(SESSION_STORAGE_KEY);
+          sessionStorage.removeItem(SESSION_STORAGE_KEY);
           setUser(firebaseUser);
         }
         setLoading(false);
@@ -154,8 +153,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
     try {
       sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(demoAccount));
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(demoAccount));
     } catch (e) {
-      console.warn("[Auth] Failed to persist demo session in localStorage", e);
+      console.warn("[Auth] Failed to persist demo session in storage", e);
     }
     setUser(demoAccount);
     return demoAccount;

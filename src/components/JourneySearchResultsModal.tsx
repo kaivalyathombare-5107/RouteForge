@@ -79,7 +79,7 @@ export const JourneySearchResultsModal: React.FC<JourneySearchResultsModalProps>
     const executeSearch = async () => {
       try {
         const idToken = user ? await user.getIdToken() : undefined;
-        const res = await searchJourneys(params, idToken);
+        const res = await searchJourneys(params, idToken, user?.uid, user?.email || undefined);
         if (isMounted) {
           if (res.success && res.plans && res.plans.length > 0) {
             setPlans(res.plans);

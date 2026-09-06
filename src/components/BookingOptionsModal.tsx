@@ -998,10 +998,24 @@ export const BookingOptionsModal: React.FC<BookingOptionsModalProps> = ({
     try {
       if (user) {
         const idToken = await user.getIdToken();
+        const rawProviderName = (chosenWebsite.name || '').toLowerCase();
+        let canonicalProvider = 'makemytrip';
+        if (rawProviderName.includes('irctc') || isTrain) {
+          canonicalProvider = 'irctc';
+        } else if (rawProviderName.includes('redbus') || isBus) {
+          canonicalProvider = 'redbus';
+        } else if (rawProviderName.includes('uber') || isUber) {
+          canonicalProvider = 'uber';
+        } else if (rawProviderName.includes('makemytrip') || activeTab === 'flight') {
+          canonicalProvider = 'makemytrip';
+        } else {
+          canonicalProvider = rawProviderName.replace(/[^a-z0-9]/g, '') || 'makemytrip';
+        }
+
         const intentRes = await createBookingIntent(
           {
             journeyId: plan.id,
-            provider: chosenWebsite.name,
+            provider: canonicalProvider,
             selectedOption: plan,
             providerReference: plan.legs[0]?.bookingReference || `PNR-${Date.now()}`,
             bookingMethod: activeOption.method,
@@ -1019,7 +1033,7 @@ export const BookingOptionsModal: React.FC<BookingOptionsModalProps> = ({
         const bookingRes = await createBooking(
           {
             intentId: intentRes.intentId,
-            provider: chosenWebsite.name,
+            provider: canonicalProvider,
             title: plan.title,
             totalPrice: activeOption.totalPayable,
             currency: plan.currency,

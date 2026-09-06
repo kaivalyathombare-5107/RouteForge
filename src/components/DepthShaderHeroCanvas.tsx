@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
 interface DepthShaderHeroCanvasProps {
@@ -20,30 +20,37 @@ export const DepthShaderHeroCanvas: React.FC<DepthShaderHeroCanvasProps> = ({
   const textureLoaderRef = useRef<THREE.TextureLoader>(new THREE.TextureLoader());
   const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
   const animFrameRef = useRef<number | null>(null);
+  const [webglFailed, setWebglFailed] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
     const container = containerRef.current;
-    const width = container.clientWidth || window.innerWidth;
-    const height = container.clientHeight || window.innerHeight;
+    const width = Math.max(1, container.clientWidth || window.innerWidth);
+    const height = Math.max(1, container.clientHeight || window.innerHeight);
 
-    // Scene & Orthographic Camera for full-screen quad
-    const scene = new THREE.Scene();
-    sceneRef.current = scene;
+    let renderer: THREE.WebGLRenderer;
+    let geometry: THREE.PlaneGeometry;
+    let material: THREE.ShaderMaterial;
+    let resizeObserver: ResizeObserver | null = null;
 
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    cameraRef.current = camera;
+    try {
+      // Scene & Orthographic Camera for full-screen quad
+      const scene = new THREE.Scene();
+      sceneRef.current = scene;
 
-    // Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      cameraRef.current = camera;
 
-    container.innerHTML = '';
-    container.appendChild(renderer.domElement);
-    rendererRef.current = renderer;
+      // Renderer with hardware fallback catch
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.1;
+
+      container.innerHTML = '';
+      container.appendChild(renderer.domElement);
+      rendererRef.current = renderer;
 
     // Vertex & Fragment Shaders for Parallax & Distortion Waves
     const vertexShader = `
@@ -139,13 +146,13 @@ export const DepthShaderHeroCanvas: React.FC<DepthShaderHeroCanvasProps> = ({
     // Resize observer
     const handleResize = () => {
       if (!containerRef.current || !rendererRef.current || !materialRef.current) return;
-      const w = containerRef.current.clientWidth || window.innerWidth;
-      const h = containerRef.current.clientHeight || window.innerHeight;
+      const w = Math.max(1, containerRef.current.clientWidth || window.innerWidth);
+      const h = Math.max(1, containerRef.current.clientHeight || window.innerHeight);
       rendererRef.current.setSize(w, h);
       materialRef.current.uniforms.uResolution.value.set(w, h);
     };
 
-    const resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver = new ResizeObserver(handleResize);
     resizeObserver.observe(container);
 
     // Animation Loop
@@ -173,19 +180,23 @@ export const DepthShaderHeroCanvas: React.FC<DepthShaderHeroCanvasProps> = ({
     };
 
     animate();
+    } catch (err) {
+      console.warn('[DepthShaderHeroCanvas] WebGL context initialization fallback:', err);
+      setWebglFailed(true);
+    }
 
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-      resizeObserver.disconnect();
-      renderer.dispose();
-      geometry.dispose();
-      material.dispose();
+      if (resizeObserver) resizeObserver.disconnect();
+      if (renderer) renderer.dispose();
+      if (geometry) geometry.dispose();
+      if (material) material.dispose();
     };
   }, []);
 
   // Update texture when imageUrl changes
   useEffect(() => {
-    if (!materialRef.current) return;
+    if (!materialRef.current || webglFailed) return;
     textureLoaderRef.current.load(imageUrl, (tex) => {
       tex.minFilter = THREE.LinearFilter;
       tex.magFilter = THREE.LinearFilter;
@@ -195,16 +206,25 @@ export const DepthShaderHeroCanvas: React.FC<DepthShaderHeroCanvasProps> = ({
         materialRef.current.needsUpdate = true;
       }
     });
-  }, [imageUrl]);
+  }, [imageUrl, webglFailed]);
 
   // Track cursor movement for interactive 3D parallax
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (reducedMotion) return;
+    if (reducedMotion || webglFailed) return;
     const x = (e.clientX / window.innerWidth) * 2 - 1;
     const y = -(e.clientY / window.innerHeight) * 2 + 1;
     mouseRef.current.targetX = x;
     mouseRef.current.targetY = y;
   };
+
+  if (webglFailed) {
+    return (
+      <div
+        className="absolute inset-0 w-full h-full bg-cover bg-center select-none"
+        style={{ backgroundImage: `url(${imageUrl})` }}
+      />
+    );
+  }
 
   return (
     <div

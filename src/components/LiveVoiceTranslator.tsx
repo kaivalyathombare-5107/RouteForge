@@ -208,6 +208,16 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
   const animationFrameRef = useRef<number | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const debounceTimerRef = useRef<any>(null);
+  const isListeningRef = useRef<boolean>(false);
+  const finalSpokenTextRef = useRef<string>('');
+
+  useEffect(() => {
+    isListeningRef.current = isListening;
+  }, [isListening]);
+
+  useEffect(() => {
+    finalSpokenTextRef.current = finalSpokenText;
+  }, [finalSpokenText]);
 
   // Check Web Speech Recognition support
   const isSpeechSupported = typeof window !== 'undefined' &&
@@ -406,12 +416,13 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
 
       recognition.onstart = () => {
         setIsListening(true);
+        isListeningRef.current = true;
         startAudioVisualizer(existingStream);
       };
 
       recognition.onresult = (event: any) => {
         let interim = '';
-        let final = finalSpokenText;
+        let final = finalSpokenTextRef.current;
 
         for (let i = event.resultIndex; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
@@ -422,7 +433,8 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
         }
 
         setInterimSpokenText(interim);
-        if (final !== finalSpokenText) {
+        if (final !== finalSpokenTextRef.current) {
+          finalSpokenTextRef.current = final;
           setFinalSpokenText(final);
           triggerDebouncedTranslation(final, sourceLang, targetLang);
         } else if (interim) {
@@ -444,15 +456,17 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
       };
 
       recognition.onend = () => {
-        if (isListening) {
+        if (isListeningRef.current) {
           try {
             recognition.start();
           } catch {
             setIsListening(false);
+            isListeningRef.current = false;
             stopAudioVisualizer();
           }
         } else {
           setIsListening(false);
+          isListeningRef.current = false;
           stopAudioVisualizer();
         }
       };
@@ -463,6 +477,7 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
       console.error('Failed to start speech recognition:', err);
       setSpeechError(`Failed to initialize microphone: ${err?.message}`);
       setIsListening(false);
+      isListeningRef.current = false;
       stopAudioVisualizer();
     }
   };
@@ -481,6 +496,7 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
 
   const stopListening = () => {
     setIsListening(false);
+    isListeningRef.current = false;
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop();

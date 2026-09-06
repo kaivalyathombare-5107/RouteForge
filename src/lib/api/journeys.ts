@@ -3,7 +3,9 @@ import { JourneySearchParams, JourneySearchResponse } from '../../types/journey'
 
 export async function searchJourneys(
   params: JourneySearchParams,
-  idToken?: string
+  idToken?: string,
+  uid?: string,
+  email?: string
 ): Promise<JourneySearchResponse> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -11,6 +13,12 @@ export async function searchJourneys(
 
   if (idToken) {
     headers['Authorization'] = `Bearer ${idToken}`;
+  }
+  if (uid) {
+    headers['x-firebase-uid'] = uid;
+  }
+  if (email) {
+    headers['x-firebase-email'] = email;
   }
 
   const res = await fetch('/api/journeys/search', {

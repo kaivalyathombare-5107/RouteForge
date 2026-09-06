@@ -27,18 +27,20 @@ export const ReRouteSignInModal: React.FC<ReRouteSignInModalProps> = ({ isOpen, 
     } catch (e: any) {
       console.error("[ReRouteSignInModal] Sign-in error:", e);
       const code = e?.code || '';
+      const domain = typeof window !== 'undefined' ? window.location.hostname : 'this domain';
+      const host = typeof window !== 'undefined' ? window.location.host : 'this app';
       if (code === 'auth/configuration-not-found' || code === 'auth/operation-not-allowed') {
         setError('Google Sign-In is not enabled yet in your Firebase Console. Please go to Firebase Console → Authentication → Sign-in method → Enable Google.');
       } else if (code === 'auth/popup-blocked') {
-        setError('Browser popup was blocked. Please allow popups for localhost:3000 in your address bar.');
+        setError(`Browser popup was blocked. Please allow popups for ${host} in your address bar or use Instant Privé VIP Access below.`);
       } else if (code === 'auth/popup-closed-by-user') {
         setError('Sign-in cancelled (Google sign-in popup was closed before completing).');
       } else if (code === 'auth/unauthorized-domain') {
-        setError('This domain is not authorized in Firebase Console → Authentication → Settings → Authorized domains.');
+        setError(`This domain (${domain}) is not authorized in Firebase Console → Authentication → Settings → Authorized domains. Click "Instant Privé VIP Access" below to proceed immediately.`);
       } else if (code === 'auth/invalid-api-key') {
-        setError('Firebase API key is unconfigured or invalid in .env. Click "Instant VIP Demo Access" below to continue.');
+        setError('Firebase API key is unconfigured or invalid in .env. Click "Instant Privé VIP Access" below to continue.');
       } else {
-        setError(e?.message || 'Sign-in window could not be opened. Click "Instant VIP Demo Access" below to proceed.');
+        setError(e?.message || 'Sign-in window could not be opened. Click "Instant Privé VIP Access" below to proceed.');
       }
     } finally {
       setSigningIn(false);

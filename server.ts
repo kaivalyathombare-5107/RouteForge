@@ -188,8 +188,14 @@ app.post('/api/bookings/intent', (req, res) => {
     }
 
     // Resolve adapter deep-link if official deep-link is supported
+    let normalizedProvider = (provider || '').toLowerCase().trim();
+    if (normalizedProvider.includes('irctc')) normalizedProvider = 'irctc';
+    else if (normalizedProvider.includes('makemytrip')) normalizedProvider = 'makemytrip';
+    else if (normalizedProvider.includes('redbus')) normalizedProvider = 'redbus';
+    else if (normalizedProvider.includes('uber')) normalizedProvider = 'uber';
+
     let deepLinkUrl: string | undefined = undefined;
-    const adapter = providerAdaptersMap[provider.toLowerCase()];
+    const adapter = providerAdaptersMap[normalizedProvider] || providerAdaptersMap['custom'];
     if (adapter?.generateDeepLink) {
       deepLinkUrl = adapter.generateDeepLink(requestedParameters || {});
     }
@@ -197,7 +203,7 @@ app.post('/api/bookings/intent', (req, res) => {
     const intent = BookingIntentStore.createIntent({
       userId: uid,
       journeyId,
-      provider: provider.toLowerCase(),
+      provider: normalizedProvider,
       selectedOption,
       providerReference: providerReference || selectedOption.id || selectedOption.serviceNumber,
       bookingMethod: bookingMethod || 'OFFICIAL_PARTNER',
@@ -384,7 +390,17 @@ app.post('/api/bookings/:id/cancel', async (req, res) => {
     const reason = req.body?.reason || 'Passenger voluntary cancellation';
 
     // 1. Invoke Provider Cancellation
-    const adapter = providerAdaptersMap[booking.provider] as any;
+    let adapterKey = (booking.provider || '').toLowerCase();
+    if (adapterKey.includes('irctc')) adapterKey = 'irctc';
+    else if (adapterKey.includes('makemytrip') || adapterKey.includes('air india') || adapterKey.includes('carrier')) adapterKey = 'makemytrip';
+    else if (adapterKey.includes('redbus')) adapterKey = 'redbus';
+    else if (adapterKey.includes('uber')) adapterKey = 'uber';
+    else if (adapterKey.includes('ola')) adapterKey = 'ola';
+    else if (adapterKey.includes('rapido')) adapterKey = 'rapido';
+    else if (adapterKey.includes('ixigo')) adapterKey = 'ixigo';
+    else if (adapterKey.includes('goibibo')) adapterKey = 'goibibo';
+
+    const adapter = providerAdaptersMap[adapterKey] as any;
     let providerCancellationResult: any = null;
     if (adapter && typeof adapter.cancel === 'function') {
       try {
@@ -435,6 +451,9 @@ app.post('/api/bookings/:id/cancel', async (req, res) => {
     });
 
     // 4. Create statutory refund case in RefundStore
+    const providerRefund = providerCancellationResult?.refundAmount ?? providerCancellationResult?.data?.eligibleRefund ?? 0;
+    const computedActualRefund = providerRefund || (isCarrierFault ? refundAmount : 0);
+
     const refundCase = RefundStore.createRefundCase({
       userId: uid,
       bookingId: booking.id,
@@ -443,8 +462,8 @@ app.post('/api/bookings/:id/cancel', async (req, res) => {
       providerReference: booking.bookingReference,
       originalAmount: booking.totalPrice,
       expectedRefund: refundAmount,
-      actualRefund: providerCancellationResult?.refundAmount || (isCarrierFault ? refundAmount : 0),
-      status: (providerCancellationResult?.refundAmount || isCarrierFault) ? 'PROCESSING' : 'REQUESTED',
+      actualRefund: computedActualRefund,
+      status: (computedActualRefund > 0 || isCarrierFault) ? 'PROCESSING' : 'REQUESTED',
       reason,
       ruleId,
       policyVersion: policyCitation,
@@ -1532,6 +1551,26 @@ Respond STRICTLY with valid JSON:
       targetLanguage: req.body?.targetLanguage || 'en',
     });
   }
+});
+
+// Explicit 404 Catch-All for API endpoints to prevent HTML SPA fallback for API queries
+app.all('/api/*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    error: `API route ${req.method} ${req.path} not found`,
+  });
+});
+
+// Express global error handler
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('[API Uncaught Error]', err);
+  if (res.headersSent) {
+    return next(err);
+  }
+  res.status(typeof err.status === 'number' ? err.status : 500).json({
+    success: false,
+    error: err.message || 'Internal Server Error',
+  });
 });
 
 // Vite middleware & Static serving

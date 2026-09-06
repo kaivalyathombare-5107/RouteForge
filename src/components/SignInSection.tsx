@@ -87,12 +87,13 @@ export const SignInSection: React.FC<SignInSectionProps> = ({
     } catch (e: any) {
       console.error('[SignInSection] Google sign-in error:', e);
       const code = e?.code || '';
+      const domain = typeof window !== 'undefined' ? window.location.hostname : 'this domain';
       if (code === 'auth/popup-blocked') {
         setError('Browser popup was blocked. Please enable popups or use Instant Privé VIP Access below.');
       } else if (code === 'auth/popup-closed-by-user') {
-        setError('Sign-in cancelled. Please click below to try again.');
+        setError('Sign-in cancelled. Please click below to try again or use Instant Privé VIP Access.');
       } else if (code === 'auth/unauthorized-domain') {
-        setError('This app URL is not authorized in Firebase. Add localhost to Firebase Console → Authentication → Settings → Authorized domains, then reload this page.');
+        setError(`This app domain (${domain}) is not authorized in Firebase Console. Add "${domain}" in Firebase Console → Authentication → Settings → Authorized domains, or click "Bypass with Instant VIP Access" below.`);
       } else {
         setError(e?.message || 'Google sign-in window could not be opened. You can use Instant Privé VIP Access below.');
       }
@@ -165,18 +166,31 @@ export const SignInSection: React.FC<SignInSectionProps> = ({
           </p>
         </div>
 
-        {/* Error Alert Display */}
+        {/* Error Alert Display with Instant Bypass Option */}
         {error && (
-          <div className="relative z-10 mb-5 p-3.5 rounded-2xl bg-red-950/60 border border-red-500/50 flex items-start space-x-3">
-            <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-            <div className="space-y-0.5 text-xs font-sans-luxury">
-              <p className="font-semibold text-red-200">Authentication Alert</p>
-              <p className="text-red-300">{error}</p>
+          <div className="relative z-10 mb-5 p-3.5 rounded-2xl bg-red-950/60 border border-red-500/50 space-y-3">
+            <div className="flex items-start space-x-3">
+              <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+              <div className="space-y-0.5 text-xs font-sans-luxury">
+                <p className="font-semibold text-red-200">Authentication Alert</p>
+                <p className="text-red-300 leading-relaxed">{error}</p>
+              </div>
+            </div>
+            <div className="pl-7 pt-1">
+              <button
+                type="button"
+                onClick={handleDemoSignIn}
+                disabled={signingIn}
+                className="px-4 py-2 rounded-xl bg-red-900/70 hover:bg-red-800 border border-red-400/60 text-xs font-cinzel font-bold text-white flex items-center space-x-2 transition-all cursor-pointer shadow-md hover:scale-[1.02]"
+              >
+                <Crown className="w-3.5 h-3.5 text-[#FCE7AC]" />
+                <span>Bypass with Instant VIP Access</span>
+              </button>
             </div>
           </div>
         )}
 
-        {/* Authentication Action Container - Clean Single Action without Demo Button */}
+        {/* Authentication Action Container */}
         <div className="relative z-10 max-w-sm mx-auto space-y-3 mb-6">
           <button
             type="button"
@@ -188,8 +202,18 @@ export const SignInSection: React.FC<SignInSectionProps> = ({
             <span>{signingIn ? 'CONNECTING TO GOOGLE...' : 'SIGN IN WITH GOOGLE'}</span>
           </button>
 
+          <button
+            type="button"
+            onClick={handleDemoSignIn}
+            disabled={signingIn}
+            className="w-full py-3 rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 border border-gold-subtle/60 hover:border-[#D4AF37] text-[#D4AF37] hover:text-[#FCE7AC] font-cinzel text-[11px] sm:text-xs font-semibold tracking-[0.18em] transition-all flex items-center justify-center space-x-2 shadow-lg cursor-pointer"
+          >
+            <Crown className="w-3.5 h-3.5" />
+            <span>INSTANT PRIVÉ VIP ACCESS (KAIVALYA THOMBARE)</span>
+          </button>
+
           <p className="text-[10px] text-center text-slate-400 font-sans-luxury">
-            Secure Google authentication grants instant access to your RouteForge travel vault.
+            Secure Google authentication or Instant Privé VIP Access grants immediate entry to your travel vault.
           </p>
         </div>
 

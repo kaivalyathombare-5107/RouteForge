@@ -92,6 +92,7 @@ export const PanoramicSuiteViewer: React.FC<PanoramicSuiteViewerProps> = ({ soun
   const [timeOfDay, setTimeOfDay] = useState<'sunset' | 'day' | 'night'>('sunset');
   const [fovZoom, setFovZoom] = useState<number>(75);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [webglFailed, setWebglFailed] = useState<boolean>(false);
 
   const activeSuite = LUXURY_SUITES[activeSuiteIndex];
 
@@ -242,64 +243,76 @@ export const PanoramicSuiteViewer: React.FC<PanoramicSuiteViewerProps> = ({ soun
   useEffect(() => {
     if (!containerRef.current) return;
     const container = containerRef.current;
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+    const width = Math.max(1, container.clientWidth || window.innerWidth);
+    const height = Math.max(1, container.clientHeight || window.innerHeight);
 
-    const scene = new THREE.Scene();
-    sceneRef.current = scene;
+    let renderer: THREE.WebGLRenderer | null = null;
+    let geometry: THREE.SphereGeometry | null = null;
+    let material: THREE.MeshBasicMaterial | null = null;
+    let texture: THREE.CanvasTexture | null = null;
 
-    const camera = new THREE.PerspectiveCamera(fovZoom, width / height, 0.1, 1000);
-    camera.position.set(0, 0, 0.1);
-    cameraRef.current = camera;
+    try {
+      const scene = new THREE.Scene();
+      sceneRef.current = scene;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
-    container.innerHTML = '';
-    container.appendChild(renderer.domElement);
-    rendererRef.current = renderer;
+      const camera = new THREE.PerspectiveCamera(fovZoom, width / height, 0.1, 1000);
+      camera.position.set(0, 0, 0.1);
+      cameraRef.current = camera;
 
-    // Sphere geometry with inverted normals for inside-out 360 panoramic mapping
-    const geometry = new THREE.SphereGeometry(500, 60, 40);
-    geometry.scale(-1, 1, 1);
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.1;
+      container.innerHTML = '';
+      container.appendChild(renderer.domElement);
+      rendererRef.current = renderer;
 
-    const texture = generateProceduralEquirectangular(activeSuite.decorTone, timeOfDay);
-    const material = new THREE.MeshBasicMaterial({ map: texture });
-    const sphereMesh = new THREE.Mesh(geometry, material);
-    scene.add(sphereMesh);
-    sphereMeshRef.current = sphereMesh;
+      // Sphere geometry with inverted normals for inside-out 360 panoramic mapping
+      geometry = new THREE.SphereGeometry(500, 60, 40);
+      geometry.scale(-1, 1, 1);
 
-    // Animation Loop
-    const animate = () => {
-      animFrameIdRef.current = requestAnimationFrame(animate);
+      texture = generateProceduralEquirectangular(activeSuite.decorTone, timeOfDay);
+      material = new THREE.MeshBasicMaterial({ map: texture });
+      const sphereMesh = new THREE.Mesh(geometry, material);
+      scene.add(sphereMesh);
+      sphereMeshRef.current = sphereMesh;
 
-      if (isAutoRotating && !isPointerDownRef.current) {
-        lonRef.current += 0.06;
-      }
+      // Animation Loop
+      const animate = () => {
+        animFrameIdRef.current = requestAnimationFrame(animate);
 
-      latRef.current = Math.max(-85, Math.min(85, latRef.current));
-      phiRef.current = THREE.MathUtils.degToRad(90 - latRef.current);
-      thetaRef.current = THREE.MathUtils.degToRad(lonRef.current);
+        if (isAutoRotating && !isPointerDownRef.current) {
+          lonRef.current += 0.06;
+        }
 
-      const targetX = 500 * Math.sin(phiRef.current) * Math.cos(thetaRef.current);
-      const targetY = 500 * Math.cos(phiRef.current);
-      const targetZ = 500 * Math.sin(phiRef.current) * Math.sin(thetaRef.current);
+        latRef.current = Math.max(-85, Math.min(85, latRef.current));
+        phiRef.current = THREE.MathUtils.degToRad(90 - latRef.current);
+        thetaRef.current = THREE.MathUtils.degToRad(lonRef.current);
 
-      camera.lookAt(targetX, targetY, targetZ);
-      renderer.render(scene, camera);
-    };
+        const targetX = 500 * Math.sin(phiRef.current) * Math.cos(thetaRef.current);
+        const targetY = 500 * Math.cos(phiRef.current);
+        const targetZ = 500 * Math.sin(phiRef.current) * Math.sin(thetaRef.current);
 
-    animate();
+        camera.lookAt(targetX, targetY, targetZ);
+        if (rendererRef.current && sceneRef.current) {
+          rendererRef.current.render(sceneRef.current, camera);
+        }
+      };
+
+      animate();
+    } catch (err) {
+      console.warn('[PanoramicSuiteViewer] WebGL initialization fallback:', err);
+      setWebglFailed(true);
+    }
 
     const handleResize = () => {
-      if (!containerRef.current || !renderer || !camera) return;
-      const w = containerRef.current.clientWidth;
-      const h = containerRef.current.clientHeight;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
+      if (!containerRef.current || !rendererRef.current || !cameraRef.current) return;
+      const w = Math.max(1, containerRef.current.clientWidth || window.innerWidth);
+      const h = Math.max(1, containerRef.current.clientHeight || window.innerHeight);
+      cameraRef.current.aspect = w / h;
+      cameraRef.current.updateProjectionMatrix();
+      rendererRef.current.setSize(w, h);
     };
 
     window.addEventListener('resize', handleResize);
@@ -307,10 +320,10 @@ export const PanoramicSuiteViewer: React.FC<PanoramicSuiteViewerProps> = ({ soun
     return () => {
       window.removeEventListener('resize', handleResize);
       if (animFrameIdRef.current) cancelAnimationFrame(animFrameIdRef.current);
-      geometry.dispose();
-      material.dispose();
-      texture.dispose();
-      renderer.dispose();
+      if (geometry) geometry.dispose();
+      if (material) material.dispose();
+      if (texture) texture.dispose();
+      if (renderer) renderer.dispose();
     };
   }, [activeSuiteIndex, timeOfDay]);
 
@@ -398,6 +411,17 @@ export const PanoramicSuiteViewer: React.FC<PanoramicSuiteViewerProps> = ({ soun
           onPointerUp={handlePointerUp}
           className="w-full h-full"
         />
+
+        {webglFailed && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-gradient-to-b from-slate-900 to-black z-20">
+            <Bed className="w-12 h-12 text-[#D4AF37] mb-3 opacity-80" />
+            <h3 className="text-lg font-cinzel font-bold text-white mb-1">{activeSuite.name}</h3>
+            <p className="text-xs text-slate-400 max-w-md font-sans-luxury">{activeSuite.description}</p>
+            <span className="mt-3 text-[11px] font-mono text-[#E5C07B] bg-slate-950/80 px-3 py-1 rounded border border-gold-subtle">
+              360° Hardware acceleration unavailable • Direct Suite Preview Mode
+            </span>
+          </div>
+        )}
 
         {/* Overlay Vignette */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/40" />
