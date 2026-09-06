@@ -69,8 +69,18 @@ export const ActionConfirmationModal: React.FC<ActionConfirmationModalProps> = (
   if (!isOpen || !option) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
-      <div className="relative w-full max-w-2xl p-6 sm:p-8 rounded-3xl bg-[#0B0D13] border border-gold-bright shadow-2xl space-y-6 text-slate-100 font-sans-luxury">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md"
+      onClick={(e) => {
+        if (!isExecuting && e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-2xl p-6 sm:p-8 rounded-3xl bg-[#0B0D13] border border-gold-bright shadow-2xl space-y-6 text-slate-100 font-sans-luxury"
+      >
         {/* Close Button */}
         {!isExecuting && (
           <button

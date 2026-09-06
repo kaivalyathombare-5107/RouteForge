@@ -138,16 +138,16 @@ export const Navigation: React.FC<NavigationProps> = ({
           </button>
 
           <button
-            id="nav-tab-ai-copilot"
+            id="nav-tab-travel-concierge"
             onClick={() => setActiveTab('ai_assistant')}
             className={`px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer ${
               activeTab === 'ai_assistant'
-                ? 'bg-purple-950/50 text-purple-300 border border-purple-500/40 shadow-sm font-bold'
+                ? 'bg-amber-950/50 text-[#FCE7AC] border border-[#D4AF37]/50 shadow-sm font-bold'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            <Bot className="w-3.5 h-3.5 text-purple-400" />
-            <span>AI Copilot</span>
+            <Compass className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <span>Travel Concierge</span>
           </button>
         </nav>
 
@@ -239,9 +239,9 @@ export const Navigation: React.FC<NavigationProps> = ({
         </button>
         <button
           onClick={() => setActiveTab('ai_assistant')}
-          className={`px-2.5 py-1 rounded-lg shrink-0 ${activeTab === 'ai_assistant' ? 'bg-purple-900 text-purple-100 font-bold' : 'text-slate-400'}`}
+          className={`px-2.5 py-1 rounded-lg shrink-0 ${activeTab === 'ai_assistant' ? 'bg-amber-900 text-amber-100 font-bold' : 'text-slate-400'}`}
         >
-          AI Concierge
+          Travel Concierge
         </button>
       </div>
     </header>

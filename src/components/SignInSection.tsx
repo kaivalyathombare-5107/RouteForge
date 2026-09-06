@@ -114,9 +114,19 @@ export const SignInSection: React.FC<SignInSectionProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-fadeIn">
+    <div 
+      className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-fadeIn"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onNavigateBack();
+        }
+      }}
+    >
       {/* Pop-up Window Container */}
-      <div className="relative w-full max-w-2xl rounded-3xl bg-[#0B0D13] border border-gold-bright shadow-2xl p-6 sm:p-8 overflow-hidden my-auto max-h-[92vh] overflow-y-auto">
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-2xl rounded-3xl bg-[#0B0D13] border border-gold-bright shadow-2xl p-6 sm:p-8 overflow-hidden my-auto max-h-[92vh] overflow-y-auto"
+      >
         {/* Close Button */}
         <button
           type="button"
@@ -223,9 +233,9 @@ export const SignInSection: React.FC<SignInSectionProps> = ({
             <div className="p-3 rounded-xl bg-[#121520]/80 border border-gold-subtle/60 flex items-start space-x-2.5">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 mt-0.5" />
               <div className="space-y-0.5">
-                <div className="text-[11px] font-semibold text-white">24/7 AI Disruption Concierge</div>
+                <div className="text-[11px] font-semibold text-white">24/7 Dedicated Travel Concierge</div>
                 <p className="text-[10px] text-slate-400 font-sans-luxury leading-snug">
-                  Personalized travel intelligence and dedicated multilingual assistance throughout your journey.
+                  Personalized travel stewardship and dedicated multilingual ground support throughout your journey.
                 </p>
               </div>
             </div>

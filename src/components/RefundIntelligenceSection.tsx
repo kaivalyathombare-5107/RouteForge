@@ -190,9 +190,9 @@ export const RefundIntelligenceSection: React.FC<RefundIntelligenceSectionProps>
                   {c.deterministicReason}
                 </div>
 
-                {/* Grounded AI Explanation */}
+                {/* Expert Regulatory Guidance */}
                 <div className="text-xs p-3 rounded-2xl bg-slate-950/40 border border-gold-subtle/20 text-slate-300 font-sans-luxury">
-                  <span className="text-[#FCE7AC] font-cinzel font-semibold text-[11px] block mb-0.5">AI REGULATORY CONTEXT:</span>
+                  <span className="text-[#FCE7AC] font-cinzel font-semibold text-[11px] block mb-0.5">STATUTORY ADVISORY BRIEFING:</span>
                   {c.aiExplanation}
                 </div>
               </div>

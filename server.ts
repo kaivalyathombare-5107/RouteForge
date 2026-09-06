@@ -669,6 +669,77 @@ function getGeminiClient(): GoogleGenAI | null {
   return aiClient;
 }
 
+// Groq API Key retrieval & client helper for lightning-fast fallback LLM reasoning
+function getGroqApiKey(req?: express.Request): string | undefined {
+  const headerKey = req?.headers?.['x-groq-api-key'] as string;
+  const bodyKey = req?.body?.groqApiKey;
+  const envKey = process.env.GROQ_API_KEY;
+  const key = headerKey || bodyKey || envKey;
+  return key && key.trim().length > 0 ? key.trim() : undefined;
+}
+
+interface GroqChatOptions {
+  apiKey?: string;
+  responseFormatJson?: boolean;
+  model?: string;
+  temperature?: number;
+}
+
+async function callGroqChat(
+  messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>,
+  options?: GroqChatOptions
+): Promise<{ text: string; model: string } | null> {
+  const apiKey = options?.apiKey || process.env.GROQ_API_KEY;
+  if (!apiKey || !apiKey.trim()) return null;
+
+  // Primary model with automatic fallback to high-throughput instant model
+  const candidateModels = [
+    options?.model || 'llama-3.3-70b-versatile',
+    'llama-3.1-8b-instant',
+    'mixtral-8x7b-32768',
+  ];
+
+  for (const model of candidateModels) {
+    try {
+      const payload: any = {
+        model,
+        messages,
+        temperature: options?.temperature ?? 0.1,
+      };
+
+      if (options?.responseFormatJson) {
+        payload.response_format = { type: 'json_object' };
+      }
+
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey.trim()}`,
+          'Content-Type': 'application/json',
+          'User-Agent': 'RouteForge-Travel-Concierge/1.0',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text().catch(() => '');
+        console.warn(`[Groq Fallback] Model ${model} returned HTTP ${res.status}:`, errorText);
+        continue;
+      }
+
+      const data = (await res.json()) as any;
+      const content = data?.choices?.[0]?.message?.content;
+      if (content && typeof content === 'string' && content.trim()) {
+        return { text: content.trim(), model };
+      }
+    } catch (err: any) {
+      console.warn(`[Groq Fallback] Request with model ${model} failed:`, err?.message);
+    }
+  }
+
+  return null;
+}
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({
@@ -677,6 +748,30 @@ app.get('/api/health', (req, res) => {
     version: '3.0.0-celestial',
     timestamp: new Date().toISOString(),
     geminiConfigured: !!process.env.GEMINI_API_KEY,
+    groqConfigured: !!process.env.GROQ_API_KEY,
+  });
+});
+
+// AI Provider Status Endpoint
+app.get('/api/ai/status', (req, res) => {
+  const customGroqKey = getGroqApiKey(req);
+  res.json({
+    success: true,
+    gemini: {
+      configured: !!process.env.GEMINI_API_KEY,
+      role: 'primary',
+      model: 'gemini-3.1-flash-lite',
+    },
+    groq: {
+      configured: !!customGroqKey,
+      role: 'fallback',
+      models: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'],
+    },
+    offlineEngine: {
+      configured: true,
+      role: 'emergency_fallback',
+      provider: 'High-Speed Multilingual Engine & Travel Lexicon',
+    },
   });
 });
 
@@ -908,22 +1003,11 @@ app.post('/api/refund/calculate', (req, res) => {
   }
 });
 
-// AI Explanation & Disruption Analysis Endpoint (Powered by Gemini)
+// AI Explanation & Disruption Analysis Endpoint (Powered by Gemini with Groq fallback)
 app.post('/api/gemini/explain', async (req, res) => {
   try {
     const { trip, disruptedBooking, affectedBookings, recoveryOptions, refundCases } = req.body;
     const ai = getGeminiClient();
-
-    if (!ai) {
-      // Fallback deterministic structured explanation if API key is not yet set
-      return res.json({
-        success: true,
-        source: 'DETERMINISTIC_FALLBACK',
-        explanation: `Flight ${disruptedBooking?.providerCode || '6E-204'} was cancelled by the carrier. Because the Delhi-Jaipur Train (12952) departs at 13:00 with only an 80-minute transfer window, the connection is physically broken. Downstream, your ITC Rajputana hotel check-in is at risk of no-show, and the 20:00 HackCelestial Keynote cannot be reached without executing an immediate re-routing plan.`,
-        recoverySummary: 'Option A (Fastest) replaces the flight with Air India AI-864 arriving at 12:20 IST, safely preserving your train connection with a 40-minute metro transfer.',
-        refundAdvice: 'Under DGCA Civil Aviation Charter Section 3, you are entitled to a 100% full refund of ₹5,200 from IndiGo. Indian Railways will issue a 100% refund for Train 12952 upon online TDR submission citing connecting carrier failure.',
-      });
-    }
 
     const systemPrompt = `You are JOURNEY//X AI, an expert aviation & multimodal travel recovery intelligence engine.
 CRITICAL SAFETY RULES:
@@ -943,19 +1027,55 @@ Provide a concise 3-part briefing:
 2. Recommended Recovery Strategy: Why the top ranked option is best.
 3. Refund & Legal Protection: Clear statement of DGCA/IRCTC rules protecting the passenger.`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-flash-latest',
-      contents: prompt,
-      config: {
-        systemInstruction: systemPrompt,
-        temperature: 0.2,
-      },
-    });
+    // 1. Primary: Gemini Reasoning
+    if (ai) {
+      try {
+        const response = await ai.models.generateContent({
+          model: 'gemini-3.1-flash-lite',
+          contents: prompt,
+          config: {
+            systemInstruction: systemPrompt,
+            temperature: 0.2,
+          },
+        });
 
+        if (response.text) {
+          return res.json({
+            success: true,
+            source: 'GEMINI_AI_REASONING',
+            explanation: response.text,
+          });
+        }
+      } catch (geminiErr: any) {
+        console.warn('[Explain] Gemini reasoning failed, trying Groq fallback:', geminiErr?.message);
+      }
+    }
+
+    // 2. High-throughput Fallback: Groq AI (Llama-3.3-70b / Llama-3.1-8b)
+    const groqKey = getGroqApiKey(req);
+    if (groqKey) {
+      const groqResult = await callGroqChat([
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: prompt },
+      ], { apiKey: groqKey, temperature: 0.2 });
+
+      if (groqResult?.text) {
+        return res.json({
+          success: true,
+          source: 'GROQ_AI_FALLBACK',
+          model: groqResult.model,
+          explanation: groqResult.text,
+        });
+      }
+    }
+
+    // 3. Deterministic Structured Fallback
     res.json({
       success: true,
-      source: 'GEMINI_AI_REASONING',
-      explanation: response.text || 'Analysis complete.',
+      source: 'DETERMINISTIC_FALLBACK',
+      explanation: `Flight ${disruptedBooking?.providerCode || '6E-204'} was cancelled by the carrier. Because the Delhi-Jaipur Train (12952) departs at 13:00 with only an 80-minute transfer window, the connection is physically broken. Downstream, your ITC Rajputana hotel check-in is at risk of no-show, and the 20:00 HackCelestial Keynote cannot be reached without executing an immediate re-routing plan.`,
+      recoverySummary: 'Option A (Fastest) replaces the flight with Air India AI-864 arriving at 12:20 IST, safely preserving your train connection with a 40-minute metro transfer.',
+      refundAdvice: 'Under DGCA Civil Aviation Charter Section 3, you are entitled to a 100% full refund of ₹5,200 from IndiGo. Indian Railways will issue a 100% refund for Train 12952 upon online TDR submission citing connecting carrier failure.',
     });
   } catch (error: any) {
     console.error('Gemini explanation error:', error);
@@ -967,35 +1087,11 @@ Provide a concise 3-part briefing:
   }
 });
 
-// Grounded Contextual AI Assistant Chat Endpoint
+// Grounded Contextual AI Assistant Chat Endpoint (Gemini with Groq fallback)
 app.post('/api/gemini/assist', async (req, res) => {
   try {
     const { message, tripContext } = req.body;
     const ai = getGeminiClient();
-
-    if (!ai) {
-      // Intelligent rule-based contextual responses if Gemini key is pending
-      const lower = (message || '').toLowerCase();
-      let reply = "I'm monitoring your trip graph in real-time. All 4 bookings and 3 dependency edges are actively tracked.";
-      let suggestedActions = ['SHOW RECOVERY OPTIONS', 'CHECK REFUND BREAKDOWN', 'EXPLAIN IMPACT'];
-
-      if (lower.includes('hotel') || lower.includes('what happens')) {
-        reply = "Your ITC Rajputana booking remains valid, but your current missed train will delay arrival past the 18:15 check-in window. I have generated 3 recovery options that either preserve check-in or send an automated late-arrival hold to the front desk.";
-      } else if (lower.includes('refund') || lower.includes('money') || lower.includes('tdr') || lower.includes('cost')) {
-        reply = "Under DGCA Section 3 and IRCTC Rule 73A, you are eligible for ₹7,060 in total refunds (₹5,200 full flight refund + ₹1,860 train refund via TDR).";
-        suggestedActions = ['VIEW REFUND CENTER', 'AUTO-FILE TDR', 'APPLY TO RECOVERY'];
-      } else if (lower.includes('option') || lower.includes('fast') || lower.includes('recover')) {
-        reply = "Option A (Fastest) switches to Air India AI-864, arriving at 12:20 IST. It completely preserves your downstream train and hotel schedule with a net ₹400 refund surplus.";
-        suggestedActions = ['CONFIRM OPTION A', 'COMPARE ALL 3 OPTIONS', '3D GRAPH PREVIEW'];
-      }
-
-      return res.json({
-        success: true,
-        source: 'STRUCTURED_CONTEXTUAL_ASSISTANT',
-        reply,
-        suggestedActions,
-      });
-    }
 
     const systemPrompt = `You are JOURNEY//X Copilot, a high-precision travel recovery assistant.
 Canonical Data:
@@ -1013,20 +1109,70 @@ RULES:
 - Never invent prices, availability, or policies.
 - Always offer concrete next action buttons.`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-flash-latest',
-      contents: message,
-      config: {
-        systemInstruction: systemPrompt,
-        temperature: 0.3,
-      },
-    });
+    // 1. Primary: Gemini Assistant
+    if (ai) {
+      try {
+        const response = await ai.models.generateContent({
+          model: 'gemini-3.1-flash-lite',
+          contents: message,
+          config: {
+            systemInstruction: systemPrompt,
+            temperature: 0.3,
+          },
+        });
 
-    res.json({
+        if (response.text) {
+          return res.json({
+            success: true,
+            source: 'GEMINI_AI_CHAT',
+            reply: response.text,
+            suggestedActions: ['SHOW OPTIONS', 'CHECK REFUND', 'EXPLAIN IMPACT'],
+          });
+        }
+      } catch (geminiErr: any) {
+        console.warn('[Assist] Gemini chat failed, trying Groq fallback:', geminiErr?.message);
+      }
+    }
+
+    // 2. High-speed Fallback: Groq AI (Llama-3.3-70b / Llama-3.1-8b)
+    const groqKey = getGroqApiKey(req);
+    if (groqKey) {
+      const groqResult = await callGroqChat([
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: message },
+      ], { apiKey: groqKey, temperature: 0.3 });
+
+      if (groqResult?.text) {
+        return res.json({
+          success: true,
+          source: 'GROQ_AI_FALLBACK',
+          model: groqResult.model,
+          reply: groqResult.text,
+          suggestedActions: ['SHOW OPTIONS', 'CHECK REFUND', 'EXPLAIN IMPACT'],
+        });
+      }
+    }
+
+    // 3. Intelligent rule-based contextual responses if both LLMs are offline
+    const lower = (message || '').toLowerCase();
+    let reply = "I'm monitoring your trip graph in real-time. All 4 bookings and 3 dependency edges are actively tracked.";
+    let suggestedActions = ['SHOW RECOVERY OPTIONS', 'CHECK REFUND BREAKDOWN', 'EXPLAIN IMPACT'];
+
+    if (lower.includes('hotel') || lower.includes('what happens')) {
+      reply = "Your ITC Rajputana booking remains valid, but your current missed train will delay arrival past the 18:15 check-in window. I have generated 3 recovery options that either preserve check-in or send an automated late-arrival hold to the front desk.";
+    } else if (lower.includes('refund') || lower.includes('money') || lower.includes('tdr') || lower.includes('cost')) {
+      reply = "Under DGCA Section 3 and IRCTC Rule 73A, you are eligible for ₹7,060 in total refunds (₹5,200 full flight refund + ₹1,860 train refund via TDR).";
+      suggestedActions = ['VIEW REFUND CENTER', 'AUTO-FILE TDR', 'APPLY TO RECOVERY'];
+    } else if (lower.includes('option') || lower.includes('fast') || lower.includes('recover')) {
+      reply = "Option A (Fastest) switches to Air India AI-864, arriving at 12:20 IST. It completely preserves your downstream train and hotel schedule with a net ₹400 refund surplus.";
+      suggestedActions = ['CONFIRM OPTION A', 'COMPARE ALL 3 OPTIONS', '3D GRAPH PREVIEW'];
+    }
+
+    return res.json({
       success: true,
-      source: 'GEMINI_AI_CHAT',
-      reply: response.text || 'Here is what you need to know about your journey.',
-      suggestedActions: ['SHOW OPTIONS', 'CHECK REFUND', 'EXPLAIN IMPACT'],
+      source: 'STRUCTURED_CONTEXTUAL_ASSISTANT',
+      reply,
+      suggestedActions,
     });
   } catch (error: any) {
     console.error('AI assistant error:', error);
@@ -1043,9 +1189,18 @@ RULES:
 const DICTIONARY_MAP: Record<string, Record<string, string>> = {
   'hi-en': {
     'नमस्ते': 'Hello',
+    'होटल ताज कहाँ है': 'Where is the Taj Hotel?',
+    'ताज होटल कहाँ है': 'Where is the Taj Hotel?',
+    'होटल कहाँ है': 'Where is the hotel?',
+    'होटल': 'Hotel',
+    'टैक्सी': 'Taxi',
+    'हवाई अड्डा': 'Airport',
+    'रेलवे स्टेशन': 'Railway Station',
     'मेरी ट्रेन लेट हो गई है': 'My train is delayed',
     'मेरी ट्रेन लेट है': 'My train is running late',
+    'मेरी ट्रेन 12952 लेट हो गई है, क्या मुझे पूरा रिफंड मिलेगा?': 'My train 12952 is delayed, will I receive a full refund?',
     'मेरी फ्लाइट कैंसिल हो गई है': 'My flight has been cancelled',
+    'मेरी इंडिगो फ्लाइट रद्द हो गई है, उदयपुर पहुंचने के लिए नया विकल्प क्या है?': 'My IndiGo flight is cancelled, what is the new recovery option to reach Udaipur?',
     'मेरी फ्लाइट रद्द हो गई है': 'My flight has been cancelled',
     'क्या मुझे रिफंड मिलेगा': 'Will I receive a statutory refund?',
     'रिफंड कैसे मिलेगा': 'How will I receive the refund under IRCTC Rule 73A?',
@@ -1053,47 +1208,112 @@ const DICTIONARY_MAP: Record<string, Record<string, string>> = {
     'मुझे कार या टैक्सी चाहिए': 'I need a royal chauffeur or transfer car',
     'एयरपोर्ट ट्रांसफर कहां है': 'Where is the airport transfer arranged?',
     'उदयपुर पैलेस का रास्ता क्या है': 'What is the fastest route to Udaipur Palace?',
-    'मेरी मदद कीजिए': 'Please assist me with my disrupted travel itinerary',
+    'मेरी मदद कीजिए': 'Please assist me with my travel itinerary',
+    'धन्यवाद': 'Thank you',
+    'कितना किराया है': 'How much is the fare?',
   },
   'en-hi': {
     'hello': 'नमस्ते',
+    'where is the hotel taj': 'ताज होटल कहाँ है?',
+    'where is the taj hotel': 'ताज होटल कहाँ है?',
+    'where is hotel taj': 'होटल ताज कहाँ है?',
+    'where is the hotel': 'होटल कहाँ है?',
+    'hotel': 'होटल',
+    'taxi': 'टैक्सी',
+    'airport': 'हवाई अड्डा',
+    'train': 'ट्रेन',
+    'flight': 'उड़ान / फ्लाइट',
     'my flight is cancelled': 'मेरी उड़ान रद्द हो गई है',
     'my train is delayed': 'मेरी ट्रेन में देरी हो गई है',
     'how much refund will i get': 'मुझे कितना रिफंड मिलेगा?',
     'what about my hotel': 'मेरे होटल का क्या होगा?',
     'i need a taxi': 'मुझे एक टैक्सी की आवश्यकता है',
+    'how much is the fare': 'किराया कितना है?',
+    'thank you': 'धन्यवाद',
+    'please help me': 'कृपया मेरी सहायता करें',
   },
   'fr-en': {
     'bonjour': 'Hello',
+    'où est l\'hôtel': 'Where is the hotel?',
+    'où se trouve mon chauffeur pour le transfert au palais d’udaipur?': 'Where is my chauffeur for the transfer to Udaipur Palace?',
     'mon vol est annulé': 'My flight is cancelled',
     'mon train a du retard': 'My train is delayed',
     'où est mon chauffeur': 'Where is my chauffeur?',
     'aidez-moi s\'il vous plaît': 'Please assist me with my travel recovery',
+    'merci': 'Thank you',
+  },
+  'en-fr': {
+    'hello': 'Bonjour',
+    'where is the hotel taj': 'Où est l’hôtel Taj ?',
+    'where is the hotel': 'Où est l’hôtel ?',
+    'i need a taxi': 'J’ai besoin d’un taxi',
+    'my flight is cancelled': 'Mon vol est annulé',
+    'thank you': 'Merci',
   },
   'es-en': {
     'hola': 'Hello',
+    'por favor notifique al hotel itc rajputana que llegaré tarde.': 'Please notify hotel ITC Rajputana that I will arrive late.',
     'mi vuelo está cancelado': 'My flight is cancelled',
     'mi tren tiene retraso': 'My train is delayed',
     'dónde está el hotel': 'Where is the hotel?',
     'necesito ayuda con mi viaje': 'I need help with my journey',
+    'gracias': 'Thank you',
+  },
+  'en-es': {
+    'hello': 'Hola',
+    'where is the hotel taj': '¿Dónde está el hotel Taj?',
+    'where is the hotel': '¿Dónde está el hotel?',
+    'i need a taxi': 'Necesito un taxi',
+    'thank you': 'Gracias',
+  },
+  'ja-en': {
+    'こんにちは': 'Hello',
+    'フライトキャンセルの払い戻しと手荷物の振替について教えてください。': 'Please tell me about flight cancellation refund and baggage transfer.',
+    'ホテルはどこですか': 'Where is the hotel?',
+    'ありがとう': 'Thank you',
+  },
+  'en-ja': {
+    'hello': 'こんにちは',
+    'where is the hotel taj': 'タージホテルはどこですか？',
+    'where is the hotel': 'ホテルはどこですか？',
+    'thank you': 'ありがとうございます',
   }
 };
 
-// Fast Multilingual Translation Service (Gemini with Public Translation Fallback)
-async function fetchPublicTranslation(text: string, sourceLang: string, targetLang: string): Promise<string | null> {
-  const normText = (text || '').trim();
-  if (!normText) return '';
+const LANGUAGE_NAMES: Record<string, string> = {
+  'hi': 'Hindi',
+  'en': 'English',
+  'fr': 'French',
+  'es': 'Spanish',
+  'de': 'German',
+  'ja': 'Japanese',
+  'it': 'Italian',
+  'ar': 'Arabic',
+  'ta': 'Tamil',
+  'ru': 'Russian',
+  'zh': 'Chinese',
+  'pt': 'Portuguese',
+};
 
-  const src = (sourceLang || 'auto').toLowerCase().slice(0, 2);
+// Fast Multilingual Translation Service (Gemini with Public Translation Fallback)
+async function fetchPublicTranslation(text: string, sourceLang: string, targetLang: string): Promise<{ translatedText: string; detectedSource?: string } | null> {
+  const normText = (text || '').trim();
+  if (!normText) return null;
+
+  const rawSrc = (sourceLang || 'auto').toLowerCase().slice(0, 2);
   const tgt = (targetLang || 'en').toLowerCase().slice(0, 2);
 
-  if (src === tgt) return normText;
+  if (rawSrc === tgt && rawSrc !== 'au') return { translatedText: normText, detectedSource: rawSrc };
 
-  const pairKey = `${src === 'au' ? 'auto' : src}|${tgt}`;
+  // Resolve 'auto' to detected script
+  const src = (rawSrc === 'au' || rawSrc === 'auto') ? detectScriptLanguage(normText) : rawSrc;
+  if (src === tgt) return { translatedText: normText, detectedSource: src };
+
+  const pairKey = `${src}|${tgt}`;
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 4000);
-    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(normText)}&langpair=${pairKey}`, {
+    const timeout = setTimeout(() => controller.abort(), 4500);
+    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(normText)}&langpair=${pairKey}&de=concierge@rerouteprive.com`, {
       signal: controller.signal,
     });
     clearTimeout(timeout);
@@ -1103,8 +1323,16 @@ async function fetchPublicTranslation(text: string, sourceLang: string, targetLa
       if (data && data.responseData && data.responseData.translatedText) {
         const result = data.responseData.translatedText.trim();
         // Ignore automated warning text from MyMemory if any
-        if (!result.toLowerCase().startsWith('warning:') && !result.toLowerCase().includes('quota exceeded')) {
-          return result;
+        if (!result.toLowerCase().startsWith('warning:') && 
+            !result.toLowerCase().includes('quota exceeded') &&
+            !result.toLowerCase().includes('invalid source language')) {
+          return { translatedText: result, detectedSource: src };
+        }
+      }
+      if (Array.isArray(data?.matches)) {
+        const validMatch = data.matches.find((m: any) => m.translation && !m.translation.toLowerCase().startsWith('warning:'));
+        if (validMatch?.translation) {
+          return { translatedText: validMatch.translation.trim(), detectedSource: src };
         }
       }
     }
@@ -1130,6 +1358,13 @@ function fallbackDictionaryLookup(text: string, sourceLang: string, targetLang: 
   const key = `${src}-${tgt}`;
 
   if (DICTIONARY_MAP[key]) {
+    // Exact or near-exact match
+    for (const [phrase, translated] of Object.entries(DICTIONARY_MAP[key])) {
+      if (norm === phrase.toLowerCase()) {
+        return translated;
+      }
+    }
+    // Sub-phrase match
     for (const [phrase, translated] of Object.entries(DICTIONARY_MAP[key])) {
       if (norm.includes(phrase.toLowerCase()) || phrase.toLowerCase().includes(norm)) {
         return translated;
@@ -1137,21 +1372,9 @@ function fallbackDictionaryLookup(text: string, sourceLang: string, targetLang: 
     }
   }
 
-  // Common travel responses in target languages
-  const TRAVEL_TRANSLATIONS: Record<string, string> = {
-    'hi': 'मेरी यात्रा में व्यवधान आया है, कृपया तत्काल सहायता करें।',
-    'fr': 'Mon voyage est interrompu, veuillez m’aider immédiatement.',
-    'es': 'Mi viaje está interrumpido, por favor ayúdenme de inmediato.',
-    'de': 'Meine Reise ist unterbrochen, bitte helfen Sie mir sofort.',
-    'ja': '旅行に支障が生じました。至急ご対応をお願いいたします。',
-    'it': 'Il mio viaggio è interrotto, vi prego di assistermi immediatamente.',
-    'ar': 'لقد تعطلت رحلتي، يرجى تقديم المساعدة العاجلة.',
-    'ru': 'Моя поездка нарушена, пожалуйста, помогите немедленно.',
-    'ta': 'எனது பயணம் தடைபட்டுள்ளது, தயவுசெய்து உடனே உதவவும்.',
-    'en': 'My travel has been disrupted, please assist me immediately.'
-  };
-
-  return TRAVEL_TRANSLATIONS[tgt] || text;
+  // Graceful return of original text if no dictionary match is found.
+  // Never return an unrelated canned phrase about travel disruptions!
+  return text;
 }
 
 // Live Travel Speech & Text Translation Endpoint
@@ -1162,9 +1385,10 @@ app.post('/api/translate', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Text is required for translation' });
     }
 
-    const detected = sourceLanguage === 'auto' ? detectScriptLanguage(text) : sourceLanguage;
+    const detected = (sourceLanguage === 'auto' || sourceLanguage === 'au') ? detectScriptLanguage(text) : sourceLanguage;
     const src = detected.toLowerCase().slice(0, 2);
     const tgt = (targetLanguage || 'en').toLowerCase().slice(0, 2);
+    const targetName = LANGUAGE_NAMES[tgt] || tgt;
 
     if (src === tgt) {
       return res.json({
@@ -1182,20 +1406,20 @@ app.post('/api/translate', async (req, res) => {
     if (ai) {
       try {
         const prompt = `You are a real-time, high-precision travel translator.
-Translate the following travel speech or inquiry accurately into the target language (${targetLanguage}).
-Ensure the translated output is ONLY in the target language (${targetLanguage}), maintaining all flight numbers, train codes, times, and amounts.
+Translate the following travel speech or inquiry accurately into ${targetName} (target language code: ${tgt}).
+Ensure the translated output is ONLY in ${targetName}, maintaining all flight numbers, train codes, times, proper names, and amounts.
 
 Input: "${text.replace(/"/g, '\\"')}"
 
 Respond STRICTLY with valid JSON:
 {
-  "translatedText": "the translation strictly in ${targetLanguage}",
+  "translatedText": "the translation strictly in ${targetName}",
   "detectedSource": "${detected}",
-  "phoneticOrNotes": "pronunciation or notes if useful"
+  "phoneticOrNotes": "pronunciation or Romanized guide if useful"
 }`;
 
         const response = await ai.models.generateContent({
-          model: 'gemini-flash-latest',
+          model: 'gemini-3.1-flash-lite',
           contents: prompt,
           config: {
             temperature: 0.1,
@@ -1208,7 +1432,7 @@ Respond STRICTLY with valid JSON:
           if (parsed && parsed.translatedText && parsed.translatedText.trim()) {
             return res.json({
               success: true,
-              source: 'GEMINI_TRANSLATION',
+              source: 'GEMINI_AI_TRANSLATION',
               originalText: text,
               translatedText: parsed.translatedText.trim(),
               detectedSource: parsed.detectedSource || detected,
@@ -1218,20 +1442,70 @@ Respond STRICTLY with valid JSON:
           }
         }
       } catch (geminiErr: any) {
-        // Log brief notice without flooding the console with 429 quota traces
-        console.warn(`[Translate] Gemini rate limit/unavailable (${geminiErr?.status || geminiErr?.code || 'quota'}), switching to high-speed public translation engine.`);
+        console.warn(`[Translate] Gemini fallback triggered (${geminiErr?.status || geminiErr?.code || 'info'}), checking Groq fallback.`);
+      }
+    }
+
+    // High-throughput Groq AI Fallback (Llama-3.3-70b / Llama-3.1-8b)
+    const groqKey = getGroqApiKey(req);
+    if (groqKey) {
+      try {
+        const groqPrompt = `You are a real-time, high-precision travel translator.
+Translate the following travel speech or inquiry accurately into ${targetName} (target language code: ${tgt}).
+Ensure the translated output is ONLY in ${targetName}, maintaining all flight numbers, train codes, times, proper names, and amounts.
+
+Input: "${text.replace(/"/g, '\\"')}"
+
+Respond STRICTLY with valid JSON:
+{
+  "translatedText": "the translation strictly in ${targetName}",
+  "detectedSource": "${detected}",
+  "phoneticOrNotes": "pronunciation or Romanized guide if useful"
+}`;
+
+        const groqResult = await callGroqChat([
+          {
+            role: 'system',
+            content: 'You are an ultra-fast real-time speech translation engine for travel emergencies. Respond strictly in JSON format.'
+          },
+          {
+            role: 'user',
+            content: groqPrompt
+          }
+        ], {
+          apiKey: groqKey,
+          responseFormatJson: true,
+        });
+
+        if (groqResult?.text) {
+          const parsed = JSON.parse(groqResult.text);
+          if (parsed && parsed.translatedText && parsed.translatedText.trim()) {
+            return res.json({
+              success: true,
+              source: 'GROQ_AI_FALLBACK',
+              model: groqResult.model,
+              originalText: text,
+              translatedText: parsed.translatedText.trim(),
+              detectedSource: parsed.detectedSource || detected,
+              phoneticOrNotes: parsed.phoneticOrNotes || '',
+              targetLanguage,
+            });
+          }
+        }
+      } catch (groqErr: any) {
+        console.warn('[Translate] Groq fallback failed, moving to high-speed engine:', groqErr?.message);
       }
     }
 
     // High-speed public translation engine (MyMemory) fallback
     const publicResult = await fetchPublicTranslation(text, src, tgt);
-    if (publicResult) {
+    if (publicResult && publicResult.translatedText) {
       return res.json({
         success: true,
         source: 'HIGH_SPEED_MULTILINGUAL_ENGINE',
         originalText: text,
-        translatedText: publicResult,
-        detectedSource: detected,
+        translatedText: publicResult.translatedText,
+        detectedSource: publicResult.detectedSource || detected,
         targetLanguage,
       });
     }

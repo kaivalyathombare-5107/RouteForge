@@ -663,15 +663,15 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
             {/* Quick Iconic Hubs & Vector Vibe Chips (when input is empty) */}
             {value.length === 0 && (
               <div className="py-2 mb-2 border-b border-slate-800/80 space-y-2">
-                {/* AI Vector Vibe Quick Search */}
+                {/* Curated Travel Experiences Quick Search */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[8px] font-cinzel text-purple-300 tracking-widest uppercase font-semibold flex items-center space-x-1">
-                      <Zap className="w-2.5 h-2.5 text-purple-400" />
-                      <span>VECTOR THEMATIC VIBE SEARCH</span>
+                    <span className="text-[8px] font-cinzel text-[#FCE7AC] tracking-widest uppercase font-semibold flex items-center space-x-1">
+                      <Compass className="w-2.5 h-2.5 text-[#D4AF37]" />
+                      <span>CURATED TRAVEL ESCAPES</span>
                     </span>
-                    <span className="text-[7px] font-mono text-slate-500">
-                      1-Click Semantic Match
+                    <span className="text-[7px] font-mono text-slate-400">
+                      Hand-Selected Journeys
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-1">

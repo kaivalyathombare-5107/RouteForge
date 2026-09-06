@@ -16,7 +16,14 @@ import {
   AudioWaveform as WaveformIcon,
   CornerDownLeft,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  ShieldAlert,
+  ShieldCheck,
+  Smartphone,
+  Laptop,
+  ExternalLink,
+  Info,
+  Zap
 } from 'lucide-react';
 
 export interface LanguageOption {
@@ -25,6 +32,15 @@ export interface LanguageOption {
   name: string;
   flag: string;
   nativeName: string;
+}
+
+export type MicPermissionState = 'prompt' | 'granted' | 'denied' | 'requesting' | 'unsupported';
+export type DeviceCategory = 'ios' | 'android' | 'desktop';
+
+export interface DeviceInfo {
+  category: DeviceCategory;
+  label: string;
+  browser: string;
 }
 
 export const SUPPORTED_LANGUAGES: LanguageOption[] = [
@@ -96,12 +112,72 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
   const [translatedText, setTranslatedText] = useState<string>('');
   const [detectedLanguage, setDetectedLanguage] = useState<string>('');
   const [phoneticGuide, setPhoneticGuide] = useState<string>('');
+  const [engineSource, setEngineSource] = useState<string>('');
   const [isTranslating, setIsTranslating] = useState<boolean>(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
   const [audioLevel, setAudioLevel] = useState<number>(0);
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
+
+  // Cross-device microphone permission & environment state
+  const [micPermission, setMicPermission] = useState<MicPermissionState>('prompt');
+  const [deviceDetails, setDeviceDetails] = useState<DeviceInfo>({
+    category: 'desktop',
+    label: 'Desktop Computer',
+    browser: 'Browser',
+  });
+  const [isInIframe, setIsInIframe] = useState<boolean>(false);
+
+  // Detect device category & initial permission state on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    setIsInIframe(window.self !== window.top);
+
+    const ua = navigator.userAgent || '';
+    const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isAndroid = /Android/i.test(ua);
+
+    let browser = 'Browser';
+    if (/Edg/i.test(ua)) browser = 'Microsoft Edge';
+    else if (/Chrome/i.test(ua) && !/Edg/i.test(ua)) browser = 'Google Chrome';
+    else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = 'Apple Safari';
+    else if (/Firefox/i.test(ua)) browser = 'Mozilla Firefox';
+    else if (/SamsungBrowser/i.test(ua)) browser = 'Samsung Internet';
+
+    if (isIOS) {
+      setDeviceDetails({ category: 'ios', label: 'Apple iOS (iPhone / iPad)', browser });
+    } else if (isAndroid) {
+      setDeviceDetails({ category: 'android', label: 'Android Mobile / Tablet', browser });
+    } else {
+      setDeviceDetails({ category: 'desktop', label: 'Desktop Computer', browser });
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setMicPermission('unsupported');
+      return;
+    }
+
+    // Attempt permission query if supported by this browser
+    if (navigator.permissions && navigator.permissions.query) {
+      try {
+        navigator.permissions.query({ name: 'microphone' as PermissionName })
+          .then((status) => {
+            setMicPermission(status.state as MicPermissionState);
+            status.onchange = () => {
+              setMicPermission(status.state as MicPermissionState);
+            };
+          })
+          .catch(() => {
+            // Safari / WebKit does not support { name: 'microphone' } query
+            // Remains 'prompt' so user is prompted on first interaction
+          });
+      } catch {
+        // Fallback for browsers that don't support mic permission query
+      }
+    }
+  }, []);
 
   // Load and cache browser TTS voices
   useEffect(() => {
@@ -161,6 +237,7 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
       const data = await res.json();
       if (data && data.translatedText) {
         setTranslatedText(data.translatedText);
+        if (data.source) setEngineSource(data.source);
         if (data.detectedSource) setDetectedLanguage(data.detectedSource);
         if (data.phoneticOrNotes) setPhoneticGuide(data.phoneticOrNotes);
       }
@@ -180,12 +257,18 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
   };
 
   // Audio Visualizer setup via Web Audio API
-  const startAudioVisualizer = async () => {
+  const startAudioVisualizer = async (existingStream?: MediaStream) => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      let stream = existingStream || mediaStreamRef.current;
+      if (!stream) {
+        if (!navigator.mediaDevices?.getUserMedia) return;
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      }
       mediaStreamRef.current = stream;
 
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+
       const audioCtx = new AudioContextClass();
       audioContextRef.current = audioCtx;
 
@@ -237,7 +320,7 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
 
       drawWaveform();
     } catch (err: any) {
-      console.warn('Microphone stream access notice:', err?.message);
+      console.warn('Microphone audio visualizer stream notice:', err?.message);
     }
   };
 
@@ -257,13 +340,61 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
     setAudioLevel(0);
   };
 
-  // Toggle Speech Recognition
-  const startListening = () => {
+  // Explicitly prompt the user on any device for microphone permission
+  const requestMicrophoneAccess = async (autoStartListening = false): Promise<MediaStream | null> => {
     setSpeechError(null);
+    setMicPermission('requesting');
 
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+      setMicPermission('unsupported');
+      setSpeechError('Microphone hardware access is not supported by this browser environment. You can type directly.');
+      return null;
+    }
+
+    try {
+      // Calling getUserMedia inside user interaction triggers browser permission modal across iOS, Android, and Desktop
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      setMicPermission('granted');
+      mediaStreamRef.current = stream;
+
+      if (autoStartListening) {
+        executeSpeechRecognition(stream);
+      } else {
+        // Stop the temporary stream if this was just a permission check
+        stream.getTracks().forEach(t => t.stop());
+        mediaStreamRef.current = null;
+      }
+      return stream;
+    } catch (err: any) {
+      console.warn('Microphone permission request error:', err);
+      if (
+        err.name === 'NotAllowedError' ||
+        err.name === 'PermissionDeniedError' ||
+        err.name === 'SecurityError' ||
+        err.message?.toLowerCase().includes('denied') ||
+        err.message?.toLowerCase().includes('dismissed')
+      ) {
+        setMicPermission('denied');
+        setSpeechError('Microphone permission was denied. Please allow microphone access in your browser or device settings.');
+      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+        setMicPermission('unsupported');
+        setSpeechError('No microphone hardware detected on this device. You can type directly or select preset phrases.');
+      } else {
+        setSpeechError(`Microphone error: ${err.message || 'Permission needed'}`);
+      }
+      return null;
+    }
+  };
+
+  // Run Speech Recognition with acquired audio permission
+  const executeSpeechRecognition = (existingStream?: MediaStream) => {
     const SpeechRecognitionClass = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognitionClass) {
-      setSpeechError('Web Speech API is not supported in this browser environment. You can use preset phrases or type directly.');
+      setSpeechError('Web Speech Recognition is not supported in this browser. You can type directly or use travel presets.');
+      if (existingStream) {
+        startAudioVisualizer(existingStream);
+        setIsListening(true);
+      }
       return;
     }
 
@@ -275,7 +406,7 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
 
       recognition.onstart = () => {
         setIsListening(true);
-        startAudioVisualizer();
+        startAudioVisualizer(existingStream);
       };
 
       recognition.onresult = (event: any) => {
@@ -302,7 +433,8 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
       recognition.onerror = (event: any) => {
         console.warn('Speech recognition error:', event.error);
         if (event.error === 'not-allowed') {
-          setSpeechError('Microphone access was denied. Please allow microphone permissions in your browser or try the simulation buttons.');
+          setMicPermission('denied');
+          setSpeechError('Microphone access was denied. Please allow microphone permissions in your browser or device settings.');
           stopListening();
         } else if (event.error === 'no-speech') {
           // Keep listening or ignore
@@ -312,7 +444,6 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
       };
 
       recognition.onend = () => {
-        // If still listening, restart unless stopped intentionally
         if (isListening) {
           try {
             recognition.start();
@@ -333,6 +464,18 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
       setSpeechError(`Failed to initialize microphone: ${err?.message}`);
       setIsListening(false);
       stopAudioVisualizer();
+    }
+  };
+
+  // Toggle Speech Recognition (verifies permission first on any device)
+  const startListening = async () => {
+    setSpeechError(null);
+
+    // If permission is not granted, actively request permission first
+    if (micPermission !== 'granted') {
+      await requestMicrophoneAccess(true);
+    } else {
+      executeSpeechRecognition();
     }
   };
 
@@ -367,6 +510,11 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
     const prevTrans = translatedText;
     setFinalSpokenText(prevTrans);
     setTranslatedText(prevFinal);
+    setInterimSpokenText('');
+
+    if (prevTrans && prevTrans.trim()) {
+      performTranslation(prevTrans, prevTgt, prevSrc);
+    }
 
     if (isListening) {
       stopListening();
@@ -449,6 +597,8 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
     setInterimSpokenText('');
     setTranslatedText('');
     setPhoneticGuide('');
+    setEngineSource('');
+    setDetectedLanguage('');
     setSpeechError(null);
   };
 
@@ -565,6 +715,128 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
             </div>
           </div>
 
+          {/* Cross-Device Microphone Permission Status & Request Banner */}
+          {micPermission !== 'granted' ? (
+            <div className="p-4 rounded-xl bg-gradient-to-r from-amber-950/40 via-slate-950/80 to-amber-950/20 border border-amber-500/40 text-slate-200 text-xs shadow-lg space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-start space-x-3">
+                  <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 mt-0.5 shrink-0">
+                    <Mic className="w-4 h-4 animate-pulse" />
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-cinzel font-bold text-xs text-[#FCE7AC] tracking-wider uppercase">
+                        Microphone Permission Required
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-slate-900 border border-amber-500/30 text-amber-300 flex items-center space-x-1">
+                        {deviceDetails.category === 'ios' ? (
+                          <Smartphone className="w-3 h-3 text-amber-400" />
+                        ) : deviceDetails.category === 'android' ? (
+                          <Smartphone className="w-3 h-3 text-emerald-400" />
+                        ) : (
+                          <Laptop className="w-3 h-3 text-sky-400" />
+                        )}
+                        <span>{deviceDetails.label}</span>
+                      </span>
+                      {isInIframe && (
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-mono bg-slate-900/90 text-slate-400 border border-slate-700">
+                          Sandbox Frame
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-slate-300 text-[11px] font-sans-luxury mt-1 leading-relaxed">
+                      This website needs permission to use your device's microphone to capture, transcribe, and translate live travel speech.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2 shrink-0">
+                  <button
+                    id="request-mic-permission-btn"
+                    onClick={() => requestMicrophoneAccess(true)}
+                    disabled={micPermission === 'requesting'}
+                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#A88325] hover:from-[#FCE7AC] hover:to-[#D4AF37] text-slate-950 font-cinzel font-bold text-xs flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-md disabled:opacity-50"
+                  >
+                    <Mic className="w-3.5 h-3.5 text-slate-950" />
+                    <span>{micPermission === 'requesting' ? 'Asking Browser...' : 'Allow Microphone'}</span>
+                  </button>
+
+                  {isInIframe && (
+                    <button
+                      onClick={() => window.open(window.location.href, '_blank')}
+                      className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-gold-subtle/50 text-[#FCE7AC] text-xs transition-all cursor-pointer"
+                      title="Open full page in new window for direct microphone hardware access"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Denied / Blocked Device Guidance */}
+              {micPermission === 'denied' && (
+                <div className="p-3.5 rounded-xl bg-red-950/40 border border-red-500/50 text-red-200 text-xs space-y-2">
+                  <div className="flex items-center space-x-2 text-red-300 font-medium">
+                    <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />
+                    <span>Microphone access was denied or blocked on {deviceDetails.browser}.</span>
+                  </div>
+                  <div className="text-[11px] font-sans-luxury text-slate-300 pl-6 space-y-1">
+                    <p className="font-semibold text-amber-200">How to enable on your device:</p>
+                    {deviceDetails.category === 'ios' ? (
+                      <ol className="list-decimal list-inside space-y-0.5 text-slate-300">
+                        <li>Tap the <strong className="text-white">"AA"</strong> or Website Settings icon in Safari's address bar.</li>
+                        <li>Select <strong className="text-white">Website Settings</strong> &gt; <strong className="text-white">Microphone</strong> and choose <strong className="text-emerald-400">Allow</strong>.</li>
+                        <li>Then click <strong className="text-[#FCE7AC]">"Ask Permission Again"</strong> below.</li>
+                      </ol>
+                    ) : deviceDetails.category === 'android' ? (
+                      <ol className="list-decimal list-inside space-y-0.5 text-slate-300">
+                        <li>Tap the <strong className="text-white">🔒 Lock</strong> or Site Settings icon beside the address bar.</li>
+                        <li>Tap <strong className="text-white">Permissions</strong> &gt; <strong className="text-white">Microphone</strong> and choose <strong className="text-emerald-400">Allow</strong>.</li>
+                        <li>Then click <strong className="text-[#FCE7AC]">"Ask Permission Again"</strong> below.</li>
+                      </ol>
+                    ) : (
+                      <ol className="list-decimal list-inside space-y-0.5 text-slate-300">
+                        <li>Click the <strong className="text-white">🔒 Lock / Media icon</strong> in your browser's address bar.</li>
+                        <li>Set <strong className="text-white">Microphone</strong> permission to <strong className="text-emerald-400">Allow</strong>.</li>
+                        <li>Then click <strong className="text-[#FCE7AC]">"Ask Permission Again"</strong> below.</li>
+                      </ol>
+                    )}
+                  </div>
+
+                  <div className="pt-2 pl-6 flex items-center space-x-3">
+                    <button
+                      onClick={() => requestMicrophoneAccess(true)}
+                      className="px-3 py-1.5 rounded-lg bg-red-900/60 hover:bg-red-800 border border-red-400/50 text-white text-[11px] font-cinzel font-bold transition-all cursor-pointer"
+                    >
+                      Ask Permission Again
+                    </button>
+                    {isInIframe && (
+                      <button
+                        onClick={() => window.open(window.location.href, '_blank')}
+                        className="text-amber-300 hover:text-white text-[11px] underline flex items-center space-x-1 cursor-pointer"
+                      >
+                        <span>Open in Standalone Tab</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="px-3.5 py-2 rounded-xl bg-emerald-950/30 border border-emerald-500/30 flex items-center justify-between text-xs text-emerald-200">
+              <div className="flex items-center space-x-2">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="font-sans-luxury text-[11px]">
+                  Microphone access granted on <strong className="text-white">{deviceDetails.label}</strong>. Voice translation is armed.
+                </span>
+              </div>
+              <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/40">
+                ● MIC GRANTED
+              </span>
+            </div>
+          )}
+
           {/* Microphone Action & Waveform Display */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-slate-950/90 border border-gold-subtle/60 shadow-inner">
             <div className="flex items-center space-x-3 w-full sm:w-auto">
@@ -639,53 +911,55 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
                 <div className="flex items-center space-x-1.5">
                   <span className="text-base">{activeSourceObj.flag}</span>
                   <span className="text-xs font-semibold text-white font-serif-display">
-                    Spoken Input ({activeSourceObj.name})
+                    Spoken or Typed Input ({activeSourceObj.name})
                   </span>
                 </div>
-                {isListening && (
-                  <span className="text-[10px] font-mono text-emerald-400 animate-pulse">
-                    ● Listening...
-                  </span>
+                <div className="flex items-center space-x-2">
+                  {isListening && (
+                    <span className="text-[10px] font-mono text-emerald-400 animate-pulse flex items-center space-x-1">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                      <span>Listening...</span>
+                    </span>
+                  )}
+                  {finalSpokenText && (
+                    <button
+                      onClick={handleClear}
+                      className="text-[10px] font-mono text-slate-400 hover:text-red-400 cursor-pointer transition-colors"
+                      title="Clear text"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Directly Editable Spoken/Typed Text Area */}
+              <div className="relative min-h-[95px] max-h-[140px] flex flex-col">
+                <textarea
+                  value={finalSpokenText}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setFinalSpokenText(val);
+                    setInterimSpokenText('');
+                    triggerDebouncedTranslation(val, sourceLang, targetLang);
+                  }}
+                  placeholder={`Speak or type here in ${activeSourceObj.name} (e.g. where is the hotel Taj?)...`}
+                  rows={3}
+                  className="w-full h-full bg-transparent text-xs sm:text-sm font-sans-luxury text-slate-100 placeholder:text-slate-500 placeholder:italic resize-none focus:outline-none leading-relaxed"
+                />
+                {interimSpokenText && (
+                  <div className="text-[11px] text-emerald-300/80 italic font-mono mt-1 animate-pulse">
+                    🎙️ Listening: {interimSpokenText}
+                  </div>
                 )}
               </div>
 
-              {/* Spoken Text Box */}
-              <div className="min-h-[90px] max-h-[140px] overflow-y-auto text-xs sm:text-sm font-sans-luxury text-slate-200 leading-relaxed">
-                {finalSpokenText ? (
-                  <span>
-                    {finalSpokenText}
-                    {interimSpokenText && (
-                      <span className="text-slate-400 italic ml-1.5">
-                        {interimSpokenText}
-                      </span>
-                    )}
-                  </span>
-                ) : interimSpokenText ? (
-                  <span className="text-slate-400 italic">
-                    {interimSpokenText}
-                  </span>
-                ) : (
-                  <p className="text-slate-500 italic text-xs">
-                    Tap "START SPEAKING" and talk into your mic, or select one of the travel test phrases below.
-                  </p>
-                )}
-              </div>
-
-              {/* Editable manual override */}
+              {/* Character count & status footer */}
               <div className="pt-2 border-t border-gold-subtle/20 flex items-center justify-between text-[11px] text-slate-400">
                 <span>{finalSpokenText.length} characters</span>
-                <button
-                  onClick={() => {
-                    const manual = prompt('Enter text to translate:', finalSpokenText);
-                    if (manual !== null) {
-                      setFinalSpokenText(manual);
-                      performTranslation(manual, sourceLang, targetLang);
-                    }
-                  }}
-                  className="hover:text-[#FCE7AC] underline cursor-pointer"
-                >
-                  Type manually
-                </button>
+                <span className="text-[10px] text-slate-500 font-mono">
+                  {isListening ? 'Voice stream active' : 'Click mic to speak or type directly'}
+                </span>
               </div>
             </div>
 
@@ -710,7 +984,36 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
                   {isTranslating ? (
                     <span className="text-[10px] font-mono text-[#D4AF37] flex items-center space-x-1 bg-[#D4AF37]/10 px-2 py-0.5 rounded-full border border-[#D4AF37]/30">
                       <Sparkles className="w-3 h-3 animate-spin text-[#D4AF37]" />
-                      <span>Translating to {activeTargetObj.name}...</span>
+                      <span>Translating...</span>
+                    </span>
+                  ) : engineSource ? (
+                    <span className={`text-[9px] font-mono px-2 py-0.5 rounded-full border flex items-center space-x-1 ${
+                      engineSource.includes('GEMINI')
+                        ? 'border-[#D4AF37]/40 bg-[#D4AF37]/10 text-[#FCE7AC]'
+                        : engineSource.includes('GROQ')
+                        ? 'border-orange-500/40 bg-orange-500/10 text-orange-200'
+                        : engineSource.includes('OFFLINE')
+                        ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
+                        : 'border-blue-500/40 bg-blue-500/10 text-blue-200'
+                    }`}>
+                      {engineSource.includes('GEMINI') ? (
+                        <>
+                          <Sparkles className="w-2.5 h-2.5 text-[#D4AF37]" />
+                          <span>Gemini 3.1 Flash</span>
+                        </>
+                      ) : engineSource.includes('GROQ') ? (
+                        <>
+                          <Zap className="w-2.5 h-2.5 text-orange-400" />
+                          <span>Groq Llama-3.3 Fallback</span>
+                        </>
+                      ) : engineSource.includes('OFFLINE') ? (
+                        <span>📖 Travel Lexicon</span>
+                      ) : (
+                        <>
+                          <Zap className="w-2.5 h-2.5 text-blue-400" />
+                          <span>High-Speed Engine</span>
+                        </>
+                      )}
                     </span>
                   ) : detectedLanguage ? (
                     <span className="text-[10px] font-mono text-slate-400 bg-slate-900/80 px-2 py-0.5 rounded border border-slate-800">
@@ -721,7 +1024,7 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
               </div>
 
               {/* Translated Text Box */}
-              <div className="min-h-[90px] max-h-[140px] overflow-y-auto text-xs sm:text-sm font-sans-luxury text-[#FCE7AC] font-medium leading-relaxed bg-black/40 p-2.5 rounded-lg border border-gold-subtle/20">
+              <div className="min-h-[95px] max-h-[140px] overflow-y-auto text-xs sm:text-sm font-sans-luxury text-[#FCE7AC] font-medium leading-relaxed bg-black/40 p-2.5 rounded-lg border border-gold-subtle/20">
                 {translatedText ? (
                   <div>
                     <p className="text-white font-medium selection:bg-[#D4AF37]/40">{translatedText}</p>
@@ -733,7 +1036,7 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
                   </div>
                 ) : (
                   <p className="text-slate-500 italic text-xs">
-                    Live translation into {activeTargetObj.name} will appear here instantly as speech or text is received.
+                    Live translation into {activeTargetObj.name} will appear here accurately as speech or text is provided.
                   </p>
                 )}
               </div>
@@ -828,6 +1131,26 @@ export const LiveVoiceTranslator: React.FC<LiveVoiceTranslatorProps> = ({
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* AI Pipeline Architecture Status */}
+          <div className="pt-2 border-t border-gold-subtle/20 flex flex-wrap items-center justify-between text-[10px] text-slate-500 font-mono gap-2">
+            <div className="flex items-center space-x-2">
+              <span className="flex items-center space-x-1 text-slate-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
+                <span>Primary: Gemini 3.1 Flash</span>
+              </span>
+              <span className="text-slate-700">•</span>
+              <span className="flex items-center space-x-1 text-orange-400/90">
+                <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
+                <span>Fallback: Groq (Llama-3.3-70b / Llama-3.1-8b)</span>
+              </span>
+              <span className="text-slate-700">•</span>
+              <span className="text-slate-500">
+                <span>Cache: Multilingual Lexicon</span>
+              </span>
+            </div>
+            <span className="text-slate-500">Autonomous failover active</span>
           </div>
         </div>
       )}

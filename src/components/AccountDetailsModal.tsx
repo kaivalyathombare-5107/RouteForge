@@ -64,7 +64,7 @@ const FORMAT_LABELS: Record<string, string> = {
   // Flexibility
   moderate: 'Moderate (±2h buffer)',
   strict: 'Strict (Exact schedules)',
-  high: 'High (Optimal AI)',
+  high: 'High (Adaptive Reroutes)',
   // Food
   pure_veg: 'Pure Vegetarian (Strict)',
   jain: 'Jain Meal (No Root/Onion/Garlic)',
@@ -139,8 +139,18 @@ export const AccountDetailsModal: React.FC<AccountDetailsModalProps> = ({
   } : null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-lg flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-      <div className="relative w-full max-w-2xl rounded-3xl bg-[#0C0E14] border border-gold-bright shadow-2xl p-6 sm:p-8 space-y-6 my-auto">
+    <div 
+      className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-lg flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-2xl rounded-3xl bg-[#0C0E14] border border-gold-bright shadow-2xl p-6 sm:p-8 space-y-6 my-auto"
+      >
         {/* Ambient Gold Glow */}
         <div className="absolute top-0 right-10 w-72 h-72 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
 

@@ -188,10 +188,18 @@ export const JourneySearchResultsModal: React.FC<JourneySearchResultsModalProps>
 
   return (
     <>
-      <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-lg flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+      <div 
+        className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-lg flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            onClose();
+          }
+        }}
+      >
         {/* Modal Dialog Card - Selected Element for Style Changes */}
         <div 
           id="journey-planner-dialog-card"
+          onClick={(e) => e.stopPropagation()}
           className="relative w-full max-w-4xl rounded-3xl bg-[#0A0C12] border border-[#D4AF37]/50 shadow-[0_0_60px_-15px_rgba(212,175,55,0.25)] p-6 sm:p-8 space-y-5 my-auto backdrop-blur-2xl"
         >
           {/* Ambient Glow */}

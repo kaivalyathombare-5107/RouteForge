@@ -67,7 +67,7 @@ export const ProviderAdapterSection: React.FC = () => {
           Provider Abstraction &amp; Deterministic Pipeline
         </h2>
         <p className="text-xs text-slate-400 font-light mt-1 max-w-3xl">
-          RouteForge abstracts heterogeneous legacy provider data into a canonical trip graph. Business rules remain strictly deterministic; AI is safely layered on top purely for contextual explanation.
+          RouteForge abstracts heterogeneous legacy provider data into a canonical trip graph. Business rules remain strictly deterministic, paired with expert human travel briefings and contextual guidance.
         </p>
       </div>
 
@@ -104,10 +104,10 @@ export const ProviderAdapterSection: React.FC = () => {
           },
           {
             layer: 'LAYER 5',
-            title: 'AI Explanation Layer',
-            desc: 'Gemini reasoning, grounded briefing, human-friendly translation',
+            title: 'Travel Briefing Layer',
+            desc: 'Curated concierge intelligence, grounded briefing, localized translations',
             icon: Activity,
-            color: 'border-purple-500/50 bg-purple-950/30 text-purple-300',
+            color: 'border-amber-500/50 bg-amber-950/30 text-amber-300',
           },
         ].map(l => (
           <div key={l.layer} className={`p-4 rounded-2xl border ${l.color} space-y-2 flex flex-col justify-between`}>

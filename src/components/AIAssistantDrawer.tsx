@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bot, Send, Sparkles, ShieldCheck, ArrowRight, CornerDownLeft, RefreshCw, MessageSquare, Crown, Languages, Mic, X } from 'lucide-react';
+import { Bot, Compass, Send, Sparkles, ShieldCheck, ArrowRight, CornerDownLeft, RefreshCw, MessageSquare, Crown, Languages, Mic, X } from 'lucide-react';
 import { Trip, RecoveryOption } from '../types';
 
 interface AIAssistantDrawerProps {
@@ -17,6 +17,7 @@ interface ChatMessage {
   sender: 'user' | 'ai';
   text: string;
   timestamp: string;
+  engineSource?: string;
   originalSpoken?: string;
   sourceLang?: string;
   actionChips?: { label: string; action: () => void }[];
@@ -36,8 +37,8 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
       id: 'init_1',
       sender: 'ai',
       text: isDisrupted
-        ? '⚠️ Attention: Flight AI-864 connection has a critical delay notice. I have audited your Udaipur Lake Palace itinerary. You are entitled to ₹7,060 in deterministic statutory refunds under DGCA CAR, and I have synthesized 3 feasible luxury recovery plans to protect your heritage suite check-in.'
-        : 'ReRoute Privé AI Concierge active. Monitoring all your luxury rail, air, and royal palace bookings in real-time. How may I assist your travel party today?',
+        ? '⚠️ Attention: Flight connection has a critical delay notice. Our chief travel desk has audited your Udaipur Lake Palace itinerary. You are entitled to ₹7,060 in statutory refunds under DGCA CAR, and we have hand-crafted 3 luxury recovery plans to protect your heritage suite check-in.'
+        : 'Welcome to ReRoute Privé Personal Travel Desk. We are actively monitoring your luxury rail, air, and royal palace reservations. How may we assist your journey today?',
       timestamp: '13:42 IST',
       actionChips: isDisrupted ? [
         { label: 'Review Recovery Plans', action: () => onNavigateTab('recovery_planner') },
@@ -57,15 +58,15 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-5 right-5 sm:bottom-7 sm:right-7 z-[60] flex h-16 w-16 sm:h-[70px] sm:w-[70px] items-center justify-center rounded-full border-2 border-[#D4AF37] bg-[#0B0D13] text-[#D4AF37] shadow-[0_0_35px_rgba(212,175,55,0.35)] transition-all hover:scale-110 hover:bg-[#D4AF37] hover:text-slate-950 hover:shadow-[0_0_45px_rgba(212,175,55,0.55)] cursor-pointer animate-concierge-entrance"
-        title="Open ReRoute Privé AI Concierge"
-        aria-label="Open ReRoute Privé AI Concierge"
+        className="fixed bottom-5 right-5 sm:bottom-7 sm:right-7 z-[60] flex w-[72px] h-[38px] sm:w-[76px] sm:h-[40px] items-center justify-center rounded-full border-2 border-[#D4AF37] bg-[#0B0D13] text-[#D4AF37] shadow-[0_0_30px_rgba(212,175,55,0.35)] transition-all hover:scale-105 hover:bg-[#D4AF37] hover:text-slate-950 hover:shadow-[0_0_40px_rgba(212,175,55,0.55)] cursor-pointer animate-concierge-entrance"
+        title="Open ReRoute Privé Personal Travel Concierge"
+        aria-label="Open ReRoute Privé Personal Travel Concierge"
       >
-        <Bot className="h-7 w-7 sm:h-8 sm:w-8" />
-        {/* Subtle pulsing indicator ring */}
-        <span className="absolute -top-1 -right-1 flex h-4 w-4">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-4 w-4 bg-[#FCE7AC] border border-slate-900"></span>
+        <Bot className="h-6 w-6 sm:h-[26px] sm:w-[26px] text-[#D4AF37]" strokeWidth={2.2} />
+        {/* Ivory / cream circular indicator dot nestled at top right of pill as in reference */}
+        <span className="absolute -top-1 -right-0.5 flex h-3.5 w-3.5 sm:h-4 sm:w-4">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-60"></span>
+          <span className="relative inline-flex rounded-full h-3.5 w-3.5 sm:h-4 sm:w-4 bg-[#FCE7AC] border border-[#0B0D13]"></span>
         </span>
       </button>
     );
@@ -115,6 +116,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
         sender: 'ai',
         text: data.reply || "I have analyzed your request based on the canonical trip graph.",
         timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) + ' IST',
+        engineSource: data.source,
         actionChips: dynamicChips.length > 0 ? dynamicChips : undefined,
       };
 
@@ -125,6 +127,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
         sender: 'ai',
         text: 'Under DGCA Civil Aviation Requirements and IRCTC Rule 73A, all refunds (₹7,060) are 100% legally mandated. Option A safely reaches your heritage destination at 12:20 IST.',
         timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) + ' IST',
+        engineSource: 'CANONICAL_FALLBACK',
       };
       setMessages(prev => [...prev, fallbackMsg]);
     } finally {
@@ -147,13 +150,13 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h2 className="text-xl font-bold font-serif-display text-white">ReRoute Privé AI Concierge</h2>
+              <h2 className="text-xl font-bold font-serif-display text-white">ReRoute Privé Personal Concierge</h2>
               <span className="text-[10px] font-cinzel font-semibold px-2.5 py-0.5 rounded-full bg-slate-950 text-[#D4AF37] border border-gold-subtle">
-                GEMINI GROUNDED
+                DEDICATED DESK
               </span>
             </div>
             <p className="text-xs text-slate-300 font-sans-luxury font-light mt-0.5">
-              Authoritative luxury travel intelligence grounded strictly in deterministic rules and royal service standards.
+              Authoritative luxury travel stewardship grounded in local master concierges and royal hospitality standards.
             </p>
           </div>
         </div>
@@ -165,8 +168,8 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
               onCloseFloating?.();
             }}
             className="absolute right-6 top-6 rounded-full border border-slate-700 p-1.5 text-slate-400 transition-colors hover:border-gold-bright hover:text-[#FCE7AC]"
-            title="Minimize AI Concierge"
-            aria-label="Minimize AI Concierge"
+            title="Minimize Travel Concierge"
+            aria-label="Minimize Travel Concierge"
           >
             <X className="h-4 w-4" />
           </button>
@@ -180,8 +183,23 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
             key={msg.id}
             className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
           >
-            <div className="text-[10px] font-mono text-slate-400 mb-1 px-1">
-              {msg.sender === 'user' ? 'You' : 'ReRoute Privé Concierge'} • {msg.timestamp}
+            <div className="text-[10px] font-mono text-slate-400 mb-1 px-1 flex items-center space-x-2">
+              <span>{msg.sender === 'user' ? 'You' : 'ReRoute Privé Concierge'} • {msg.timestamp}</span>
+              {msg.engineSource && (
+                <span className={`px-1.5 py-0.2 rounded text-[9px] font-mono border ${
+                  msg.engineSource.includes('GROQ')
+                    ? 'border-orange-500/50 bg-orange-500/10 text-orange-300'
+                    : msg.engineSource.includes('GEMINI')
+                    ? 'border-[#D4AF37]/50 bg-[#D4AF37]/10 text-[#FCE7AC]'
+                    : 'border-slate-800 bg-slate-900/90 text-slate-400'
+                }`}>
+                  {msg.engineSource.includes('GROQ')
+                    ? '⚡ Groq Llama-3.3 Fallback'
+                    : msg.engineSource.includes('GEMINI')
+                    ? '✨ Gemini 3.1 Flash'
+                    : '🛡️ Canonical Logic'}
+                </span>
+              )}
             </div>
             <div
               className={`p-5 rounded-2xl max-w-3xl lg:max-w-4xl text-xs sm:text-sm font-sans-luxury leading-relaxed shadow-lg ${
@@ -196,7 +214,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
               {msg.originalSpoken && (
                 <div className="mt-2.5 pt-2 border-t border-slate-950/20 text-[11px] font-mono text-slate-900 flex items-center space-x-1.5 opacity-90">
                   <Mic className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span>Transcribed from mic: "{msg.originalSpoken}"</span>
+                  <span>Transcribed from voice: "{msg.originalSpoken}"</span>
                 </div>
               )}
 
@@ -234,7 +252,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
           value={inputVal}
           onChange={e => setInputVal(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSend()}
-          placeholder="Ask the ReRoute Privé AI Concierge about connections, palace holds, refunds..."
+          placeholder="Ask your Personal Travel Concierge about connections, palace holds, refunds..."
           className="w-full bg-[#0B0D13]/90 border border-gold-subtle rounded-2xl px-6 py-4 sm:py-5 pr-48 text-xs sm:text-sm font-sans-luxury text-slate-100 placeholder-slate-400 focus:outline-none focus:border-gold-bright transition-colors shadow-2xl"
         />
         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center space-x-2">

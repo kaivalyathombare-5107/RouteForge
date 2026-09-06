@@ -28,7 +28,7 @@ const STORY_SCENES = [
     roman: 'II',
     title: 'Disruption Detected',
     headline: '2. Something goes wrong',
-    description: 'Live airline feed reports a cancellation at Mumbai T2. The autonomous concierge flags root causality within 12 milliseconds.',
+    description: 'Live airline feed reports a cancellation at Mumbai T2. The travel concierge desk identifies root causality immediately and intervenes.',
     badge: 'DISRUPTION DETECTED',
     badgeColor: 'text-rose-400 border-rose-500/40 bg-rose-950/40',
   },

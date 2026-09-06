@@ -80,8 +80,18 @@ export const ReRouteSignInModal: React.FC<ReRouteSignInModalProps> = ({ isOpen, 
     const initials = memberName.slice(0, 2).toUpperCase();
 
     return (
-      <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div className="relative w-full max-w-xl rounded-3xl bg-[#0B0D13] border border-gold-bright shadow-2xl p-6 sm:p-8 overflow-hidden max-h-[90vh] overflow-y-auto">
+      <div 
+        className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            onClose();
+          }
+        }}
+      >
+        <div 
+          onClick={(e) => e.stopPropagation()}
+          className="relative w-full max-w-xl rounded-3xl bg-[#0B0D13] border border-gold-bright shadow-2xl p-6 sm:p-8 overflow-hidden max-h-[90vh] overflow-y-auto"
+        >
           {/* Ambient Glow */}
           <div className="absolute top-0 right-0 w-72 h-72 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -175,7 +185,7 @@ export const ReRouteSignInModal: React.FC<ReRouteSignInModalProps> = ({ isOpen, 
               <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-1">
                 <div className="flex items-center space-x-1.5 text-xs text-slate-200 font-medium">
                   <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
-                  <span>24/7 AI Concierge</span>
+                  <span>24/7 Travel Concierge</span>
                 </div>
                 <p className="text-[11px] text-slate-400 font-sans-luxury">
                   Priority recovery with alternative flights, trains, &amp; transfers.
@@ -234,8 +244,18 @@ export const ReRouteSignInModal: React.FC<ReRouteSignInModalProps> = ({ isOpen, 
 
   // Sign-In View when User is Not Signed In
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="relative w-full max-w-lg rounded-3xl bg-[#0B0D13] border border-gold-bright shadow-2xl p-6 sm:p-8 overflow-hidden">
+    <div 
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-lg rounded-3xl bg-[#0B0D13] border border-gold-bright shadow-2xl p-6 sm:p-8 overflow-hidden"
+      >
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
         <button onClick={onClose} className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-900 border border-gold-subtle hover:border-[#D4AF37] flex items-center justify-center text-slate-400 hover:text-white transition-colors cursor-pointer">
           <X className="w-4 h-4" />
@@ -246,7 +266,7 @@ export const ReRouteSignInModal: React.FC<ReRouteSignInModalProps> = ({ isOpen, 
             <span>ROUTEFORGE PRIVÉ ACCESS</span>
           </div>
           <h2 className="font-serif-display font-medium text-2xl sm:text-3xl text-white">Clientele &amp; VIP Membership</h2>
-          <p className="text-xs font-sans-luxury text-slate-300 font-light">Access private jet charters, 24/7 dedicated AI concierge disruption recovery, and suite upgrades worldwide.</p>
+          <p className="text-xs font-sans-luxury text-slate-300 font-light">Access private jet charters, 24/7 dedicated concierge disruption recovery, and suite upgrades worldwide.</p>
         </div>
 
         {/* Error / Alert Message */}

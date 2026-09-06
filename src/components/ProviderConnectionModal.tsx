@@ -90,8 +90,18 @@ export const ProviderConnectionModal: React.FC<ProviderConnectionModalProps> = (
   const connectedCount = providers.filter(p => p.connectionState === 'CONNECTED').length;
 
   return (
-    <div className="fixed inset-0 z-[9990] bg-slate-950/85 backdrop-blur-2xl flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-      <div className="relative w-full max-w-4xl rounded-3xl bg-[#0B0D13] border border-gold-bright shadow-2xl p-6 sm:p-8 overflow-hidden my-auto max-h-[90vh] flex flex-col">
+    <div 
+      className="fixed inset-0 z-[9990] bg-slate-950/85 backdrop-blur-2xl flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-4xl rounded-3xl bg-[#0B0D13] border border-gold-bright shadow-2xl p-6 sm:p-8 overflow-hidden my-auto max-h-[90vh] flex flex-col"
+      >
         {/* Ambient Gold Glow Aura */}
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-[#D4AF37]/5 rounded-full blur-3xl pointer-events-none" />

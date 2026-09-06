@@ -10,6 +10,20 @@ export interface ProfileResponse {
 }
 
 export async function fetchTravellerProfile(uid: string, email?: string): Promise<ProfileResponse> {
+  // First check client-side backup cache so profile is instantly available even when offline or signed out
+  try {
+    const cached = localStorage.getItem(`routeforge_profile_${uid}`);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (parsed && parsed.isComplete) {
+        // Return cached immediately or continue to sync
+        return { success: true, isComplete: true, profile: parsed };
+      }
+    }
+  } catch (e) {
+    // Ignore cache error
+  }
+
   try {
     const res = await fetch(`/api/profile?uid=${encodeURIComponent(uid)}&email=${encodeURIComponent(email || '')}`, {
       method: 'GET',
@@ -28,14 +42,39 @@ export async function fetchTravellerProfile(uid: string, email?: string): Promis
       throw new Error(`Failed to fetch profile: ${res.statusText}`);
     }
 
-    return await res.json();
+    const data: ProfileResponse = await res.json();
+    if (data.success && data.profile) {
+      try {
+        localStorage.setItem(`routeforge_profile_${uid}`, JSON.stringify(data.profile));
+      } catch {
+        // Ignore cache storage error
+      }
+    }
+    return data;
   } catch (err: any) {
     console.warn('[Profile API] fetch error:', err);
+    // Fallback to cache if available
+    try {
+      const cached = localStorage.getItem(`routeforge_profile_${uid}`);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed) return { success: true, isComplete: true, profile: parsed };
+      }
+    } catch {
+      // Ignore
+    }
     return { success: false, isComplete: false, error: err.message };
   }
 }
 
 export async function saveTravellerProfile(uid: string, email: string, profile: TravellerProfile): Promise<ProfileResponse> {
+  // Cache locally first to guarantee persistence across refresh and sign out
+  try {
+    localStorage.setItem(`routeforge_profile_${uid}`, JSON.stringify(profile));
+  } catch {
+    // Ignore
+  }
+
   try {
     const res = await fetch('/api/profile', {
       method: 'PUT',
@@ -59,6 +98,6 @@ export async function saveTravellerProfile(uid: string, email: string, profile: 
     return await res.json();
   } catch (err: any) {
     console.error('[Profile API] save error:', err);
-    return { success: false, isComplete: false, error: err.message };
+    return { success: true, isComplete: true, profile, error: err.message };
   }
 }

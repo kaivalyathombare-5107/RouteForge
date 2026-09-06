@@ -220,8 +220,18 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[9990] bg-slate-950/85 backdrop-blur-2xl flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-      <div className="relative w-full max-w-2xl rounded-3xl bg-[#0B0D13] border border-gold-bright shadow-2xl p-6 sm:p-10 overflow-hidden my-auto">
+    <div 
+      className="fixed inset-0 z-[9990] bg-slate-950/85 backdrop-blur-2xl flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && onClose) {
+          onClose();
+        }
+      }}
+    >
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-2xl rounded-3xl bg-[#0B0D13] border border-gold-bright shadow-2xl p-6 sm:p-10 overflow-hidden my-auto"
+      >
         {/* Ambient Gold Glow Aura */}
         <div className="absolute -top-20 -right-20 w-80 h-80 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-[#D4AF37]/5 rounded-full blur-3xl pointer-events-none" />
@@ -496,7 +506,7 @@ export const TravellerProfileModal: React.FC<TravellerProfileModalProps> = ({
                   <option value="">SELECT</option>
                   <option value="moderate">Moderate (±2 hours buffer)</option>
                   <option value="strict">Strict (Exact schedules only)</option>
-                  <option value="high">High (Open to optimal AI reroutes)</option>
+                  <option value="high">High (Open to adaptive luxury reroutes)</option>
                 </select>
               </div>
             </div>

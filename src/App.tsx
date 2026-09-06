@@ -29,7 +29,6 @@ import { ReRouteNavigation, ReRouteSection } from './components/ReRouteNavigatio
 import { VerticalSidebarDock, SidebarCategory } from './components/VerticalSidebarDock';
 import { HeroJourneySection, JourneyMode } from './components/HeroJourneySection';
 import { DestinationTiltCards, FEATURED_DESTINATIONS, DestinationItem } from './components/DestinationTiltCards';
-import { ValuePropositionBar } from './components/ValuePropositionBar';
 import { Full360PanoramaModal } from './components/Full360PanoramaModal';
 import { ReRouteSignInModal } from './components/ReRouteSignInModal';
 import { JourneySearchResultsModal } from './components/JourneySearchResultsModal';
@@ -72,8 +71,8 @@ export default function App() {
     }
   };
 
-  // Navigation & Category States
-  const [activeSection, setActiveSection] = useState<ReRouteSection>(() => readStored('routeforge_active_section', 'destinations'));
+  // Navigation & Category States - Always start at home page ('destinations') on fresh load / refresh
+  const [activeSection, setActiveSection] = useState<ReRouteSection>('destinations');
   const [activeCategory, setActiveCategory] = useState<SidebarCategory>('home');
 
   // Destination & Carousel State
@@ -674,16 +673,6 @@ export default function App() {
                 reducedMotion={reducedMotion}
               />
             </div>
-
-            {/* Bottom: 4 Value Propositions Bar */}
-            <ValuePropositionBar
-              onSelectFeature={(feat) => {
-                if (feat === 'concierge') setActiveSection('concierge');
-                if (feat === 'vip') setActiveSection('signin');
-                if (feat === 'seamless') setActiveSection('journeys');
-                if (feat === 'guarantee') setActiveSection('journeys');
-              }}
-            />
           </div>
         )}
 

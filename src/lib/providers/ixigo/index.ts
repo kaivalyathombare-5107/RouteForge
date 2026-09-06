@@ -76,7 +76,7 @@ export class IxigoAdapter implements ProviderAdapter {
         weatherImpactForecast: 'CLEAR',
       },
       provenance: {
-        source: 'ixigo AI Predictive Telemetry Stream',
+        source: 'ixigo Live Transit Telemetry Stream',
         verifiedAt: new Date().toLocaleTimeString('en-IN') + ' IST',
       },
     };

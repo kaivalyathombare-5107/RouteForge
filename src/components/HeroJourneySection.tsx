@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  ArrowRight, 
   Play, 
   Pause, 
   MapPin
@@ -17,7 +16,7 @@ interface HeroJourneySectionProps {
   totalSlides: number;
   isPlaying: boolean;
   onTogglePlay: () => void;
-  onExploreJourneys: () => void;
+  onExploreJourneys?: () => void;
   onSearchSubmit: (params: {
     origin: string;
     destination: string;
@@ -49,8 +48,7 @@ export const HeroJourneySection: React.FC<HeroJourneySectionProps> = ({
         reducedMotion={reducedMotion}
       />
 
-      {/* Cinematic Dark Gradient & Golden Twilight Vignette */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#08090C]/90 via-[#08090C]/40 to-[#08090C]/85 pointer-events-none" />
+      {/* Cinematic Vignette */}
       <div className="absolute inset-0 bg-gradient-to-t from-[#08090C] via-transparent to-transparent pointer-events-none" />
 
       {/* Content Container */}
@@ -78,20 +76,8 @@ export const HeroJourneySection: React.FC<HeroJourneySectionProps> = ({
             {currentDestination.description}
           </p>
 
-          {/* CTAs and Pagination controls */}
+          {/* Slider Progress & Play/Pause */}
           <div className="flex flex-wrap items-center gap-6 pt-2">
-            {/* Gold bordered Glass Button */}
-            <button
-              id="hero-explore-journeys-btn"
-              onClick={onExploreJourneys}
-              className="px-6 py-3.5 rounded-full border border-[#D4AF37] bg-slate-950/80 hover:bg-[#D4AF37] text-slate-100 hover:text-slate-950 font-cinzel text-xs font-bold tracking-[0.2em] transition-all duration-300 active:scale-95 flex items-center space-x-2.5 cursor-pointer shadow-xl shadow-[#D4AF37]/20 hover:shadow-2xl hover:shadow-[#D4AF37]/40 group"
-              title="Navigate to living transit corridors and Journey Planner"
-            >
-              <span>EXPLORE INDIAN & GLOBAL JOURNEYS</span>
-              <ArrowRight className="w-4 h-4 text-[#D4AF37] group-hover:text-slate-950 group-hover:translate-x-1 transition-all" />
-            </button>
-
-            {/* Slider Progress & Play/Pause */}
             <div className="flex items-center space-x-3 text-xs font-mono text-slate-300">
               <span className="text-[#D4AF37] font-semibold">
                 — {String(slideIndex + 1).padStart(2, '0')}
