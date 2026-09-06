@@ -28,6 +28,7 @@ const DEFAULT_VIP_USER: AuthUser = {
 };
 
 const SESSION_STORAGE_KEY = "routeforge_auth_session";
+const LEGACY_SESSION_STORAGE_KEY = "routeforge_auth_session";
 
 interface AuthContextProps {
   user: User | AuthUser | null;
@@ -46,9 +47,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // 1. Check for locally persisted session (e.g. VIP Demo or previous login)
+    // Remove the old persistent demo session so it cannot leak between users.
+    localStorage.removeItem(LEGACY_SESSION_STORAGE_KEY);
+
+    // 1. Check for a session-scoped demo session.
     try {
-      const stored = localStorage.getItem(SESSION_STORAGE_KEY);
+      const stored = sessionStorage.getItem(SESSION_STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed && parsed.uid) {
@@ -132,10 +136,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             console.warn("[Auth] Redirect fallback error:", redirectErr);
           }
         }
-        // Graceful fallback on configuration or API key issues
-        console.info("[Auth] Activating Privé VIP profile fallback.");
-        const demoUser = await signInWithDemo();
-        return { user: demoUser };
+        // Do not silently sign in as the demo owner when a real account fails.
+        throw e;
       }
     }
 
@@ -151,7 +153,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       ...customUser,
     };
     try {
-      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(demoAccount));
+      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(demoAccount));
     } catch (e) {
       console.warn("[Auth] Failed to persist demo session in localStorage", e);
     }
@@ -171,6 +173,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     try {
       localStorage.removeItem(SESSION_STORAGE_KEY);
+      sessionStorage.removeItem(SESSION_STORAGE_KEY);
       setUser(null);
       if (auth) {
         await firebaseSignOut(auth);
