@@ -482,7 +482,7 @@ export const ConciergeTripExtensionsSection: React.FC<{
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0D1017] via-transparent to-black/40" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none" />
                     <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-slate-950/80 border border-gold-subtle backdrop-blur-md text-[10px] font-cinzel text-[#FCE7AC]">
                       {stay.category}
                     </div>
@@ -611,7 +611,7 @@ export const ConciergeTripExtensionsSection: React.FC<{
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0D1017] via-transparent to-black/40" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none" />
                     <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-slate-950/80 border border-gold-subtle backdrop-blur-md text-[10px] font-cinzel text-[#FCE7AC]">
                       {trip.tag}
                     </div>

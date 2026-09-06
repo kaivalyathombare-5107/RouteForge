@@ -3,6 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('routeforge_theme');
+          var theme = saved ? saved : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          document.documentElement.classList.remove('dark', 'light');
+          document.documentElement.classList.add(theme);
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {}
+      })();
+    </script>
     <title>RouteForge // Vogue Travel & 3D Panorama</title>
     <meta name="description" content="RouteForge — Intelligent travel disruption recovery platform. Understands complete multi-modal itineraries across air, rail, transfers, and stays, identifies direct and downstream impacts, and generates deterministic recovery plans with statutory IRCTC and DGCA refund tracking." />
     <meta property="og:title" content="RouteForge // Vogue Travel & 3D Panorama" />

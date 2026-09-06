@@ -1123,5 +1123,164 @@
     "createdAt": "2026-09-06T16:30:39.970Z",
     "updatedAt": "2026-09-06T16:30:39.970Z",
     "lastVerifiedAt": "2026-09-06T16:30:39.970Z"
+  },
+  "bk_1788717764438_67rp40": {
+    "id": "bk_1788717764438_67rp40",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingReference": "RF-REDB-152020",
+    "provider": "redbus",
+    "title": "Zingbus Electric / Intrcity SmartBus Lounge Luxury Sleeper",
+    "status": "CONFIRMED",
+    "totalPrice": 1493,
+    "currency": "INR",
+    "passengers": [
+      {
+        "name": "Kaivalya Thombare",
+        "mealPreference": "Pure Veg / Jain (Profile Synced)"
+      }
+    ],
+    "segments": [
+      {
+        "id": "seg_bk_1788717764438_67rp40_1",
+        "bookingId": "bk_1788717764438_67rp40",
+        "segmentOrder": 1,
+        "transportType": "bus",
+        "operator": "redBus Verified • Multi-Axle Air Suspension",
+        "serviceNumber": "RB-VOLVO-9600",
+        "origin": "Zingbus Electric / Intrcity SmartBus Lounge (Volvo 9600 Multi-Axle Luxury Sleeper (1+2))",
+        "destination": "Destination",
+        "depTime": "14:30 IST",
+        "arrTime": "19:00 IST",
+        "seatClass": "Volvo 9600 Multi-Axle Luxury Sleeper (1+2)",
+        "status": "CONFIRMED",
+        "sourceType": "PARTNER_API",
+        "pnr": "REDB-152020",
+        "createdAt": "2026-09-06T18:02:44.438Z"
+      }
+    ],
+    "cancellationPolicy": {
+      "refundable": true,
+      "terms": "redBus Assurance: 100% refund on carrier cancellation + real-time GPS tracking & driver contact."
+    },
+    "modificationPolicy": {
+      "allowed": true,
+      "terms": "Modification supported before scheduled departure."
+    },
+    "disruptionShield": "redBus Assurance: 100% refund on carrier cancellation + real-time GPS tracking & driver contact.",
+    "provenance": {
+      "source": "PARTNER_API",
+      "verifiedAt": "11:32:16 pm IST",
+      "expiresAt": "2026-09-06T18:17:16.687Z",
+      "confidenceScore": 0.97
+    },
+    "createdAt": "2026-09-06T18:02:44.438Z",
+    "updatedAt": "2026-09-06T18:02:44.438Z",
+    "lastVerifiedAt": "2026-09-06T18:02:44.438Z"
+  },
+  "bk_1788717790253_2wvmp7": {
+    "id": "bk_1788717790253_2wvmp7",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingReference": "RF-UBER-584772",
+    "provider": "uber",
+    "title": "Uber Black Private Chauffeur",
+    "status": "CONFIRMED",
+    "totalPrice": 3143,
+    "currency": "INR",
+    "passengers": [
+      {
+        "name": "Kaivalya Thombare",
+        "mealPreference": "Pure Veg / Jain (Profile Synced)"
+      }
+    ],
+    "segments": [
+      {
+        "id": "seg_bk_1788717790253_2wvmp7_1",
+        "bookingId": "bk_1788717790253_2wvmp7",
+        "segmentOrder": 1,
+        "transportType": "car",
+        "operator": "Uber Mobility • Professional Chauffeur",
+        "serviceNumber": "UBER-Uber Black",
+        "origin": "Uber Black (Mercedes-Benz E-Class / BMW 5 Series / Audi A6)",
+        "destination": "Destination",
+        "depTime": "On Demand (Within 10m)",
+        "arrTime": "ETA +6m",
+        "seatClass": "Uber Black Executive",
+        "status": "CONFIRMED",
+        "sourceType": "PARTNER_API",
+        "pnr": "UBER-584772",
+        "createdAt": "2026-09-06T18:03:10.253Z"
+      }
+    ],
+    "cancellationPolicy": {
+      "refundable": true,
+      "terms": "Uber Reserve Guarantee: Guaranteed vehicle dispatch, 45-min complimentary waiting window & flight tracking."
+    },
+    "modificationPolicy": {
+      "allowed": true,
+      "terms": "Modification supported before scheduled departure."
+    },
+    "disruptionShield": "Uber Reserve Guarantee: Guaranteed vehicle dispatch, 45-min complimentary waiting window & flight tracking.",
+    "provenance": {
+      "source": "PARTNER_API",
+      "verifiedAt": "11:32:58 pm IST",
+      "expiresAt": "2026-09-06T18:17:58.170Z",
+      "confidenceScore": 0.99
+    },
+    "createdAt": "2026-09-06T18:03:10.253Z",
+    "updatedAt": "2026-09-06T18:03:10.253Z",
+    "lastVerifiedAt": "2026-09-06T18:03:10.253Z"
+  },
+  "bk_1788718859542_m7wfg2": {
+    "id": "bk_1788718859542_m7wfg2",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "bookingReference": "RF-IRCT-709948",
+    "provider": "irctc",
+    "title": "New Delhi - Mumbai Central Tejas Rajdhani Express",
+    "status": "CONFIRMED",
+    "totalPrice": 5343,
+    "currency": "INR",
+    "passengers": [
+      {
+        "name": "Kaivalya Thombare",
+        "mealPreference": "Pure Veg / Jain (Profile Synced)"
+      }
+    ],
+    "segments": [
+      {
+        "id": "seg_bk_1788718859542_m7wfg2_1",
+        "bookingId": "bk_1788718859542_m7wfg2",
+        "segmentOrder": 1,
+        "transportType": "train",
+        "operator": "Indian Railways IRCTC • First AC (1A)",
+        "serviceNumber": "12952",
+        "origin": "New Delhi - Mumbai Central Tejas Rajdhani (12952)",
+        "destination": "Destination",
+        "depTime": "16:55 IST",
+        "arrTime": "08:35 IST",
+        "seatClass": "First AC (1A)",
+        "status": "CONFIRMED",
+        "sourceType": "PARTNER_API",
+        "pnr": "IRCT-709948",
+        "createdAt": "2026-09-06T18:20:59.542Z"
+      }
+    ],
+    "cancellationPolicy": {
+      "refundable": true,
+      "terms": "Railway Rule 73A: 100% full statutory refund with auto-TDR filing if delayed > 3h."
+    },
+    "modificationPolicy": {
+      "allowed": true,
+      "terms": "Modification supported before scheduled departure."
+    },
+    "disruptionShield": "Railway Rule 73A: 100% full statutory refund with auto-TDR filing if delayed > 3h.",
+    "provenance": {
+      "source": "PARTNER_API",
+      "verifiedAt": "11:50 pm IST",
+      "expiresAt": "2026-09-06T18:35:16.306Z",
+      "confidenceScore": 0.98
+    },
+    "createdAt": "2026-09-06T18:20:59.542Z",
+    "updatedAt": "2026-09-06T18:20:59.542Z",
+    "lastVerifiedAt": "2026-09-06T18:20:59.542Z"
   }
 }

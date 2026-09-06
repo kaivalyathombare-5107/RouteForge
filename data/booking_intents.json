@@ -1201,5 +1201,254 @@
     "status": "CONFIRMED",
     "createdAt": "2026-09-06T16:30:39.950Z",
     "updatedAt": "2026-09-06T16:30:39.973Z"
+  },
+  "intent_1788717764433_5auhrr": {
+    "id": "intent_1788717764433_5auhrr",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "journeyId": "plan_bus_luxury",
+    "provider": "redbus",
+    "selectedOption": {
+      "id": "plan_bus_luxury",
+      "category": "COMFORT_BUS",
+      "title": "Zingbus Electric / Intrcity SmartBus Lounge Luxury Sleeper",
+      "providerSummary": "redBus Luxury Intercity GDS",
+      "totalDuration": "4h 30m Highway Coach",
+      "durationMinutes": 270,
+      "depTime": "14:30 IST",
+      "arrTime": "19:00 IST",
+      "totalPrice": 1250,
+      "currency": "INR",
+      "priceFormatted": "₹1,250 / seat",
+      "co2": "34 kg CO₂e",
+      "disruptionShield": "redBus Assurance: 100% refund on carrier cancellation + real-time GPS tracking & driver contact.",
+      "badge": "BUS • LUXURY SLEEPER COACH",
+      "legs": [
+        {
+          "id": "leg_bus_RB-VOLVO-9600",
+          "type": "bus",
+          "label": "Zingbus Electric / Intrcity SmartBus Lounge (Volvo 9600 Multi-Axle Luxury Sleeper (1+2))",
+          "carrier": "redBus Verified • Multi-Axle Air Suspension",
+          "time": "4h 30m",
+          "depTime": "14:30 IST",
+          "arrTime": "19:00 IST",
+          "provider": "redbus",
+          "sourceType": "PARTNER_API",
+          "seatClass": "Volvo 9600 Multi-Axle Luxury Sleeper (1+2)",
+          "bookingReference": "RB-VOLVO-9600",
+          "provenance": {
+            "source": "redBus GDS REST API v3",
+            "verifiedAt": "11:32:16 pm IST"
+          }
+        }
+      ],
+      "provenance": {
+        "source": "PARTNER_API",
+        "verifiedAt": "11:32:16 pm IST",
+        "expiresAt": "2026-09-06T18:17:16.687Z",
+        "confidenceScore": 0.97
+      },
+      "explanation": "Premium multi-axle Volvo sleeper coach with personal 4K entertainment screen, fast USB charging, sanitized blankets, and direct highway corridor transit.",
+      "bookingMethods": [
+        "OFFICIAL_PARTNER",
+        "DIRECT_API",
+        "DEEP_LINK"
+      ]
+    },
+    "providerReference": "RB-VOLVO-9600",
+    "bookingMethod": "OFFICIAL_PARTNER",
+    "deepLinkUrl": "https://www.redbus.in/bus-tickets/undefined-to-undefined",
+    "requestedParameters": {
+      "title": "Zingbus Electric / Intrcity SmartBus Lounge Luxury Sleeper",
+      "legs": [
+        {
+          "id": "leg_bus_RB-VOLVO-9600",
+          "type": "bus",
+          "label": "Zingbus Electric / Intrcity SmartBus Lounge (Volvo 9600 Multi-Axle Luxury Sleeper (1+2))",
+          "carrier": "redBus Verified • Multi-Axle Air Suspension",
+          "time": "4h 30m",
+          "depTime": "14:30 IST",
+          "arrTime": "19:00 IST",
+          "provider": "redbus",
+          "sourceType": "PARTNER_API",
+          "seatClass": "Volvo 9600 Multi-Axle Luxury Sleeper (1+2)",
+          "bookingReference": "RB-VOLVO-9600",
+          "provenance": {
+            "source": "redBus GDS REST API v3",
+            "verifiedAt": "11:32:16 pm IST"
+          }
+        }
+      ],
+      "totalPrice": 1493,
+      "website": "https://www.redbus.in/bus-tickets/mumbai-to-kyoto"
+    },
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-06T18:02:44.433Z",
+    "updatedAt": "2026-09-06T18:02:44.440Z"
+  },
+  "intent_1788717790246_vrpmcj": {
+    "id": "intent_1788717790246_vrpmcj",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "journeyId": "plan_uber_private",
+    "provider": "uber",
+    "selectedOption": {
+      "id": "plan_uber_private",
+      "category": "DOOR_TO_DOOR_CAB",
+      "title": "Uber Black Private Chauffeur",
+      "providerSummary": "Uber Mobility Executive Reserve",
+      "totalDuration": "6 mins Door-to-Door",
+      "durationMinutes": 6,
+      "depTime": "Immediate / Scheduled Pickup",
+      "arrTime": "Direct to Doorstep",
+      "totalPrice": 2850,
+      "currency": "INR",
+      "priceFormatted": "₹2,850 / ride",
+      "co2": "42 kg CO₂e",
+      "disruptionShield": "Uber Reserve Guarantee: Guaranteed vehicle dispatch, 45-min complimentary waiting window & flight tracking.",
+      "badge": "UBER • DOOR-TO-DOOR CHAUFFEUR",
+      "legs": [
+        {
+          "id": "leg_uber_uber_black",
+          "type": "car",
+          "label": "Uber Black (Mercedes-Benz E-Class / BMW 5 Series / Audi A6)",
+          "carrier": "Uber Mobility • Professional Chauffeur",
+          "time": "6 mins",
+          "depTime": "On Demand (Within 10m)",
+          "arrTime": "ETA +6m",
+          "provider": "uber",
+          "sourceType": "PARTNER_API",
+          "seatClass": "Uber Black Executive",
+          "bookingReference": "UBER-Uber Black",
+          "provenance": {
+            "source": "Uber Mobility OAuth API v1.2",
+            "verifiedAt": "11:32:58 pm IST"
+          }
+        }
+      ],
+      "provenance": {
+        "source": "PARTNER_API",
+        "verifiedAt": "11:32:58 pm IST",
+        "expiresAt": "2026-09-06T18:17:58.170Z",
+        "confidenceScore": 0.99
+      },
+      "explanation": "Private point-to-point luxury transit in a verified executive vehicle (Mercedes-Benz E-Class / BMW 5 Series / Audi A6). Zero waiting, door-to-door trunk assistance, and live route telemetry.",
+      "bookingMethods": [
+        "OFFICIAL_PARTNER",
+        "DIRECT_API",
+        "DEEP_LINK"
+      ]
+    },
+    "providerReference": "UBER-Uber Black",
+    "bookingMethod": "OFFICIAL_PARTNER",
+    "deepLinkUrl": "https://m.uber.com/ul/?action=setPickup&client_id=routeforge&dropoff[formatted_address]=undefined",
+    "requestedParameters": {
+      "title": "Uber Black Private Chauffeur",
+      "legs": [
+        {
+          "id": "leg_uber_uber_black",
+          "type": "car",
+          "label": "Uber Black (Mercedes-Benz E-Class / BMW 5 Series / Audi A6)",
+          "carrier": "Uber Mobility • Professional Chauffeur",
+          "time": "6 mins",
+          "depTime": "On Demand (Within 10m)",
+          "arrTime": "ETA +6m",
+          "provider": "uber",
+          "sourceType": "PARTNER_API",
+          "seatClass": "Uber Black Executive",
+          "bookingReference": "UBER-Uber Black",
+          "provenance": {
+            "source": "Uber Mobility OAuth API v1.2",
+            "verifiedAt": "11:32:58 pm IST"
+          }
+        }
+      ],
+      "totalPrice": 3143,
+      "website": "https://book.olacabs.com/?pickup_name=Mumbai&drop_name=Delhi"
+    },
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-06T18:03:10.246Z",
+    "updatedAt": "2026-09-06T18:03:10.255Z"
+  },
+  "intent_1788718859532_40dx5l": {
+    "id": "intent_1788718859532_40dx5l",
+    "userId": "eKCtV6q61wgi7edQaQ3tC8W7D9t1",
+    "journeyId": "plan_train_express",
+    "provider": "irctc",
+    "selectedOption": {
+      "id": "plan_train_express",
+      "category": "PREMIUM_RAIL",
+      "title": "New Delhi - Mumbai Central Tejas Rajdhani Express",
+      "providerSummary": "IRCTC NextGen PRS",
+      "totalDuration": "15h 36m Scenic Railway",
+      "durationMinutes": 936,
+      "depTime": "16:55 IST",
+      "arrTime": "08:35 IST",
+      "totalPrice": 4850,
+      "currency": "INR",
+      "priceFormatted": "₹4,850 / berth",
+      "co2": "28 kg CO₂e (Eco-Friendly)",
+      "disruptionShield": "Railway Rule 73A: 100% full statutory refund with auto-TDR filing if delayed > 3h.",
+      "badge": "TRAIN • HIGH-SPEED SCENIC RAIL",
+      "legs": [
+        {
+          "id": "leg_rail_12952_1A",
+          "type": "train",
+          "label": "New Delhi - Mumbai Central Tejas Rajdhani (12952)",
+          "carrier": "Indian Railways IRCTC • First AC (1A)",
+          "time": "15h 36m",
+          "depTime": "16:55 IST",
+          "arrTime": "08:35 IST",
+          "provider": "irctc",
+          "sourceType": "PARTNER_API",
+          "seatClass": "First AC (1A)",
+          "bookingReference": "12952",
+          "provenance": {
+            "source": "IRCTC NextGen PRS Gateway",
+            "verifiedAt": "11:50 pm IST"
+          }
+        }
+      ],
+      "provenance": {
+        "source": "PARTNER_API",
+        "verifiedAt": "11:50 pm IST",
+        "expiresAt": "2026-09-06T18:35:16.306Z",
+        "confidenceScore": 0.98
+      },
+      "explanation": "Verified IRCTC PRS confirmed berths with panoramic window view, complimentary onboard meals, and generous 40 kg luggage allowance.",
+      "bookingMethods": [
+        "OFFICIAL_PARTNER",
+        "DIRECT_API",
+        "DEEP_LINK"
+      ]
+    },
+    "providerReference": "12952",
+    "bookingMethod": "OFFICIAL_PARTNER",
+    "deepLinkUrl": "https://www.irctc.co.in/nget/booking/train-list?trainNo=undefined&date=undefined",
+    "requestedParameters": {
+      "title": "New Delhi - Mumbai Central Tejas Rajdhani Express",
+      "legs": [
+        {
+          "id": "leg_rail_12952_1A",
+          "type": "train",
+          "label": "New Delhi - Mumbai Central Tejas Rajdhani (12952)",
+          "carrier": "Indian Railways IRCTC • First AC (1A)",
+          "time": "15h 36m",
+          "depTime": "16:55 IST",
+          "arrTime": "08:35 IST",
+          "provider": "irctc",
+          "sourceType": "PARTNER_API",
+          "seatClass": "First AC (1A)",
+          "bookingReference": "12952",
+          "provenance": {
+            "source": "IRCTC NextGen PRS Gateway",
+            "verifiedAt": "11:50 pm IST"
+          }
+        }
+      ],
+      "totalPrice": 5343,
+      "website": "https://www.confirmtkt.com/rbooking-d/trains/from/PNV/to/NKN/2026-09-12"
+    },
+    "status": "CONFIRMED",
+    "createdAt": "2026-09-06T18:20:59.532Z",
+    "updatedAt": "2026-09-06T18:20:59.545Z"
   }
 }

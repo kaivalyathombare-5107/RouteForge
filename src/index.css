@@ -208,3 +208,499 @@ button, [role="button"] {
   animation: conciergeEntranceAnimation 2.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+/* =========================================================================
+   LUXURY LIGHT MODE OVERRIDES
+   Turns everything into clean, pristine, high-contrast luxury Light Mode:
+   - Deep obsidian/onyx tones -> Pure white (#FFFFFF) & warm alabaster (#F4F1EA)
+   - Text -> Deep charcoal (#14171F), slate (#4B5563), and rich bronze gold (#8C6B1B)
+   - Headers, Dropdown menus, Modals, Cards, Drawers, Inputs -> 100% Light Mode
+   ========================================================================= */
+html.light {
+  color-scheme: light;
+}
+
+html.light body {
+  background-color: #F8F6F0 !important;
+  color: #16181E !important;
+}
+
+/* Universal Dark Background Overrides -> Pure White (#FFFFFF) */
+html.light [class*="bg-[#050608]"],
+html.light [class*="bg-[#05070B]"],
+html.light [class*="bg-[#06070A]"],
+html.light [class*="bg-[#07080D]"],
+html.light [class*="bg-[#07090F]"],
+html.light [class*="bg-[#08090C]"],
+html.light [class*="bg-[#090A0E]"],
+html.light [class*="bg-[#090B10]"],
+html.light [class*="bg-[#090C12]"],
+html.light [class*="bg-[#090C14]"],
+html.light [class*="bg-[#0A0C10]"],
+html.light [class*="bg-[#0A0C12]"],
+html.light [class*="bg-[#0A0C14]"],
+html.light [class*="bg-[#0A0E17]"],
+html.light [class*="bg-[#0B0D13]"],
+html.light [class*="bg-[#0B0D14]"],
+html.light [class*="bg-[#0B0E14]"],
+html.light [class*="bg-[#0C0E14]"],
+html.light [class*="bg-[#0D0F16]"],
+html.light [class*="bg-[#0D1017]"],
+html.light [class*="bg-[#0E1017]"],
+html.light [class*="bg-[#0E1118]"],
+html.light [class*="bg-[#0E111A]"],
+html.light [class*="bg-[#0F121A]"],
+html.light [class*="bg-[#121520]"],
+html.light [class*="bg-[#121624]"],
+html.light [class*="bg-[#141720]"],
+html.light [class*="bg-[#141824]"],
+html.light [class*="bg-[#161922]"],
+html.light [class*="bg-[#181B26]"],
+html.light [class*="bg-[#1A1D27]"],
+html.light [class*="bg-[#1A1F2C]"],
+html.light [class*="bg-[#1E222D]"],
+html.light [class*="bg-slate-950"],
+html.light [class*="bg-zinc-950"],
+html.light [class*="bg-neutral-950"] {
+  background-color: #FFFFFF !important;
+}
+
+/* Secondary subtle warm layers -> Soft Alabaster / Cream (#F4F1EA) */
+html.light [class*="bg-slate-900"],
+html.light [class*="bg-zinc-900"],
+html.light [class*="bg-neutral-900"],
+html.light :not(.fixed):not([class*="z-"])[class*="bg-black/"] {
+  background-color: #F4F1EA !important;
+}
+
+/* Tertiary borders and dark highlights -> Muted Greige (#E8E3D7) */
+html.light [class*="bg-slate-800"],
+html.light [class*="bg-zinc-800"] {
+  background-color: #E8E3D7 !important;
+}
+
+/* Hover highlights for interactive rows and buttons */
+html.light [class*="hover:bg-slate-900"]:hover,
+html.light [class*="hover:bg-slate-800"]:hover,
+html.light [class*="hover:bg-[#121520]"]:hover {
+  background-color: #EFEBE0 !important;
+}
+
+/* Universal Dark Gradient Stops -> Light Gradient Stops */
+html.light [class*="from-[#08090C]"],
+html.light [class*="from-[#0B0D13]"],
+html.light [class*="from-[#0D1017]"],
+html.light [class*="from-[#0E1017]"],
+html.light [class*="from-[#0E121A]"],
+html.light [class*="from-[#120708]"],
+html.light [class*="from-[#141824]"],
+html.light [class*="from-[#161922]"],
+html.light [class*="from-[#171B26]"],
+html.light [class*="from-slate-950"],
+html.light [class*="from-slate-900"] {
+  --tw-gradient-from: #FFFFFF !important;
+}
+
+html.light [class*="via-[#08090C]"],
+html.light [class*="via-[#0A0D14]"],
+html.light [class*="via-[#0B0C10]"],
+html.light [class*="via-[#0B0E14]"],
+html.light [class*="via-[#0C0E14]"],
+html.light [class*="via-slate-950"],
+html.light [class*="via-slate-900"] {
+  --tw-gradient-via: #FAF8F5 !important;
+}
+
+html.light [class*="to-[#07080C]"],
+html.light [class*="to-[#08090C]"],
+html.light [class*="to-[#0A0D13]"],
+html.light [class*="to-[#0B0D13]"],
+html.light [class*="to-[#0D0F16]"],
+html.light [class*="to-[#0D1017]"],
+html.light [class*="to-[#0D1018]"],
+html.light [class*="to-[#0E1118]"],
+html.light [class*="to-slate-950"],
+html.light [class*="to-slate-900"] {
+  --tw-gradient-to: #F4F1EA !important;
+}
+
+/* Card image overlay gradients: transparent top vignette in light mode */
+html.light [class*="to-black/40"] {
+  --tw-gradient-to: transparent !important;
+}
+
+/* Modal Backdrops: Keep semi-transparent dark vignette so white modal pops over page */
+html.light .fixed.inset-0[class*="bg-slate-950"],
+html.light .fixed.inset-0[class*="bg-black"],
+html.light .fixed.inset-0.bg-slate-950\/80,
+html.light .fixed.inset-0.bg-black\/80 {
+  background-color: rgba(18, 20, 26, 0.55) !important;
+}
+
+/* Universal Typography Overrides */
+html.light .text-white,
+html.light .text-slate-100,
+html.light .text-slate-200,
+html.light .text-\[\#F3EFE6\],
+html.light h1,
+html.light h2,
+html.light h3,
+html.light h4,
+html.light h5,
+html.light h6 {
+  color: #14171F !important;
+  -webkit-text-fill-color: initial !important;
+}
+
+html.light .text-slate-300,
+html.light .text-slate-400 {
+  color: #4B5563 !important;
+  -webkit-text-fill-color: initial !important;
+}
+
+html.light .text-slate-500 {
+  color: #6B7280 !important;
+  -webkit-text-fill-color: initial !important;
+}
+
+/* Contrast Protection for Vivid Primary Buttons & Alerts (White Text on Red/Blue/Green/Purple) */
+html.light [class*="bg-blue-600"],
+html.light [class*="bg-blue-600"] *,
+html.light [class*="bg-emerald-600"],
+html.light [class*="bg-emerald-600"] *,
+html.light [class*="bg-purple-600"],
+html.light [class*="bg-purple-600"] *,
+html.light [class*="bg-sky-600"],
+html.light [class*="bg-sky-600"] *,
+html.light [class*="bg-amber-600"],
+html.light [class*="bg-amber-600"] *,
+html.light [class*="bg-red-600"],
+html.light [class*="bg-red-600"] *,
+html.light [class*="bg-rose-600"],
+html.light [class*="bg-rose-600"] *,
+html.light [class*="from-red-600"],
+html.light [class*="from-red-600"] *,
+html.light [class*="from-rose-600"],
+html.light [class*="from-rose-600"] * {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+
+/* High-Contrast Badge & Pill Color Transformations for Light Mode */
+html.light [class*="bg-emerald-950"] {
+  background-color: #ECFDF5 !important;
+  border-color: #A7F3D0 !important;
+}
+html.light [class*="text-emerald-200"],
+html.light [class*="text-emerald-300"],
+html.light [class*="text-emerald-400"] {
+  color: #047857 !important;
+}
+
+html.light [class*="bg-red-950"] {
+  background-color: #FEF2F2 !important;
+  border-color: #FECACA !important;
+}
+html.light [class*="text-red-200"],
+html.light [class*="text-red-300"],
+html.light [class*="text-red-400"] {
+  color: #B91C1C !important;
+}
+
+html.light [class*="bg-rose-950"] {
+  background-color: #FFF1F2 !important;
+  border-color: #FECDD3 !important;
+}
+html.light [class*="text-rose-200"],
+html.light [class*="text-rose-300"],
+html.light [class*="text-rose-400"] {
+  color: #BE123C !important;
+}
+
+html.light [class*="bg-amber-950"] {
+  background-color: #FFFBEB !important;
+  border-color: #FDE68A !important;
+}
+html.light [class*="text-amber-200"],
+html.light [class*="text-amber-300"],
+html.light [class*="text-amber-400"] {
+  color: #B45309 !important;
+}
+
+html.light [class*="bg-blue-950"] {
+  background-color: #EFF6FF !important;
+  border-color: #BFDBFE !important;
+}
+html.light [class*="text-blue-200"],
+html.light [class*="text-blue-300"],
+html.light [class*="text-blue-400"] {
+  color: #1D4ED8 !important;
+}
+
+html.light [class*="bg-sky-950"] {
+  background-color: #F0F9FF !important;
+  border-color: #BAE6FD !important;
+}
+html.light [class*="text-sky-200"],
+html.light [class*="text-sky-300"],
+html.light [class*="text-sky-400"] {
+  color: #0369A1 !important;
+}
+
+html.light [class*="bg-purple-950"] {
+  background-color: #FAF5FF !important;
+  border-color: #E9D5FF !important;
+}
+html.light [class*="text-purple-200"],
+html.light [class*="text-purple-300"],
+html.light [class*="text-purple-400"] {
+  color: #7E22CE !important;
+}
+
+html.light [class*="bg-cyan-950"] {
+  background-color: #ECFEFF !important;
+  border-color: #A5F3FC !important;
+}
+html.light [class*="text-cyan-300"],
+html.light [class*="text-cyan-400"] {
+  color: #0E7490 !important;
+}
+
+html.light [class*="bg-indigo-950"] {
+  background-color: #EEF2FF !important;
+  border-color: #C7D2FE !important;
+}
+html.light [class*="text-indigo-200"],
+html.light [class*="text-indigo-300"] {
+  color: #4338CA !important;
+}
+
+/* Faint semi-transparent white borders converted to elegant greige */
+html.light [class*="border-white/"] {
+  border-color: #E2DDD3 !important;
+}
+
+/* Luxury Champagne and Gold text overrides for high contrast on light backdrops */
+html.light .text-gold-gradient {
+  background: linear-gradient(135deg, #1C1E24 0%, #8C6B1B 55%, #59420D 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+html.light .text-gold-light {
+  background: linear-gradient(135deg, #16181E 0%, #7D5F16 55%, #A88325 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+html.light .text-champagne-gradient {
+  background: linear-gradient(135deg, #16181E 0%, #8C6B1B 65%, #59420D 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+html.light .text-\[\#FCE7AC\],
+html.light .text-\[\#F3E5AB\] {
+  color: #8C6B1B !important;
+  -webkit-text-fill-color: initial !important;
+}
+
+html.light .text-\[\#D4AF37\] {
+  color: #997825 !important;
+  -webkit-text-fill-color: initial !important;
+}
+
+/* Header & Dropdown Navigation Panel (Image 2) */
+html.light header {
+  background-color: rgba(255, 255, 255, 0.94) !important;
+  border-color: #E2DDD3 !important;
+}
+
+html.light #header-nav-menu div[class*="rounded-2xl"],
+html.light nav div[class*="rounded-2xl"] {
+  background-color: #FFFFFF !important;
+  border-color: rgba(184, 134, 11, 0.3) !important;
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(184, 134, 11, 0.12) !important;
+}
+
+html.light #header-nav-menu button,
+html.light nav button {
+  color: #1E222D !important;
+}
+
+html.light #header-nav-menu button:hover,
+html.light nav button:hover {
+  background-color: #F4F1EA !important;
+  color: #14171F !important;
+}
+
+html.light #header-nav-menu button[class*="bg-[#D4AF37]"],
+html.light nav button[class*="bg-[#D4AF37]"] {
+  background-color: rgba(212, 175, 55, 0.16) !important;
+  color: #8C6B1B !important;
+  border-color: rgba(212, 175, 55, 0.45) !important;
+}
+
+/* AI Assistant Concierge Drawer (Image 3) */
+html.light #concierge-terminal-drawer {
+  background-color: #FFFFFF !important;
+  border-color: rgba(184, 134, 11, 0.3) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(184, 134, 11, 0.15) !important;
+}
+
+html.light #concierge-terminal-drawer > div:first-child {
+  background-color: #F8F6F0 !important;
+  border-color: rgba(184, 134, 11, 0.2) !important;
+}
+
+html.light #concierge-terminal-drawer div[class*="overflow-y-auto"] {
+  background-color: #F7F5EE !important;
+  border-color: rgba(184, 134, 11, 0.18) !important;
+}
+
+html.light #concierge-terminal-drawer div.rounded-tl-none {
+  background-color: #FFFFFF !important;
+  color: #14171F !important;
+  border: 1px solid #E2DDD3 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+}
+
+html.light #concierge-terminal-drawer input {
+  background-color: #FFFFFF !important;
+  color: #14171F !important;
+  border-color: rgba(184, 134, 11, 0.35) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06) !important;
+}
+
+html.light #concierge-terminal-drawer input::placeholder {
+  color: #9CA3AF !important;
+}
+
+/* Disruption Shield Hero Card & KPI Badges (Image 1) */
+html.light div[class*="bg-[#0B0D13]/90"] {
+  background-color: #FFFFFF !important;
+  border-color: rgba(184, 134, 11, 0.25) !important;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light div[class*="bg-slate-950/90"] {
+  background-color: #F8F6F0 !important;
+  border-color: #E2DDD3 !important;
+}
+
+/* Form inputs & controls */
+html.light input,
+html.light select,
+html.light textarea {
+  background-color: #FFFFFF !important;
+  color: #12141A !important;
+  border-color: rgba(184, 134, 11, 0.3) !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #9CA3AF !important;
+}
+
+/* Borders */
+html.light [class*="border-slate-800"],
+html.light [class*="border-slate-700"] {
+  border-color: #E2DDD3 !important;
+}
+
+html.light [class*="border-gold-subtle"] {
+  border-color: rgba(184, 134, 11, 0.28) !important;
+}
+
+html.light [class*="border-gold-bright"] {
+  border-color: rgba(184, 134, 11, 0.65) !important;
+}
+
+/* Luxury Glass & Shadows */
+html.light .bg-gold-glass {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 246, 240, 0.94) 100%) !important;
+  backdrop-filter: blur(16px);
+}
+
+html.light .luxury-card-sheen {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(212, 175, 55, 0.05) 40%, rgba(244, 241, 234, 0.7) 100%) !important;
+}
+
+html.light .shadow-2xl,
+html.light .shadow-xl {
+  box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Scrollbars */
+html.light ::-webkit-scrollbar-track {
+  background: #F3EFE6;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  background: #D2C9B8;
+}
+
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #8C6B1B;
+}
+
+/* Photographic Hero Canvas: Keep white/gold text over image */
+html.light .hero-journey-section .text-white,
+html.light .hero-journey-section h1 {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+
+html.light .hero-journey-section .text-\[\#FCE7AC\] {
+  color: #FCE7AC !important;
+  -webkit-text-fill-color: #FCE7AC !important;
+}
+
+html.light .hero-journey-section .text-slate-200 {
+  color: #E2E8F0 !important;
+  -webkit-text-fill-color: #E2E8F0 !important;
+}
+
+html.light .hero-journey-section .text-\[\#D4AF37\] {
+  color: #D4AF37 !important;
+  -webkit-text-fill-color: #D4AF37 !important;
+}
+
+html.light .hero-journey-section .bg-slate-950\/60 {
+  background-color: rgba(6, 7, 10, 0.6) !important;
+}
+
+html.light .hero-journey-section .bg-gradient-to-t {
+  background-image: linear-gradient(to top, #08090C, transparent, transparent) !important;
+}
+
+html.light .hero-journey-section #hero-explore-journeys-btn {
+  background-color: rgba(6, 7, 10, 0.7) !important;
+  border-color: rgba(212, 175, 55, 0.6) !important;
+  color: #FCE7AC !important;
+  -webkit-text-fill-color: #FCE7AC !important;
+}
+
+html.light .hero-journey-section #hero-explore-journeys-btn:hover {
+  background-color: rgba(212, 175, 55, 0.25) !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+
+/* Destination Tilt Cards: Guarantee full, crystal-clear image visibility in Light Mode (no white fog/overlay) */
+html.light .destination-card-vignette,
+html.light .destination-tilt-card .destination-card-vignette,
+html.light .destination-tilt-card [class*="bg-gradient-to-t"],
+html.light .destination-tilt-card div[class*="from-"] {
+  display: none !important;
+  background-image: none !important;
+  opacity: 0 !important;
+}
+
+html.light .destination-tilt-card {
+  box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(184, 134, 11, 0.25) !important;
+  background-color: #FFFFFF !important;
+}
+
+
+
+

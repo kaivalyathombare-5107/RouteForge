@@ -586,7 +586,7 @@ export default function App() {
   const selectedBooking = trip.bookings.find((b) => b.id === selectedBookingId) || null;
 
   return (
-    <div className="min-h-screen bg-[#08090C] text-[#F3EFE6] relative overflow-x-hidden font-sans-luxury selection:bg-[#D4AF37]/30 selection:text-[#FCE7AC]">
+    <div className="min-h-screen bg-[#08090C] text-[#F3EFE6] relative overflow-x-hidden font-sans-luxury selection:bg-[#D4AF37]/30 selection:text-[#FCE7AC] transition-colors duration-300">
       {/* Loading Screen */}
       {loading && (
         <div className="fixed inset-0 z-[9999] bg-[#08090C] flex items-center justify-center">
@@ -691,8 +691,8 @@ export default function App() {
           </div>
         )}
 
-        {/* AUTHENTICATION GATE: SHOW SIGN IN PAGE IF USER TRIES TO ACCESS ANY SECTION WITHOUT SIGNING IN */}
-        {!loading && !user && activeSection !== 'destinations' && (
+        {/* AUTHENTICATION GATE: SHOW SIGN IN PAGE IF USER TRIES TO ACCESS RESTRICTED SECTIONS WITHOUT SIGNING IN */}
+        {!loading && !user && activeSection !== 'destinations' && activeSection !== 'journeys' && (
           <SignInSection
             targetSection={activeSection}
             onNavigateBack={() => setActiveSection('destinations')}
@@ -704,8 +704,8 @@ export default function App() {
           />
         )}
 
-        {/* PROTECTED SECTIONS: RENDERED ONLY FOR AUTHENTICATED USERS */}
-        {!loading && user && (
+        {/* APPLICATION SECTIONS: RENDERED FOR AUTHENTICATED USERS (OR PUBLIC JOURNEYS) */}
+        {!loading && (user || activeSection === 'journeys') && (
           <>
             {/* If user is signed in and on signin route, show welcome concierge summary */}
             {activeSection === 'signin' && (

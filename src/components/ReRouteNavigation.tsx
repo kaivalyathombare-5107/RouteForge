@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { User, Compass, Layers, ShieldAlert, Menu, X, Languages, Sparkles } from 'lucide-react';
+import { User, Compass, Layers, ShieldAlert, Menu, X, Languages, Sparkles, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 export type ReRouteSection = 'destinations' | 'journeys' | 'emergency' | 'concierge' | 'translator' | 'membership' | 'recovery' | 'signin';
 
@@ -22,6 +23,7 @@ export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const menuRef = useRef<HTMLElement>(null);
+  const { theme, toggleTheme, isDark } = useTheme();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -73,6 +75,21 @@ export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
           <span className="text-base sm:text-lg leading-none select-none" role="img" aria-label="Emergency">
             🚨
           </span>
+        </button>
+
+        {/* Theme Toggle Button (Light/Dark Mode) */}
+        <button
+          id="header-theme-toggle-btn"
+          onClick={toggleTheme}
+          aria-label={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-gold-subtle/60 bg-[#0A0C14]/90 hover:bg-[#121520] text-[#D4AF37] hover:text-[#FCE7AC] transition-all cursor-pointer shadow-md shrink-0 active:scale-95"
+        >
+          {isDark ? (
+            <Sun className="w-4 h-4 text-[#FCE7AC] transition-transform hover:rotate-45" />
+          ) : (
+            <Moon className="w-4 h-4 text-[#8C6B1B] transition-transform hover:-rotate-12" />
+          )}
         </button>
 
         {/* Account Tab */}
@@ -207,6 +224,22 @@ export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
                   <Languages className="w-3.5 h-3.5 text-[#D4AF37]" />
                   <span>Live Translator</span>
                 </button>
+
+                {/* Theme Switch in Dropdown */}
+                <div className="pt-1 mt-1 border-t border-gold-subtle/30">
+                  <button
+                    onClick={() => {
+                      toggleTheme();
+                    }}
+                    className="w-full text-left px-4 py-2.5 rounded-xl text-xs font-cinzel font-semibold tracking-wider transition-all flex items-center justify-between text-slate-300 hover:bg-slate-900 hover:text-white cursor-pointer"
+                  >
+                    <span className="flex items-center space-x-2">
+                      {isDark ? <Sun className="w-3.5 h-3.5 text-[#FCE7AC]" /> : <Moon className="w-3.5 h-3.5 text-[#8C6B1B]" />}
+                      <span>{isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}</span>
+                    </span>
+                    <span className="text-[10px] font-mono text-[#D4AF37] uppercase">{theme}</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>

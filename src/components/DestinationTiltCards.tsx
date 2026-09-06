@@ -253,7 +253,7 @@ const SingleDestinationCard: React.FC<{
         transform: `perspective(900px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
         transition: tilt.x === 0 ? 'transform 0.4s ease-out' : 'none',
       }}
-      className={`relative min-h-[14rem] sm:min-h-[16rem] h-auto rounded-2xl overflow-hidden cursor-pointer group shadow-2xl transition-all select-none border flex flex-col justify-between ${
+      className={`destination-tilt-card relative min-h-[14rem] sm:min-h-[16rem] h-auto rounded-2xl overflow-hidden cursor-pointer group shadow-2xl transition-all select-none border flex flex-col justify-between ${
         isSelected
           ? 'border-gold-bright ring-1 ring-[#D4AF37]/50 shadow-gold-glow scale-[1.02]'
           : 'border-gold-subtle hover:border-[#D4AF37]/60'
@@ -267,8 +267,8 @@ const SingleDestinationCard: React.FC<{
         className="absolute inset-0 w-full h-full object-cover object-center transform group-hover:scale-110 transition-transform duration-700 ease-out"
       />
 
-      {/* Dark Vignette Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#08090C] via-[#08090C]/30 to-transparent" />
+      {/* Subtle Bottom Vignette (dark mode only; stripped in light mode so full photo is 100% visible) */}
+      <div className="destination-card-vignette absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
 
       {/* Dynamic Metallic Glare Layer */}
       <div

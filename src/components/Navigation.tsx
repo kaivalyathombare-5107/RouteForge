@@ -1,5 +1,6 @@
 import React from 'react';
-import { Plane, AlertTriangle, ShieldCheck, Cpu, Bot, RotateCcw, Zap, Volume2, VolumeX, Eye, Compass, Sparkles, Building } from 'lucide-react';
+import { Plane, AlertTriangle, ShieldCheck, Cpu, Bot, RotateCcw, Zap, Volume2, VolumeX, Eye, Compass, Sparkles, Building, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 export type ActiveTab = 'command_center' | 'panoramic_suites' | 'disruption_cascade' | 'recovery_planner' | 'refund_intelligence' | 'provider_architecture' | 'ai_assistant';
 
@@ -28,6 +29,8 @@ export const Navigation: React.FC<NavigationProps> = ({
   setReducedMotion,
   currentIstTime,
 }) => {
+  const { toggleTheme, isDark } = useTheme();
+
   return (
     <header className="sticky top-0 z-40 w-full bg-[#08090C]/90 backdrop-blur-xl border-b border-gold-subtle px-4 lg:px-8 py-2.5 transition-all">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
@@ -200,6 +203,16 @@ export const Navigation: React.FC<NavigationProps> = ({
               title={reducedMotion ? 'Reduced Motion: Active (a11y)' : 'Dynamic Animations: Active'}
             >
               <Eye className="w-3.5 h-3.5" />
+            </button>
+
+            <button
+              id="telemetry-theme-toggle-btn"
+              onClick={toggleTheme}
+              className="p-1.5 rounded-lg transition-colors cursor-pointer text-[#D4AF37] hover:text-[#FCE7AC]"
+              title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
             </button>
           </div>
         </div>
