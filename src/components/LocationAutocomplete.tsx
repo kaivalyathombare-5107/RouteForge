@@ -453,7 +453,7 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
         key={cardKey}
         id={`suggestion-${id}-${loc.id}${uniqueKeySuffix !== undefined ? `-${uniqueKeySuffix}` : ''}`}
         onClick={() => handleSelect(loc)}
-        className={`group flex items-center justify-between p-2.5 rounded-xl border transition-all cursor-pointer ${
+        className={`group flex items-center justify-between p-2.5 rounded-xl border transition-all cursor-pointer min-h-[48px] h-auto ${
           isCurrent
             ? 'bg-[#D4AF37]/20 border-[#D4AF37]/60 shadow-md'
             : matchMeta
@@ -461,9 +461,9 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
             : 'bg-slate-950/40 border-slate-900/80 hover:border-gold-subtle hover:bg-slate-900/80'
         }`}
       >
-        <div className="flex items-center space-x-3 min-w-0">
+        <div className="flex items-center space-x-3 min-w-0 flex-1">
           {/* Icon & Code Badge */}
-          <div className="flex items-center space-x-1.5 bg-slate-900 px-2 py-1 rounded-lg border border-slate-800 group-hover:border-[#D4AF37]/50 flex-shrink-0">
+          <div className="flex items-center space-x-1.5 bg-slate-900 px-2 py-1 rounded-lg border border-slate-800 group-hover:border-[#D4AF37]/50 shrink-0">
             {getItemIcon(loc.type)}
             <span className="font-mono text-[11px] font-bold text-[#FCE7AC]">
               {loc.code}
@@ -471,17 +471,17 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
           </div>
 
           {/* City, State, Country & Tier/Zone/Match tags */}
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <div className="flex items-center flex-wrap gap-1.5">
-              <span className="text-xs font-semibold text-slate-100 group-hover:text-white truncate">
+              <span className="text-xs font-semibold text-slate-100 group-hover:text-white break-words">
                 {loc.city}
               </span>
               {loc.state && (
-                <span className="text-[10px] font-sans text-slate-400 truncate">
+                <span className="text-[10px] font-sans text-slate-400 break-words">
                   {loc.state},
                 </span>
               )}
-              <span className="text-[10px] font-sans-luxury text-slate-300 truncate">
+              <span className="text-[10px] font-sans-luxury text-slate-300 break-words">
                 {loc.country}
               </span>
 

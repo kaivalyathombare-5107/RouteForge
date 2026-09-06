@@ -40,19 +40,19 @@ export const ValuePropositionBar: React.FC<ValuePropositionBarProps> = ({ onSele
           <div
             key={item.id}
             onClick={() => onSelectFeature?.(item.id)}
-            className={`flex items-center space-x-3.5 px-3 py-2 cursor-pointer group hover:bg-[#D4AF37]/5 rounded-xl transition-colors ${
+            className={`flex items-center space-x-3.5 px-3 py-2.5 cursor-pointer group hover:bg-[#D4AF37]/5 rounded-xl transition-colors h-auto min-h-[64px] ${
               idx > 0 ? 'sm:pl-5' : ''
             }`}
           >
-            <div className="w-9 h-9 rounded-full border border-gold-subtle bg-slate-950/80 flex items-center justify-center text-[#D4AF37] group-hover:border-[#D4AF37] group-hover:scale-105 transition-all shadow-sm">
+            <div className="w-9 h-9 rounded-full border border-gold-subtle bg-slate-950/80 flex items-center justify-center text-[#D4AF37] group-hover:border-[#D4AF37] group-hover:scale-105 transition-all shadow-sm shrink-0">
               {item.icon}
             </div>
 
-            <div className="flex flex-col">
-              <span className="text-[11px] font-cinzel font-semibold tracking-wider text-[#FCE7AC] group-hover:text-white transition-colors">
+            <div className="flex flex-col min-w-0 flex-1">
+              <span className="text-[11px] font-cinzel font-semibold tracking-wider text-[#FCE7AC] group-hover:text-white transition-colors break-words">
                 {item.title}
               </span>
-              <span className="text-xs font-sans-luxury text-slate-400 font-light">
+              <span className="text-xs font-sans-luxury text-slate-400 font-light break-words">
                 {item.subtitle}
               </span>
             </div>

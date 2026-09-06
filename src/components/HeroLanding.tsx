@@ -196,24 +196,24 @@ export const HeroLanding: React.FC<HeroLandingProps> = ({
             key={i}
             maxTilt={12}
             highlightColor="rgba(212, 175, 55, 0.2)"
-            className={`p-5 rounded-2xl border ${dest.border} bg-gradient-to-b ${dest.bgGradient} backdrop-blur-xl shadow-xl flex flex-col justify-between space-y-4`}
+            className={`p-5 rounded-2xl border ${dest.border} bg-gradient-to-b ${dest.bgGradient} backdrop-blur-xl shadow-xl flex flex-col justify-between space-y-4 min-h-[220px] h-auto`}
           >
-            <div>
-              <div className="flex items-center justify-between text-xs font-cinzel mb-2">
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-xs font-cinzel mb-2 flex-wrap gap-1">
                 <span className="text-[#D4AF37] font-semibold">{dest.tag}</span>
                 <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-slate-950 text-slate-400 border border-gold-subtle">
                   {dest.status}
                 </span>
               </div>
-              <h3 className="text-xl font-serif-display font-bold text-white leading-snug">
+              <h3 className="text-lg sm:text-xl font-serif-display font-bold text-white leading-snug break-words">
                 {dest.title}
               </h3>
-              <p className="text-xs font-sans-luxury text-slate-400 mt-1">
+              <p className="text-xs font-sans-luxury text-slate-400 mt-1 break-words">
                 {dest.subtitle}
               </p>
             </div>
 
-            <div className="pt-3 border-t border-gold-subtle flex items-center justify-between text-xs font-mono">
+            <div className="pt-3 border-t border-gold-subtle flex items-center justify-between text-xs font-mono flex-wrap gap-2">
               <div className="flex items-center space-x-1.5 text-[#F3E5AB]">
                 <Clock className="w-3.5 h-3.5 text-[#D4AF37]" />
                 <span>{dest.time}</span>

@@ -1,5 +1,41 @@
 @import "tailwindcss";
 
+/* =========================================================================
+   UNIVERSAL BOX & LETTER CONTAINMENT (PREVENTS ANY LETTER LYING OUTSIDE BOXES)
+   ========================================================================= */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Ensure letters and words wrap properly and never spill or lie outside their containing boxes */
+p, span, h1, h2, h3, h4, h5, h6, a, button, label, input, textarea, div, strong, em, b, i {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* Containers expand height so all content comfortably fits without clipping */
+.card, [class*="rounded-"], [class*="border-"], [class*="bg-"] {
+  overflow-wrap: break-word;
+}
+
+/* Ensure buttons, badges and pills allow height expansion to fit all textual content */
+button, [role="button"] {
+  height: auto;
+  min-height: fit-content;
+}
+
+/* Auto-expanding box utilities across website */
+.auto-expand-box {
+  height: auto !important;
+  min-height: fit-content;
+}
+
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -139,5 +175,36 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #D4AF37;
+}
+
+/* Luxury Floating Assistant entrance pulse & shimmer animation (2.8s on starting browser) */
+@keyframes conciergeEntranceAnimation {
+  0% {
+    transform: scale(0.6) translateY(24px);
+    opacity: 0;
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.9);
+  }
+  25% {
+    transform: scale(1.22) translateY(-6px);
+    opacity: 1;
+    box-shadow: 0 0 45px 14px rgba(212, 175, 55, 0.7);
+  }
+  50% {
+    transform: scale(0.94) translateY(0);
+    box-shadow: 0 0 25px 4px rgba(212, 175, 55, 0.5);
+  }
+  75% {
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 0 35px 8px rgba(212, 175, 55, 0.65);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.35);
+  }
+}
+
+.animate-concierge-entrance {
+  animation: conciergeEntranceAnimation 2.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 

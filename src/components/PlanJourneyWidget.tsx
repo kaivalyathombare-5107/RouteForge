@@ -87,18 +87,18 @@ export const PlanJourneyWidget: React.FC<PlanJourneyWidgetProps> = ({
   };
 
   return (
-    <div id="plan-your-journey" className="rounded-2xl bg-[#0B0D13]/90 backdrop-blur-2xl border border-gold-subtle p-6 shadow-2xl space-y-4 w-full">
+    <div id="plan-your-journey" className="rounded-2xl bg-[#0B0D13]/90 backdrop-blur-2xl border border-gold-subtle p-5 sm:p-6 shadow-2xl space-y-4 w-full h-auto min-h-fit">
       {/* Card Header Title */}
-      <div className="flex items-center justify-between pb-1 border-b border-gold-subtle/50">
-        <div className="flex flex-col">
-          <h2 className="font-cinzel text-xs sm:text-sm font-bold tracking-[0.25em] text-[#FCE7AC]">
+      <div className="flex items-center justify-between pb-1 border-b border-gold-subtle/50 gap-2">
+        <div className="flex flex-col min-w-0 flex-1">
+          <h2 className="font-cinzel text-xs sm:text-sm font-bold tracking-[0.18em] sm:tracking-[0.25em] text-[#FCE7AC] break-words">
             PLAN YOUR JOURNEY
           </h2>
-          <span className="text-[9px] font-sans-luxury text-slate-400">
+          <span className="text-[9px] font-sans-luxury text-slate-400 break-words">
             Curated for Indian Families, Executives & VIPs
           </span>
         </div>
-        <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
+        <Sparkles className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
       </div>
 
       {/* City Origin and Destination Input Rows with Location Suggestions and Swap Icon */}
@@ -216,10 +216,10 @@ export const PlanJourneyWidget: React.FC<PlanJourneyWidgetProps> = ({
         <button
           type="button"
           onClick={handleSearchClick}
-          className="w-full py-3 rounded-xl gold-gradient-bar hover:opacity-95 text-slate-950 font-cinzel text-xs font-bold tracking-[0.25em] transition-all flex items-center justify-center space-x-2 cursor-pointer shadow-lg shadow-[#D4AF37]/25 hover:shadow-[#D4AF37]/40"
+          className="w-full py-3 px-4 rounded-xl gold-gradient-bar hover:opacity-95 text-slate-950 font-cinzel text-xs font-bold tracking-[0.18em] sm:tracking-[0.25em] transition-all flex items-center justify-center space-x-2 cursor-pointer shadow-lg shadow-[#D4AF37]/25 hover:shadow-[#D4AF37]/40 h-auto min-h-[44px]"
         >
-          <span>SEARCH JOURNEYS</span>
-          <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+          <span className="break-words">SEARCH JOURNEYS</span>
+          <ArrowRight className="w-3.5 h-3.5 stroke-[2.5] shrink-0" />
         </button>
       </div>
     </div>

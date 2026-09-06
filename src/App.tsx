@@ -57,9 +57,10 @@ import { ActionConfirmationModal } from './components/ActionConfirmationModal';
 import { ReportMidJourneyProblemModal } from './components/ReportMidJourneyProblemModal';
 import { EmergencySection } from './components/EmergencySection';
 import { LiveTranslatorSection } from './components/LiveTranslatorSection';
+import { SignInSection } from './components/SignInSection';
 
 import { PlanJourneyWidget } from './components/PlanJourneyWidget';
-import { Sparkles, Shield, AlertCircle, ArrowDown } from 'lucide-react';
+import { Sparkles, Shield, AlertCircle, ArrowDown, Crown } from 'lucide-react';
 
 export default function App() {
   const readStored = <T,>(key: string, fallback: T): T => {
@@ -604,7 +605,7 @@ export default function App() {
           playSound('click', soundEnabled);
           setActiveSection(sec);
         }}
-        onOpenSignIn={() => setIsSignInOpen(true)}
+        onOpenSignIn={() => setActiveSection('signin')}
         onOpenProviders={() => setIsProviderConnectionOpen(true)}
         onOpenAccount={() => setIsAccountDetailsOpen(true)}
         user={user}
@@ -617,7 +618,7 @@ export default function App() {
           playSound('click', soundEnabled);
           setActiveCategory(cat);
           if (cat === 'stays') setIsFullPanoramaOpen(true);
-          if (cat === 'vip_services') setIsSignInOpen(true);
+          if (cat === 'vip_services') setActiveSection('signin');
           if (cat === 'flights' || cat === 'trains') {
             setSearchParams({
               origin: 'JFK New York',
@@ -678,7 +679,7 @@ export default function App() {
             <ValuePropositionBar
               onSelectFeature={(feat) => {
                 if (feat === 'concierge') setActiveSection('concierge');
-                if (feat === 'vip') setIsSignInOpen(true);
+                if (feat === 'vip') setActiveSection('signin');
                 if (feat === 'seamless') setActiveSection('journeys');
                 if (feat === 'guarantee') setActiveSection('journeys');
               }}
@@ -686,8 +687,68 @@ export default function App() {
           </div>
         )}
 
-        {/* SECTION 2: JOURNEYS & 2D SPATIAL CORRIDORS */}
-        {activeSection === 'journeys' && (
+        {/* AUTHENTICATION LOADING STATE (FOR PROTECTED SECTIONS) */}
+        {loading && activeSection !== 'destinations' && (
+          <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-4 py-16 animate-fadeIn">
+            <div className="w-12 h-12 rounded-full border-2 border-[#D4AF37]/30 border-t-[#D4AF37] animate-spin shadow-lg shadow-[#D4AF37]/10" />
+            <div className="space-y-1 text-center">
+              <span className="text-xs font-cinzel tracking-[0.25em] text-[#D4AF37] font-semibold">
+                VERIFYING ROUTEFORGE PRIVÉ CREDENTIALS
+              </span>
+              <p className="text-[11px] text-slate-400 font-sans-luxury">
+                Connecting to secure Swiss vault...
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* AUTHENTICATION GATE: SHOW SIGN IN PAGE IF USER TRIES TO ACCESS ANY SECTION WITHOUT SIGNING IN */}
+        {!loading && !user && activeSection !== 'destinations' && (
+          <SignInSection
+            targetSection={activeSection}
+            onNavigateBack={() => setActiveSection('destinations')}
+            onSignInSuccess={() => {
+              if (activeSection === 'signin') {
+                setActiveSection('recovery');
+              }
+            }}
+          />
+        )}
+
+        {/* PROTECTED SECTIONS: RENDERED ONLY FOR AUTHENTICATED USERS */}
+        {!loading && user && (
+          <>
+            {/* If user is signed in and on signin route, show welcome concierge summary */}
+            {activeSection === 'signin' && (
+              <div className="space-y-6 max-w-2xl mx-auto py-12 text-center animate-fadeIn">
+                <div className="w-16 h-16 mx-auto rounded-full bg-[#D4AF37]/10 border border-[#D4AF37] flex items-center justify-center text-[#D4AF37]">
+                  <Crown className="w-8 h-8" />
+                </div>
+                <h2 className="text-3xl font-serif-display text-white">
+                  Welcome, {user.displayName || 'Distinguished Member'}
+                </h2>
+                <p className="text-sm text-slate-300 font-sans-luxury">
+                  Your RouteForge Privé session is verified and active.
+                </p>
+                <div className="flex justify-center gap-4 pt-4">
+                  <button
+                    onClick={() => setActiveSection('recovery')}
+                    className="px-6 py-3 rounded-full gold-gradient-bar text-slate-950 font-cinzel text-xs font-bold tracking-widest cursor-pointer shadow-lg"
+                  >
+                    GO TO RECOVERY PLANS
+                  </button>
+                  <button
+                    onClick={() => setActiveSection('concierge')}
+                    className="px-6 py-3 rounded-full bg-slate-900 border border-gold-subtle text-slate-200 hover:text-white font-cinzel text-xs font-bold tracking-widest cursor-pointer"
+                  >
+                    DISRUPTION SHIELD
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* SECTION 2: JOURNEYS & 2D SPATIAL CORRIDORS */}
+            {activeSection === 'journeys' && (
           <div className="space-y-8 animate-fadeIn">
             <div className="flex items-center justify-between border-b border-gold-subtle pb-4">
               <div>
@@ -1154,6 +1215,8 @@ export default function App() {
               </div>
             </div>
           </div>
+        )}
+          </>
         )}
       </main>
 

@@ -253,7 +253,7 @@ const SingleDestinationCard: React.FC<{
         transform: `perspective(900px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
         transition: tilt.x === 0 ? 'transform 0.4s ease-out' : 'none',
       }}
-      className={`relative h-56 sm:h-64 rounded-2xl overflow-hidden cursor-pointer group shadow-2xl transition-all select-none border ${
+      className={`relative min-h-[14rem] sm:min-h-[16rem] h-auto rounded-2xl overflow-hidden cursor-pointer group shadow-2xl transition-all select-none border flex flex-col justify-between ${
         isSelected
           ? 'border-gold-bright ring-1 ring-[#D4AF37]/50 shadow-gold-glow scale-[1.02]'
           : 'border-gold-subtle hover:border-[#D4AF37]/60'
@@ -279,12 +279,12 @@ const SingleDestinationCard: React.FC<{
       />
 
       {/* Card Header & Country Tag in Structured Glass Box */}
-      <div className="relative z-10 p-3 sm:p-3.5 h-full flex flex-col justify-start">
-        <div className="p-2.5 rounded-xl bg-slate-950/80 backdrop-blur-md border border-gold-subtle/60 shadow-lg space-y-0.5">
-          <h3 className="font-serif-display font-medium text-base sm:text-lg text-white tracking-wide leading-tight group-hover:text-[#F3E5AB] transition-colors">
+      <div className="relative z-10 p-3 sm:p-3.5 w-full flex flex-col justify-start">
+        <div className="p-2.5 rounded-xl bg-slate-950/85 backdrop-blur-md border border-gold-subtle/60 shadow-lg space-y-0.5 w-full">
+          <h3 className="font-serif-display font-medium text-base sm:text-lg text-white tracking-wide leading-tight group-hover:text-[#F3E5AB] transition-colors break-words">
             {dest.name}
           </h3>
-          <span className="text-[9px] font-cinzel font-semibold tracking-[0.2em] text-slate-300 block truncate">
+          <span className="text-[9px] font-cinzel font-semibold tracking-[0.16em] sm:tracking-[0.2em] text-slate-300 block break-words">
             {dest.country}
           </span>
         </div>

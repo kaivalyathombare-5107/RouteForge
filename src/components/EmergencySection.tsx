@@ -151,22 +151,22 @@ export const EmergencySection: React.FC<EmergencySectionProps> = ({
   return (
     <div id="emergency-section" className="space-y-12 animate-fadeIn w-full">
       {/* Top Banner: Global Emergency Intelligence & Rapid SOS */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#120708] via-[#0C0E14] to-[#08090C] border-2 border-red-500/40 backdrop-blur-xl shadow-2xl relative overflow-hidden">
+      <div className="p-5 sm:p-8 rounded-3xl bg-gradient-to-br from-[#120708] via-[#0C0E14] to-[#08090C] border-2 border-red-500/40 backdrop-blur-xl shadow-2xl relative overflow-hidden h-auto min-h-fit">
         {/* Subtle background emergency beacon glow */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
 
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
-          <div className="space-y-2">
+          <div className="space-y-2 min-w-0 flex-1">
             <div className="flex items-center space-x-2.5">
-              <span className="w-3 h-3 rounded-full bg-red-500 animate-ping" />
-              <span className="text-[11px] font-cinzel font-bold tracking-[0.25em] text-red-400 uppercase">
+              <span className="w-3 h-3 rounded-full bg-red-500 animate-ping shrink-0" />
+              <span className="text-[10px] sm:text-[11px] font-cinzel font-bold tracking-[0.16em] sm:tracking-[0.25em] text-red-400 uppercase break-words">
                 GLOBAL EMERGENCY DIRECTORY & INSTANT DIALER
               </span>
             </div>
-            <h1 className="font-serif-display text-3xl sm:text-4xl lg:text-5xl text-white">
+            <h1 className="font-serif-display text-2xl sm:text-4xl lg:text-5xl text-white break-words">
               Emergency Contacts & Official Assistance
             </h1>
-            <p className="text-xs sm:text-sm font-sans-luxury text-slate-300 font-light max-w-3xl leading-relaxed">
+            <p className="text-xs sm:text-sm font-sans-luxury text-slate-300 font-light max-w-3xl leading-relaxed break-words">
               Official verified emergency dispatch hotlines, tourist police helplines, disaster management portals, and consular services across all countries.
               <strong className="text-[#FCE7AC] font-medium ml-1">
                 Tapping any phone number automatically opens your mobile phone dialpad prefilled with the number.
@@ -175,12 +175,12 @@ export const EmergencySection: React.FC<EmergencySectionProps> = ({
           </div>
 
           {/* Quick SOS Card for the active country */}
-          <div className="p-5 rounded-2xl bg-black/60 border border-red-500/50 flex flex-col items-center justify-center text-center space-y-3 min-w-[260px] shadow-lg shadow-red-950/40">
+          <div className="p-4 sm:p-5 rounded-2xl bg-black/60 border border-red-500/50 flex flex-col items-center justify-center text-center space-y-3 min-w-[240px] sm:min-w-[260px] max-w-full shadow-lg shadow-red-950/40 h-auto min-h-fit">
             <div className="flex items-center space-x-2">
-              <span className="text-2xl">{activeCountry.flag}</span>
-              <div className="text-left">
+              <span className="text-2xl shrink-0">{activeCountry.flag}</span>
+              <div className="text-left min-w-0">
                 <div className="text-[10px] font-cinzel text-slate-400 tracking-wider">SELECTED NATION</div>
-                <div className="text-sm font-bold text-white">{activeCountry.name}</div>
+                <div className="text-sm font-bold text-white break-words">{activeCountry.name}</div>
               </div>
             </div>
 
@@ -188,14 +188,14 @@ export const EmergencySection: React.FC<EmergencySectionProps> = ({
             <a
               id="rapid-universal-sos-btn"
               href={`tel:${activeCountry.universalSos.replace(/[^0-9+]/g, '')}`}
-              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-cinzel text-xs font-bold tracking-widest flex items-center justify-center space-x-2 shadow-lg shadow-red-600/30 transition-all cursor-pointer transform active:scale-95"
+              className="w-full py-3 px-3 sm:px-4 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-cinzel text-xs font-bold tracking-wider sm:tracking-widest flex items-center justify-center space-x-2 shadow-lg shadow-red-600/30 transition-all cursor-pointer transform active:scale-95 h-auto min-h-[44px]"
               title={`Call Universal SOS ${activeCountry.universalSos} in ${activeCountry.name}`}
             >
-              <PhoneCall className="w-4 h-4 animate-bounce" />
-              <span>TAP TO CALL SOS: {activeCountry.universalSos}</span>
+              <PhoneCall className="w-4 h-4 animate-bounce shrink-0" />
+              <span className="break-words">TAP TO CALL SOS: {activeCountry.universalSos}</span>
             </a>
 
-            <span className="text-[10px] text-slate-400 font-mono">
+            <span className="text-[10px] text-slate-400 font-mono break-words">
               Redirects to native mobile dialpad with {activeCountry.universalSos} prefilled
             </span>
           </div>
@@ -369,58 +369,58 @@ export const EmergencySection: React.FC<EmergencySectionProps> = ({
               return (
                 <div
                   key={idx}
-                  className={`p-4 rounded-2xl border flex flex-col justify-between space-y-3 transition-all ${
+                  className={`p-4 rounded-2xl border flex flex-col justify-between space-y-3 transition-all min-h-[160px] h-auto ${
                     contact.isPrimary
                       ? 'bg-gradient-to-br from-red-950/40 via-[#0B0E14] to-[#0A0D13] border-red-500/50 shadow-md shadow-red-950/30'
                       : 'bg-[#090B10] border-gold-subtle/30 hover:border-gold-subtle hover:bg-slate-900/50'
                   }`}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-2.5">
-                      <div className="p-2 rounded-xl bg-black/50 border border-slate-800">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center space-x-2.5 min-w-0 flex-1">
+                      <div className="p-2 rounded-xl bg-black/50 border border-slate-800 shrink-0">
                         {getContactIcon(contact.type)}
                       </div>
-                      <div>
-                        <h4 className="text-sm font-bold text-white leading-tight">
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-sm font-bold text-white leading-tight break-words">
                           {contact.label}
                         </h4>
-                        <span className="text-[10px] font-mono text-slate-400 uppercase">
+                        <span className="text-[10px] font-mono text-slate-400 uppercase break-words">
                           {contact.type.toUpperCase()}
                         </span>
                       </div>
                     </div>
 
                     {contact.isPrimary && (
-                      <span className="px-2 py-0.5 rounded-full text-[9px] font-cinzel font-bold bg-red-600/30 text-red-300 border border-red-500/40">
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-cinzel font-bold bg-red-600/30 text-red-300 border border-red-500/40 shrink-0 whitespace-nowrap">
                         PRIMARY SOS
                       </span>
                     )}
                   </div>
 
-                  <p className="text-xs text-slate-400 font-sans-luxury leading-relaxed flex-grow">
+                  <p className="text-xs text-slate-400 font-sans-luxury leading-relaxed flex-grow break-words">
                     {contact.description}
                   </p>
 
-                  <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
+                  <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
                     {/* The Primary Interactive Call Button (Opens Dialpad on Mobile) */}
                     <a
                       id={`call-contact-${activeCountry.id}-${idx}`}
                       href={`tel:${sanitizedNumber}`}
-                      className={`flex-grow py-2.5 px-3 rounded-xl text-xs font-cinzel font-bold tracking-wider flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-md ${
+                      className={`flex-grow py-2.5 px-3 rounded-xl text-xs font-cinzel font-bold tracking-wider flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-md h-auto min-h-[40px] ${
                         contact.isPrimary
                           ? 'bg-red-600 hover:bg-red-500 text-white shadow-red-900/30'
                           : 'bg-slate-900 hover:bg-[#D4AF37] text-white hover:text-slate-950 border border-gold-subtle/50'
                       }`}
                       title={`Open phone dialpad with ${contact.number}`}
                     >
-                      <PhoneCall className="w-3.5 h-3.5" />
-                      <span>DIAL {contact.number}</span>
+                      <PhoneCall className="w-3.5 h-3.5 shrink-0" />
+                      <span className="break-words">DIAL {contact.number}</span>
                     </a>
 
                     {/* Copy button */}
                     <button
                       onClick={() => handleCopyNumber(contact.number)}
-                      className="p-2.5 rounded-xl bg-black/60 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                      className="p-2.5 rounded-xl bg-black/60 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer shrink-0 h-auto min-h-[40px]"
                       title="Copy phone number to clipboard"
                     >
                       {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -454,34 +454,34 @@ export const EmergencySection: React.FC<EmergencySectionProps> = ({
                 href={website.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-4 rounded-2xl bg-[#090B10] border border-gold-subtle/40 hover:border-[#D4AF37] hover:bg-slate-900/50 transition-all flex flex-col justify-between space-y-3 cursor-pointer group shadow-lg"
+                className="p-4 rounded-2xl bg-[#090B10] border border-gold-subtle/40 hover:border-[#D4AF37] hover:bg-slate-900/50 transition-all flex flex-col justify-between space-y-3 cursor-pointer group shadow-lg min-h-[140px] h-auto"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-2.5">
-                    <div className="p-2 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37]">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center space-x-2.5 min-w-0 flex-1">
+                    <div className="p-2 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] shrink-0">
                       <Building2 className="w-4 h-4" />
                     </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-white group-hover:text-[#FCE7AC] transition-colors leading-tight">
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-sm font-bold text-white group-hover:text-[#FCE7AC] transition-colors leading-tight break-words">
                         {website.name}
                       </h4>
-                      <span className="text-[10px] font-mono text-slate-500">
+                      <span className="text-[10px] font-mono text-slate-500 break-words">
                         {new URL(website.url).hostname}
                       </span>
                     </div>
                   </div>
-                  <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-[#D4AF37] transition-colors flex-shrink-0" />
+                  <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-[#D4AF37] transition-colors shrink-0" />
                 </div>
 
-                <p className="text-xs text-slate-400 font-sans-luxury leading-relaxed">
+                <p className="text-xs text-slate-400 font-sans-luxury leading-relaxed break-words">
                   {website.description}
                 </p>
 
-                <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
-                  <span className="text-[10px] font-cinzel text-slate-500 uppercase tracking-widest">
+                <div className="pt-2 border-t border-slate-800 flex items-center justify-between flex-wrap gap-1">
+                  <span className="text-[10px] font-cinzel text-slate-500 uppercase tracking-widest break-words">
                     VERIFIED OFFICIAL SERVICE
                   </span>
-                  <span className="text-[11px] text-[#D4AF37] font-cinzel font-semibold flex items-center space-x-1 group-hover:translate-x-1 transition-transform">
+                  <span className="text-[11px] text-[#D4AF37] font-cinzel font-semibold flex items-center space-x-1 group-hover:translate-x-1 transition-transform shrink-0">
                     <span>Visit Portal</span>
                     <ChevronRight className="w-3 h-3" />
                   </span>
@@ -538,7 +538,7 @@ export const EmergencySection: React.FC<EmergencySectionProps> = ({
                     setSelectedCountryId(c.id);
                     document.getElementById('country-details-spotlight')?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
+                  className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between space-y-3 min-h-[190px] h-auto ${
                     isSelected
                       ? 'bg-[#121520] border-[#D4AF37] ring-1 ring-[#D4AF37]/50 shadow-xl'
                       : 'bg-[#0A0C12] border-slate-800/80 hover:border-gold-subtle/60 hover:bg-slate-900/60'
@@ -551,8 +551,8 @@ export const EmergencySection: React.FC<EmergencySectionProps> = ({
                         {c.dialCode}
                       </span>
                     </div>
-                    <h4 className="text-base font-bold text-white">{c.name}</h4>
-                    <p className="text-[11px] text-slate-400 font-mono truncate">{c.nativeName}</p>
+                    <h4 className="text-base font-bold text-white break-words">{c.name}</h4>
+                    <p className="text-[11px] text-slate-400 font-mono break-words">{c.nativeName}</p>
                   </div>
 
                   <div className="space-y-2 pt-2 border-t border-slate-800">

@@ -57,11 +57,16 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 z-[60] flex h-14 w-14 items-center justify-center rounded-full border border-gold-bright bg-[#0B0D13] text-[#D4AF37] shadow-[0_0_30px_rgba(212,175,55,0.25)] transition-all hover:scale-105 hover:bg-[#D4AF37] hover:text-slate-950"
+        className="fixed bottom-5 right-5 sm:bottom-7 sm:right-7 z-[60] flex h-16 w-16 sm:h-[70px] sm:w-[70px] items-center justify-center rounded-full border-2 border-[#D4AF37] bg-[#0B0D13] text-[#D4AF37] shadow-[0_0_35px_rgba(212,175,55,0.35)] transition-all hover:scale-110 hover:bg-[#D4AF37] hover:text-slate-950 hover:shadow-[0_0_45px_rgba(212,175,55,0.55)] cursor-pointer animate-concierge-entrance"
         title="Open ReRoute Privé AI Concierge"
         aria-label="Open ReRoute Privé AI Concierge"
       >
-        <Bot className="h-6 w-6" />
+        <Bot className="h-7 w-7 sm:h-8 sm:w-8" />
+        {/* Subtle pulsing indicator ring */}
+        <span className="absolute -top-1 -right-1 flex h-4 w-4">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-4 w-4 bg-[#FCE7AC] border border-slate-900"></span>
+        </span>
       </button>
     );
   }
