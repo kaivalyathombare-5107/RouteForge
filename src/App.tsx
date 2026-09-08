@@ -640,7 +640,7 @@ export default function App() {
       {/* Main Content Viewport */}
       <main
         id="main-content"
-        className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 xl:pl-28 xl:pr-12 pt-24 pb-28 space-y-16 transition-all duration-300 relative z-10"
+        className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-8 pt-24 pb-28 space-y-16 transition-all duration-300 relative z-10"
       >
         {/* SECTION 1: DESTINATIONS & EDITORIAL PORTAL */}
         {activeSection === 'destinations' && (

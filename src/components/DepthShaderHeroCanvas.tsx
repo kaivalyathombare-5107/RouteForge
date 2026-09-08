@@ -48,6 +48,13 @@ export const DepthShaderHeroCanvas: React.FC<DepthShaderHeroCanvasProps> = ({
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.1;
 
+      renderer.domElement.style.width = '100%';
+      renderer.domElement.style.height = '100%';
+      renderer.domElement.style.display = 'block';
+      renderer.domElement.style.position = 'absolute';
+      renderer.domElement.style.left = '0';
+      renderer.domElement.style.top = '0';
+
       container.innerHTML = '';
       container.appendChild(renderer.domElement);
       rendererRef.current = renderer;
