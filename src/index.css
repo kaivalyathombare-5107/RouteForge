@@ -701,6 +701,64 @@ html.light .destination-tilt-card {
   background-color: #FFFFFF !important;
 }
 
+/* Header Navigation & Desktop Menu Bar in Light Mode */
+html.light #desktop-nav-menu-bar {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(184, 134, 11, 0.3) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light #desktop-nav-menu-bar button {
+  color: #374151 !important;
+}
+
+html.light #desktop-nav-menu-bar button:hover {
+  color: #111827 !important;
+  background-color: #F4F1EA !important;
+}
+
+html.light #desktop-nav-menu-bar button[class*="bg-[#D4AF37]"] {
+  background-color: rgba(212, 175, 55, 0.22) !important;
+  color: #785A14 !important;
+  border-color: rgba(184, 134, 11, 0.6) !important;
+}
+
+html.light #desktop-nav-menu-bar #menu-bar-theme-toggle-btn {
+  background-color: #F4F1EA !important;
+  border-color: rgba(184, 134, 11, 0.35) !important;
+  color: #1F2937 !important;
+}
+
+html.light #desktop-nav-menu-bar #menu-bar-theme-toggle-btn:hover {
+  background-color: #EAE5D9 !important;
+  border-color: rgba(184, 134, 11, 0.6) !important;
+}
+
+html.light #header-nav-menu div[class*="bg-[#090B10]"] {
+  background-color: #FFFFFF !important;
+  border-color: rgba(184, 134, 11, 0.28) !important;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15) !important;
+}
+
+html.light #header-nav-menu div[class*="bg-[#090B10]"] button {
+  color: #374151 !important;
+}
+
+html.light #header-nav-menu div[class*="bg-[#090B10]"] button:hover {
+  color: #111827 !important;
+  background-color: #F4F1EA !important;
+}
+
+html.light #header-nav-menu #menu-theme-toggle-btn {
+  background-color: #F8F6F0 !important;
+  border-color: rgba(184, 134, 11, 0.35) !important;
+}
+
+html.light #header-nav-menu #menu-theme-toggle-btn span {
+  color: #1F2937 !important;
+}
+
+
 
 
 

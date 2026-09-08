@@ -152,6 +152,16 @@ export const Navigation: React.FC<NavigationProps> = ({
             <Compass className="w-3.5 h-3.5 text-[#D4AF37]" />
             <span>Travel Concierge</span>
           </button>
+
+          <button
+            id="nav-tab-theme-toggle"
+            onClick={toggleTheme}
+            className="px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer text-slate-400 hover:text-slate-200 border border-gold-subtle/30 hover:border-gold-subtle"
+            title={isDark ? 'Switch to Bright Theme' : 'Switch to Dark Theme'}
+          >
+            {isDark ? <Sun className="w-3.5 h-3.5 text-[#FCE7AC]" /> : <Moon className="w-3.5 h-3.5 text-[#8C6B1B]" />}
+            <span>{isDark ? 'Bright' : 'Dark'}</span>
+          </button>
         </nav>
 
         {/* Right: Simulation Actions & Telemetry Controls */}
@@ -204,22 +214,20 @@ export const Navigation: React.FC<NavigationProps> = ({
             >
               <Eye className="w-3.5 h-3.5" />
             </button>
-
-            <button
-              id="telemetry-theme-toggle-btn"
-              onClick={toggleTheme}
-              className="p-1.5 rounded-lg transition-colors cursor-pointer text-[#D4AF37] hover:text-[#FCE7AC]"
-              title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            >
-              {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-            </button>
           </div>
         </div>
       </div>
 
       {/* Mobile Horizontal Subnav */}
       <div className="lg:hidden flex items-center overflow-x-auto space-x-2 pt-2 border-t border-gold-subtle mt-2 pb-1 no-scrollbar text-xs font-cinzel">
+        <button
+          id="mobile-nav-theme-toggle"
+          onClick={toggleTheme}
+          className="px-2.5 py-1 rounded-lg shrink-0 text-[#D4AF37] border border-gold-subtle/40 flex items-center space-x-1"
+        >
+          {isDark ? <Sun className="w-3 h-3 text-[#FCE7AC]" /> : <Moon className="w-3 h-3 text-[#8C6B1B]" />}
+          <span>{isDark ? 'Bright Mode' : 'Dark Mode'}</span>
+        </button>
         <button
           onClick={() => setActiveTab('command_center')}
           className={`px-2.5 py-1 rounded-lg shrink-0 ${activeTab === 'command_center' ? 'bg-[#D4AF37] text-slate-950 font-bold' : 'text-slate-400'}`}

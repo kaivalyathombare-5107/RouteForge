@@ -55,6 +55,94 @@ export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
         </div>
       </div>
 
+      {/* Luxury Desktop Menu Bar: Sections + Theme Change (Dark / Bright) */}
+      <nav
+        id="desktop-nav-menu-bar"
+        className="hidden lg:flex items-center space-x-1 bg-[#0B0D14]/85 p-1.5 rounded-full border border-gold-subtle/50 text-xs font-cinzel backdrop-blur-md shadow-lg"
+      >
+        <button
+          id="menu-bar-tab-destinations"
+          onClick={() => onSelectSection('destinations')}
+          className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
+            activeSection === 'destinations'
+              ? 'bg-[#D4AF37]/25 text-[#FCE7AC] border border-[#D4AF37]/50 font-bold shadow-sm'
+              : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+          }`}
+        >
+          Destinations
+        </button>
+        <button
+          id="menu-bar-tab-journeys"
+          onClick={() => onSelectSection('journeys')}
+          className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
+            activeSection === 'journeys'
+              ? 'bg-[#D4AF37]/25 text-[#FCE7AC] border border-[#D4AF37]/50 font-bold shadow-sm'
+              : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+          }`}
+        >
+          Journeys
+        </button>
+        <button
+          id="menu-bar-tab-concierge"
+          onClick={() => onSelectSection('concierge')}
+          className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
+            activeSection === 'concierge'
+              ? 'bg-[#D4AF37]/25 text-[#FCE7AC] border border-[#D4AF37]/50 font-bold shadow-sm'
+              : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+          }`}
+        >
+          Disruption Shield
+        </button>
+        <button
+          id="menu-bar-tab-recovery"
+          onClick={() => onSelectSection('recovery')}
+          className={`px-3.5 py-1.5 rounded-full transition-all flex items-center space-x-1.5 cursor-pointer ${
+            activeSection === 'recovery'
+              ? 'bg-[#D4AF37]/25 text-[#FCE7AC] border border-[#D4AF37]/50 font-bold shadow-sm'
+              : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+          }`}
+        >
+          <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
+          <span>Recovery Plans</span>
+        </button>
+        <button
+          id="menu-bar-tab-translator"
+          onClick={() => onSelectSection('translator')}
+          className={`px-3.5 py-1.5 rounded-full transition-all flex items-center space-x-1.5 cursor-pointer ${
+            activeSection === 'translator'
+              ? 'bg-[#D4AF37]/25 text-[#FCE7AC] border border-[#D4AF37]/50 font-bold shadow-sm'
+              : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+          }`}
+        >
+          <Languages className="w-3.5 h-3.5 text-[#D4AF37]" />
+          <span>Live Translator</span>
+        </button>
+
+        {/* Subtle Divider in Menu Bar */}
+        <div className="h-4 w-px bg-gold-subtle/40 mx-1.5" />
+
+        {/* Theme Change (Dark / Bright) on Menu Bar */}
+        <button
+          id="menu-bar-theme-toggle-btn"
+          onClick={toggleTheme}
+          aria-label={isDark ? "Switch to Bright Theme" : "Switch to Dark Theme"}
+          title={isDark ? "Switch to Bright Theme" : "Switch to Dark Theme"}
+          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-gold-subtle/50 bg-[#121522]/90 hover:bg-[#1A1F30] text-slate-200 hover:text-[#FCE7AC] transition-all cursor-pointer text-[11px] font-cinzel font-semibold shadow-inner"
+        >
+          {isDark ? (
+            <>
+              <Sun className="w-3.5 h-3.5 text-[#FCE7AC] transition-transform hover:rotate-45" />
+              <span className="text-[#FCE7AC]">BRIGHT</span>
+            </>
+          ) : (
+            <>
+              <Moon className="w-3.5 h-3.5 text-[#8C6B1B] transition-transform hover:-rotate-12" />
+              <span className="text-[#8C6B1B] font-bold">DARK</span>
+            </>
+          )}
+        </button>
+      </nav>
+
       {/* Header Actions: Emergency SOS Button + Account / Sign In + Menu */}
       <div className="flex items-center space-x-2 sm:space-x-3.5 shrink-0 ml-auto">
         {/* Emergency App Button in Header: In mobile view, shows ONLY the 🚨 Emoji */}
@@ -75,21 +163,6 @@ export const ReRouteNavigation: React.FC<ReRouteNavigationProps> = ({
           <span className="text-base sm:text-lg leading-none select-none" role="img" aria-label="Emergency">
             🚨
           </span>
-        </button>
-
-        {/* Theme Toggle Button (Light/Dark Mode) */}
-        <button
-          id="header-theme-toggle-btn"
-          onClick={toggleTheme}
-          aria-label={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-          title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-          className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-gold-subtle/60 bg-[#0A0C14]/90 hover:bg-[#121520] text-[#D4AF37] hover:text-[#FCE7AC] transition-all cursor-pointer shadow-md shrink-0 active:scale-95"
-        >
-          {isDark ? (
-            <Sun className="w-4 h-4 text-[#FCE7AC] transition-transform hover:rotate-45" />
-          ) : (
-            <Moon className="w-4 h-4 text-[#8C6B1B] transition-transform hover:-rotate-12" />
-          )}
         </button>
 
         {/* Account Tab */}

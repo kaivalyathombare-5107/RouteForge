@@ -151,9 +151,6 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
           <div>
             <div className="flex items-center space-x-2">
               <h2 className="text-xl font-bold font-serif-display text-white">ReRoute Privé Personal Concierge</h2>
-              <span className="text-[10px] font-cinzel font-semibold px-2.5 py-0.5 rounded-full bg-slate-950 text-[#D4AF37] border border-gold-subtle">
-                DEDICATED DESK
-              </span>
             </div>
             <p className="text-xs text-slate-300 font-sans-luxury font-light mt-0.5">
               Authoritative luxury travel stewardship grounded in local master concierges and royal hospitality standards.
